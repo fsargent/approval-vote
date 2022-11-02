@@ -1,4 +1,44 @@
-<script>import { base } from '$app/paths';</script>
+<script>
+  import VoteCounts from '../../../src/components/report_components/VoteCounts.svelte';
+import { base } from '$app/paths';
+
+
+
+let FargoApproves = {
+  "info": {
+    "name": "Prop D",
+    "date": "2020-11-03",
+    "jurisdictionPath": "us/mo/stl",
+    "electionPath": "2020/11",
+    "office": "Prop D",
+    "officeName": "Prop D",
+    "jurisdictionName": "St Louis, MO",
+    "electionName": "Prop D",
+    "website": "https://www.stlouis-mo.gov/government/departments/board-election-commissioners/documents/election-results/upload/Nov20-Final-Official-Summary.pdf",
+    "notes": ""
+  },
+  "ballotCount": 128202,
+  "candidates": [
+    {
+      "name": "No",
+      "votes": 87369,
+      "winner": true
+    },
+    {
+      "name": "Yes",
+      "votes": 40833	,
+      "winner": false
+    }
+  ],
+  "winners": [0],
+  "numberOfWinners": 1,
+  "condorcet": 0,
+  "numCandidates": 2
+}
+
+
+
+</script>
 
 <title>About approval.vote</title>
 
@@ -15,6 +55,12 @@
   made available by election boards in specialized file formats and requires
   processing to interpret. The purpose of approval.vote is to increase transparency into these
   elections by creating detailed and intuitive reports about them.
+</p>
+
+<p>
+  Approval voting is a voting system that allows voters to vote for as many
+  candidates as they like. It is a simple and intuitive system that
+  produces results that are easy to understand and verify.
 </p>
 
 <p>
@@ -44,4 +90,5 @@
   visualizations, was created with <a href="https://svelte.dev/">Svelte</a>, and is hosted on <a href="https://github.com/electionscience/approval-vote">Github Pages</a>.
   The font is <a href="https://github.com/adobe-fonts/source-sans-pro">Source Sans Pro</a>.
 </p>
+
 </div>

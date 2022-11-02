@@ -8,7 +8,8 @@
     "officeName": "Mayor",
     "jurisdictionName": "St Louis, MO",
     "electionName": "Mayor",
-    "website": "https://www.stlouis-mo.gov/government/departments/board-election-commissioners/documents/election-results/upload/Mar21-Final-Official-Summary.pdf"
+    "website": "https://www.stlouis-mo.gov/government/departments/board-election-commissioners/documents/election-results/upload/Mar21-Final-Official-Summary.pdf",
+    "notes": "St Louis, MO uses a Open Approval Primary with a top two runoff in the General. Tishaura Jones won the runoff."
   },
   "ballotCount": 44571,
   "candidates": [
