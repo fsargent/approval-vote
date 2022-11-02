@@ -15,9 +15,9 @@
       detailed reports on approval voting elections.
     </div>
     <p>
-      Approval voting elections produce more data on voter preferences than
-      pick-one elections. <strong>approval.vote</strong> runs analysis on the
-      ballot-level data and publishes reports on each election.
+      In an <a href="https://en.wikipedia.org/wiki/Approval_Voting">
+        Approval Voting election</a> voters can pick all the candidates that they like, which produces more data on voter preferences than
+      pick-one elections.
     </p>
 
     <p>

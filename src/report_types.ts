@@ -1,5 +1,5 @@
 export type CandidateId = number
-export type Allocatee = CandidateId | 'X'
+export type Allocatee = CandidateId
 
 // index.json
 
@@ -47,6 +47,7 @@ export interface IElectionInfo {
     officeName: string
     electionName: string
     website?: string
+    notes?: string
 }
 
 export interface ICandidate {

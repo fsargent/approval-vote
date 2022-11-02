@@ -8,7 +8,8 @@
 	  "officeName": "Mayor",
 	  "jurisdictionName": "Fargo, ND",
 	  "electionName": "Primary Election",
-	  "website": "https://results.sos.nd.gov/resultsSW.aspx?text=Race&type=CIALL&map=CTY&area=Fargo&name=Fargo&eid=325"
+	  "website": "https://results.sos.nd.gov/resultsSW.aspx?text=Race&type=CIALL&map=CTY&area=Fargo&name=Fargo&eid=325",
+		"notes": "Fargo conducts its city elections with the North Dakota Primary, but does not have a general election."
 	},
 	"ballotCount": 15090,
 	"candidates": [
