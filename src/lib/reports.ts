@@ -21,7 +21,7 @@ export function getIndex(): IReportIndex {
     };
 
     return {
-      path: electionRow.path,
+      path: electionRow.electionPath+"/"+electionRow.jurisdictionPath,
       jurisdictionName: electionRow.jurisdictionName,
       electionName: electionRow.electionName,
       date: electionRow.date,
