@@ -1,8 +1,9 @@
 <script type="ts">
   import { base } from '$app/paths';
+  import { getIndex } from '$lib/reports';
   import type { IElectionIndexEntry } from "$lib/report_types";
 
-  import index from '$lib/reports/index.json';
+  let index = getIndex();
   let electionsByYear = new Map<number, IElectionIndexEntry[]>();
 
   index.elections.forEach((e) => {
