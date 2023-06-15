@@ -1,0 +1,167 @@
+import Database from "better-sqlite3";
+const db = new Database("data.db");
+
+import type {
+  IReportIndex,
+  IContestReport,
+  IElectionIndexEntry,
+  IContestIndexEntry,
+} from "$lib/report_types";
+
+// Helper function to create a contest object
+function createContest(row, winners) {
+  return {
+    office: row.office,
+    officeName: row.officeName,
+    name: row.name,
+    winners: winners,
+    numCandidates: row.numCandidates,
+  };
+}
+
+function getWinners(reportId) {
+  const winnersSqlCmd = `
+    SELECT
+      name
+    FROM
+      candidates
+    WHERE
+      report_id = ?
+      AND winner = 1
+  `;
+
+  const winnersRows = db.prepare(winnersSqlCmd).all(reportId);
+
+  return winnersRows.map(row => row.name);
+}
+
+
+// Helper function to create a new election
+function createElection(row, contest) {
+  return {
+    path: row.path,
+    jurisdictionName: row.jurisdictionName,
+    electionName: row.electionName,
+    date: row.date,
+    contests: [contest],
+  };
+}
+
+// Helper function to add a contest to an existing election
+function addContestToElection(election, contest) {
+  election.contests.push(contest);
+  election.contests.sort((b, a) => {
+    // Extract numeric part from office names surrounded by spaces
+    const numA = extractNumber(a.officeName);
+    const numB = extractNumber(b.officeName);
+
+    // Compare as numbers
+    return numB - numA;
+  });
+}
+function extractNumber(str) {
+  const match = str.match(/\b(\d+)(st|nd|rd|th)?\b/);
+  return match ? parseInt(match[1]) : null;
+}
+
+export function getIndex(): IReportIndex {
+  const sqlCmd = `
+    SELECT
+      reports.*,
+      COUNT(candidates.name) AS numCandidates
+    FROM
+      reports
+    JOIN
+      candidates ON reports.id = candidates.report_id
+    GROUP BY
+      reports.id
+    ORDER BY
+      reports.date DESC
+  `;
+
+  const rows = db.prepare(sqlCmd).all();
+
+  const electionsByYear = rows.reduce((grouped, row) => {
+    const year = new Date(row.date).getFullYear();
+    const winners = getWinners(row.id);  // get winners for this report
+    const contest = createContest(row, winners);
+
+    if (!grouped[year]) {
+      grouped[year] = [];
+    }
+
+    const existingElectionIndex = grouped[year].findIndex(
+      (election) => election.path === row.path
+    );
+
+    if (existingElectionIndex === -1) {
+      grouped[year].push(createElection(row, contest));
+    } else {
+      addContestToElection(grouped[year][existingElectionIndex], contest);
+    }
+
+    return grouped;
+  }, {});
+
+  const groupedArray = Object.entries(electionsByYear).sort(
+    (a, b) => b[0] - a[0]
+  );
+
+  // Convert the reversed array back to a Map
+  const groupedMap = new Map(groupedArray);
+
+  return groupedMap;
+}
+
+export function getReport(path: string): IContestReport {
+  let office = path.split("/").slice(-1);
+  path = path.split("/").slice(0, -1).join("/");
+  const reportRow = db
+    .prepare("SELECT * FROM reports WHERE path = ? AND office = ?")
+    .get(path, office);
+
+  if (!reportRow) {
+    throw new Error(`Report not found for path: ${path}`);
+  }
+
+  const candidateRows = db
+    .prepare("SELECT * FROM candidates WHERE report_id = ?")
+    .all(reportRow.id);
+
+  // Make the winners array by getting all the candidates with winner = 1
+  const winners = db
+    .prepare("SELECT name FROM candidates WHERE report_id = ? AND winner = 1")
+    .all(reportRow.id);
+
+  const winnerNames = winners.map((candidate) => candidate.name);
+
+  const report: IContestReport = {
+    info: {
+      name: reportRow.name,
+      date: reportRow.date,
+      dataFormat: "unknown", // adjust as needed
+      tabulation: "unknown", // adjust as needed
+      jurisdictionPath: reportRow.jurisdictionPath,
+      electionPath: reportRow.electionPath,
+      office: reportRow.office,
+      loaderParams: {}, // adjust as needed
+      jurisdictionName: reportRow.jurisdictionName,
+      officeName: reportRow.officeName,
+      electionName: reportRow.electionName,
+      website: reportRow.website,
+      notes: reportRow.notes,
+    },
+    ballotCount: reportRow.ballotCount,
+    candidates: candidateRows.map((row, index) => ({
+      name: row.name,
+      writeIn: row.writeIn || false,
+      votes: row.votes,
+      winner: row.winner === 1,
+    })),
+    winners: winnerNames,
+    condorcet: reportRow.condorcet,
+    numCandidates: candidateRows.length,
+  };
+
+  return report;
+}

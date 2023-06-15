@@ -1,11 +1,9 @@
 import { error } from "@sveltejs/kit";
+import { getReport } from "$lib/server/reports";
 
-/** @type {import('./$types').PageLoad} */
+/** @type {import('./$types').PageServerLoad} */
 export async function load({ params }) {
-  const reports = import.meta.glob("$lib/reports/**/report.json", {
-    eager: true,
-  });
-  const report = reports[`/src/lib/reports/${params.path}/report.json`];
+  const report = getReport(params.path);
   if (!report) {
     throw error(404, {
       message: "Not found",
