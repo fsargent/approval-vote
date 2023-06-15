@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
+    "preview": "vite preview",
     "start": "node __vite__/build",
     "cy:run": "cypress run",
     "cy:open": "cypress open",

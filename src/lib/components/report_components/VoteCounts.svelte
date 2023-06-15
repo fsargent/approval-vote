@@ -1,5 +1,5 @@
 <script type="ts">
-  import type { ICandidate, IContestReport } from "$lib/report_types";
+  import type { ICandidate, IContestReport } from "$lib/server/report_types";
   export let report: IContestReport;
 
   import tippy from 'tippy.js';

@@ -4,7 +4,7 @@
   let report: IContestReport = data.report;
   let path: string = data.path;
   import { base } from '$app/paths';
-  import type { IContestReport } from "$lib/report_types";
+  import type { IContestReport } from "$lib/server/report_types";
   import Report from '$lib/components/Report.svelte';
 </script>
 
