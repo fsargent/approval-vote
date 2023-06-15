@@ -1,7 +1,8 @@
 <script lang="ts">
   /** @type {import('./$types').PageData} */
-  export let report: IContestReport;
-  export let path: string;
+  export let data
+  let report: IContestReport = data.report;
+  let path: string = data.path;
   import { base } from '$app/paths';
   import type { IContestReport } from "$lib/report_types";
   import Report from '$lib/components/Report.svelte';

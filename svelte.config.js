@@ -11,13 +11,6 @@ const config = {
 
   kit: {
     adapter: adapter(),
-    prerender: {
-      handleHttpError: ({ error, request }) => {
-        console.log(`HTTP error during prerendering: ${error}`);
-        console.log(`Request that caused the error: ${request}`);
-        return { status: 500 };
-      },
-    },
     alias: {},
     appDir: "_app",
     csp: {
