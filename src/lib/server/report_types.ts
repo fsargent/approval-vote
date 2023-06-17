@@ -7,6 +7,10 @@ export interface IReportIndex {
   elections: IElectionIndexEntry[];
 }
 
+export interface IReportIndexByYear {
+  [year: string]: IElectionIndexEntry[];
+}
+
 export interface IElectionIndexEntry {
   path: string;
   jurisdictionName: string;

@@ -4,12 +4,14 @@ const db = new Database("data.db");
 import type {
   IReportIndex,
   IContestReport,
-  IElectionIndexEntry,
+  IReportIndexByYear,
+  ICandidate,
   IContestIndexEntry,
+  IElectionIndexEntry,
 } from "$lib/report_types";
 
 // Helper function to create a contest object
-function createContest(row, winners) {
+function createContest(row: IContestIndexEntry, winners: string[]) {
   return {
     office: row.office,
     officeName: row.officeName,
@@ -19,7 +21,7 @@ function createContest(row, winners) {
   };
 }
 
-function getWinners(reportId) {
+function getWinners(reportId: number) {
   const winnersSqlCmd = `
     SELECT
       name
@@ -30,14 +32,15 @@ function getWinners(reportId) {
       AND winner = 1
   `;
 
-  const winnersRows = db.prepare(winnersSqlCmd).all(reportId);
+  const winnersRows = db.prepare(winnersSqlCmd).all(reportId) as {
+    name: string;
+  }[];
 
-  return winnersRows.map(row => row.name);
+  return winnersRows.map((row) => row.name);
 }
 
-
 // Helper function to create a new election
-function createElection(row, contest) {
+function createElection(row: IElectionIndexEntry, contest: IContestIndexEntry) {
   return {
     path: row.path,
     jurisdictionName: row.jurisdictionName,
@@ -48,18 +51,22 @@ function createElection(row, contest) {
 }
 
 // Helper function to add a contest to an existing election
-function addContestToElection(election, contest) {
+function addContestToElection(
+  election: IElectionIndexEntry,
+  contest: IContestIndexEntry
+) {
   election.contests.push(contest);
-  election.contests.sort((b, a) => {
+  election.contests.sort((b: IContestIndexEntry, a: IContestIndexEntry) => {
     // Extract numeric part from office names surrounded by spaces
-    const numA = extractNumber(a.officeName);
-    const numB = extractNumber(b.officeName);
+    const numA: number = extractNumber(a.officeName);
+    const numB: number = extractNumber(b.officeName);
 
     // Compare as numbers
     return numB - numA;
   });
 }
-function extractNumber(str) {
+
+function extractNumber(str: string) {
   const match = str.match(/\b(\d+)(st|nd|rd|th)?\b/);
   return match ? parseInt(match[1]) : null;
 }
@@ -81,31 +88,37 @@ export function getIndex(): IReportIndex {
 
   const rows = db.prepare(sqlCmd).all();
 
-  const electionsByYear = rows.reduce((grouped, row) => {
-    const year = new Date(row.date).getFullYear();
-    const winners = getWinners(row.id);  // get winners for this report
-    const contest = createContest(row, winners);
+  const electionsByYear = rows.reduce(
+    (
+      grouped: IReportIndexByYear,
+      row: IElectionIndexEntry
+    ): IReportIndexByYear => {
+      const year = new Date(row.date).getFullYear();
+      const winners = getWinners(row.id); // get winners for this report
+      const contest = createContest(row, winners);
 
-    if (!grouped[year]) {
-      grouped[year] = [];
-    }
+      if (!grouped[year]) {
+        grouped[year] = [];
+      }
 
-    const existingElectionIndex = grouped[year].findIndex(
-      (election) => election.path === row.path
-    );
+      const existingElectionIndex = grouped[year].findIndex(
+        (election: IElectionIndexEntry) => election.path === row.path
+      );
 
-    if (existingElectionIndex === -1) {
-      grouped[year].push(createElection(row, contest));
-    } else {
-      addContestToElection(grouped[year][existingElectionIndex], contest);
-    }
+      if (existingElectionIndex === -1) {
+        grouped[year].push(createElection(row, contest));
+      } else {
+        addContestToElection(grouped[year][existingElectionIndex], contest);
+      }
 
-    return grouped;
-  }, {});
-
-  const groupedArray = Object.entries(electionsByYear).sort(
-    (a, b) => b[0] - a[0]
+      return grouped;
+    },
+    {}
   );
+
+  const groupedArray = Object.entries(
+    electionsByYear as IReportIndexByYear
+  ).sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
 
   // Convert the reversed array back to a Map
   const groupedMap = new Map(groupedArray);
@@ -118,7 +131,7 @@ export function getReport(path: string): IContestReport {
   path = path.split("/").slice(0, -1).join("/");
   const reportRow = db
     .prepare("SELECT * FROM reports WHERE path = ? AND office = ?")
-    .get(path, office);
+    .get(path, office) as IContestReport;
 
   if (!reportRow) {
     throw new Error(`Report not found for path: ${path}`);
@@ -126,14 +139,14 @@ export function getReport(path: string): IContestReport {
 
   const candidateRows = db
     .prepare("SELECT * FROM candidates WHERE report_id = ?")
-    .all(reportRow.id);
+    .all(reportRow.id) as ICandidate[];
 
   // Make the winners array by getting all the candidates with winner = 1
   const winners = db
     .prepare("SELECT name FROM candidates WHERE report_id = ? AND winner = 1")
-    .all(reportRow.id);
+    .all(reportRow.id) as ICandidate[];
 
-  const winnerNames = winners.map((candidate) => candidate.name);
+  const winnerNames = winners.map((candidate: ICandidate) => candidate.name);
 
   const report: IContestReport = {
     info: {
