@@ -1,6 +1,6 @@
 # Approval.Vote
 
-Reports are stored in $lib/reports
+Reports are stored in the sqlite3 `data.db`. Edit it and submit a PR to add a new election.
 
 ## Developing
 
