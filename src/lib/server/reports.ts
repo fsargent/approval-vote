@@ -80,6 +80,8 @@ export function getIndex(): IReportIndex {
       reports
     JOIN
       candidates ON reports.id = candidates.report_id
+    WHERE
+      reports.hidden != 1
     GROUP BY
       reports.id
     ORDER BY
