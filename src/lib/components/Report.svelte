@@ -42,7 +42,7 @@
       'September',
       'October',
       'November',
-      'Decemner',
+      'December',
     ]
 
     return `${
