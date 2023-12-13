@@ -1,0 +1,174 @@
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,400;0,600;1,400&display=fallback");
+body {
+  margin: 0;
+  padding: 0;
+  border-top: 5px solid #1d4749;
+  font-family: "Source Sans Pro", sans-serif;
+  color: #555;
+  font-size: 11pt;
+}
+
+/* Layout */
+
+.container {
+  margin: 20px auto;
+  max-width: 600px;
+  padding: 0 12px;
+}
+
+.yearSection h2 {
+  padding-right: 20px;
+}
+
+.title strong {
+  display: block;
+}
+
+.row {
+  margin-bottom: 60px;
+}
+
+.row:last-child {
+  margin-bottom: 0;
+}
+
+@media (min-width: 1100px) {
+  .container.wide {
+    max-width: 1000px;
+  }
+
+  .row {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .leftCol {
+    width: 350px;
+  }
+
+  .leftCol p {
+    text-align: justify;
+  }
+
+  .rightCol {
+    width: 650px;
+    margin-left: 40px;
+  }
+
+  .title strong {
+    display: inline;
+  }
+
+  .yearSection h2 {
+    padding-left: 30px;
+  }
+}
+
+.rightCol :first-child,
+.leftCol :first-child {
+  margin-top: 0;
+}
+
+li {
+  margin-bottom: 10px;
+}
+
+/* Style */
+
+p {
+  margin: 16px 0;
+  line-height: 1.4;
+}
+
+.description {
+  font-size: 16pt;
+  color: black;
+}
+
+.description h1 {
+  display: inline;
+  font-size: 16pt;
+}
+
+a {
+  color: #437527;
+  text-decoration: none;
+}
+
+h2 {
+  margin: 0;
+  font-size: 16pt;
+  color: #949494;
+}
+
+h3 {
+  margin: 0;
+  font-size: 16pt;
+  font-weight: normal;
+  color: #949494;
+}
+
+h3 a {
+  font-weight: bold;
+  color: black;
+}
+
+h3 strong {
+  color: #437527;
+}
+
+.meta {
+  color: #949494;
+}
+
+.yearSection {
+  display: flex;
+}
+
+.rightCol .electionHeader {
+  margin-bottom: 10px;
+  margin-top: 22px;
+  padding: 0;
+}
+
+.electionHeader:first-child {
+  margin-top: 0;
+}
+
+.yearSection {
+  margin-top: 22px;
+}
+
+.yearSection:first-child {
+  margin-top: 0;
+}
+
+.electionSection {
+  flex: 1;
+}
+
+.race a {
+  display: flex;
+  color: #949494;
+  padding: 5px;
+  margin: 0 -5px;
+  text-decoration: none;
+}
+
+.race a:hover {
+  background: #eee;
+}
+
+.race a .meta {
+  text-align: right;
+  flex: 1;
+}
+
+.race a .title strong {
+  color: black;
+}
+
+hr {
+  border: none;
+  border-bottom: 1px dotted #ddd;
+}
