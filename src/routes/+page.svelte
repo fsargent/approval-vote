@@ -12,8 +12,7 @@
   <div class="row">
     <div class="leftCol">
       <div class="description">
-        <h1>approval.vote</h1>
-        : detailed reports on approval voting elections.
+        <h1>approval.vote</h1>: detailed reports on approval voting elections.
       </div>
       <p>
         In an <a href="https://en.wikipedia.org/wiki/Approval_Voting">
