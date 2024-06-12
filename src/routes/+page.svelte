@@ -1,4 +1,4 @@
-<script type="ts">
+<script lang="ts">
   import { base } from '$app/paths'
   import type { IElectionIndexEntry } from '$lib/server/report_types'
   /** @type {import('./$types').PageData} */
