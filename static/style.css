@@ -92,20 +92,20 @@ p {
 
 a {
   color: #437527;
-  text-decoration: none;
+  text-decoration: underline;
 }
 
 h2 {
   margin: 0;
   font-size: 16pt;
-  color: #949494;
+  color: #555555;
 }
 
 h3 {
   margin: 0;
   font-size: 16pt;
   font-weight: normal;
-  color: #949494;
+  color: #555555;
 }
 
 h3 a {
@@ -118,7 +118,7 @@ h3 strong {
 }
 
 .meta {
-  color: #949494;
+  color: #555555;
 }
 
 .yearSection {
@@ -149,7 +149,7 @@ h3 strong {
 
 .race a {
   display: flex;
-  color: #949494;
+  color: #555555;
   padding: 5px;
   margin: 0 -5px;
   text-decoration: none;
