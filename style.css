@@ -143,21 +143,40 @@ h3 strong {
   flex: 1;
 }
 
+.race {
+  margin-bottom: 1rem;
+}
+
 .race a {
-  display: flex;
+  display: block;
   color: #555555;
+  text-decoration: none;
   padding: 0.3125rem; /* 5px to rem */
   margin: 0 -0.3125rem; /* 5px to rem */
-  text-decoration: none;
 }
 
 .race a:hover {
   background: #eee;
 }
 
+.race-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.title {
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.meta {
+  white-space: nowrap;
+}
+
 .race a .meta {
   text-align: right;
-  flex: 1;
+  flex-shrink: 0;
 }
 
 .race a .title strong {
@@ -167,4 +186,10 @@ h3 strong {
 hr {
   border: none;
   border-bottom: 1px dotted #ddd;
+}
+
+@media (max-width: 767px) {
+  .title .winner {
+    display: block;
+  }
 }
