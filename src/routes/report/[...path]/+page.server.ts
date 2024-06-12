@@ -6,10 +6,10 @@ export async function load({ params }) {
   try {
     const report = getReport(params.path);
     if (!report) {
-      throw error(404, { message: "Not found" });
+      error(404, { message: "Not found" });
     }
     return { report, path: params.path };
   } catch (err) {
-    throw error(404, { message: "Not found" });
+    error(404, { message: "Not found" });
   }
 }

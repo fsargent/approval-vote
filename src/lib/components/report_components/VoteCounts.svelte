@@ -1,4 +1,4 @@
-<script type="ts">
+<script lang="ts">
   import type { ICandidate, IContestReport } from "$lib/server/report_types";
   export let report: IContestReport;
 
