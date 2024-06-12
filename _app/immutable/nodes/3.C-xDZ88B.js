@@ -1,4 +1,4 @@
-import{s as v,n as o}from"../chunks/scheduler._RQNZmqd.js";import{S as f,i as b,e as h,s as m,c as d,g as c,a as g,f as y,h as n,d as r}from"../chunks/index.BquU_noq.js";import{b as w}from"../chunks/paths.DQPMhO6E.js";function _(u){let e,l="About approval.vote",s,a,p=`<div class="description"><h1>About <a href="${w}/">approval.vote</a></h1></div> <p><a href="https://en.wikipedia.org/wiki/Approval_Voting">Approval Voting elections</a>
+import{s as v,n as o}from"../chunks/scheduler._RQNZmqd.js";import{S as f,i as b,e as h,s as m,c as d,g as c,a as g,f as y,h as n,d as r}from"../chunks/index.BquU_noq.js";import{b as w}from"../chunks/paths.BCP9n3Ti.js";function _(u){let e,l="About approval.vote",s,a,p=`<div class="description"><h1>About <a href="${w}/">approval.vote</a></h1></div> <p><a href="https://en.wikipedia.org/wiki/Approval_Voting">Approval Voting elections</a>
   produce a lot of data about voter preferences. Typically, this information is
   made available by election boards in specialized file formats and requires
   processing to interpret. The purpose of approval.vote is to increase transparency into these
