@@ -20,20 +20,16 @@
     property="og:title"
     content="{report.info.jurisdictionName} / {report.info.name}"
   />
-  <meta
-    property="og:image"
-    content={'https://r.moxy.social/ykZcSLKZUq/approval/fb.png/' + path}
-  />
-  <meta property="twitter:card" content="summary_large_image" />
-  <meta property="twitter:creator" content="@paulgb" />
+  <meta property="twitter:card" content="summary" />
+  <meta property="twitter:creator" content="@fsargent" />
   <meta
     property="twitter:title"
     content="{report.info.jurisdictionName} / {report.info.name}"
   />
-  <meta
-    property="twitter:image"
-    content={'https://r.moxy.social/ykZcSLKZUq/approval/twitter.png/' + path}
-  />
+  <meta name="twitter:description" content="approval.vote: {report.info.jurisdictionName} / {report.info.name} / {report.info.date.slice(
+      0,
+      4
+    )}" />
 </svelte:head>
 
 <div class="wide container">
