@@ -30,6 +30,7 @@
       0,
       4
     )}" />
+    <meta name="twitter:image" content="{base}/icon.png" />
 </svelte:head>
 
 <div class="wide container">
