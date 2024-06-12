@@ -9,5 +9,5 @@ export async function load({ params }) {
       message: "Not found",
     });
   }
-  return { report: report, path: params.path };
+  return { report, path: params.path };
 }

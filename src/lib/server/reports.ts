@@ -53,7 +53,7 @@ function createElection(row: IElectionIndexEntry, contest: IContestIndexEntry) {
 // Helper function to add a contest to an existing election
 function addContestToElection(
   election: IElectionIndexEntry,
-  contest: IContestIndexEntry
+  contest: IContestIndexEntry,
 ) {
   election.contests.push(contest);
   election.contests.sort((b: IContestIndexEntry, a: IContestIndexEntry) => {
@@ -93,7 +93,7 @@ export function getIndex(): IReportIndex {
   const electionsByYear = rows.reduce(
     (
       grouped: IReportIndexByYear,
-      row: IElectionIndexEntry
+      row: IElectionIndexEntry,
     ): IReportIndexByYear => {
       const year = new Date(row.date).getFullYear();
       const winners = getWinners(row.id); // get winners for this report
@@ -104,7 +104,7 @@ export function getIndex(): IReportIndex {
       }
 
       const existingElectionIndex = grouped[year].findIndex(
-        (election: IElectionIndexEntry) => election.path === row.path
+        (election: IElectionIndexEntry) => election.path === row.path,
       );
 
       if (existingElectionIndex === -1) {
@@ -115,11 +115,11 @@ export function getIndex(): IReportIndex {
 
       return grouped;
     },
-    {}
+    {},
   );
 
   const groupedArray = Object.entries(
-    electionsByYear as IReportIndexByYear
+    electionsByYear as IReportIndexByYear,
   ).sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
 
   // Convert the reversed array back to a Map

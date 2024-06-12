@@ -30,7 +30,7 @@ function addReportAndCandidates(report, candidates) {
       report.notes,
       report.ballotCount,
       report.path,
-      report.hidden
+      report.hidden,
     );
 
     // Get the last inserted row ID
@@ -38,7 +38,12 @@ function addReportAndCandidates(report, candidates) {
 
     // Insert candidates
     for (const candidate of candidates) {
-      insertCandidate.run(reportId, candidate.name, candidate.votes, candidate.winner);
+      insertCandidate.run(
+        reportId,
+        candidate.name,
+        candidate.votes,
+        candidate.winner,
+      );
     }
   });
 
@@ -61,11 +66,12 @@ const report = {
   officeName: "City Commissioner",
   jurisdictionName: "Fargo, ND",
   electionName: "Primary Election",
-  website: "https://results.sos.nd.gov/resultsSW.aspx?text=All&type=CIALL&map=CTY&area=Fargo&name=Fargo",
+  website:
+    "https://results.sos.nd.gov/resultsSW.aspx?text=All&type=CIALL&map=CTY&area=Fargo&name=Fargo",
   notes: "",
   ballotCount: 14781,
   path: "us/nd/fargo/2024/06",
-  hidden: 0
+  hidden: 0,
 };
 
 const candidates = [
@@ -76,7 +82,7 @@ const candidates = [
   { name: "Anna Johnson", votes: 3545, winner: 0 },
   { name: "Delson Saintal", votes: 2378, winner: 0 },
   { name: "Nathan Pullen", votes: 1879, winner: 0 },
-  { name: "write-in", votes: 85, winner: 0 }
+  { name: "write-in", votes: 85, winner: 0 },
 ];
 
 // Add the report and candidates to the database

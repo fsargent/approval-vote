@@ -45,7 +45,7 @@
         class={candidate.winner === true ? '' : 'eliminated'}
         transform={`translate(0 ${outerHeight * (i + 0.5)})`}
       >
-        <text font-size="12" text-anchor="end" dominant-baseline="middle">
+        <text font-size="90%" text-anchor="end" dominant-baseline="middle">
           {candidate.name}
         </text>
         <g transform={`translate(5 ${-innerHeight / 2 - 1})`}>
@@ -61,7 +61,7 @@
           />
         </g>
         <text
-          font-size="12"
+          font-size="90%"
           dominant-baseline="middle"
           x={10 + scale * candidate.votes}
         >

@@ -28,6 +28,6 @@ To add to the report, edit `./load-report.js` with the data from the election.
 Submit a pull request with the updated `data.db`.
 
 ## Deployment
+
 The site is hosted on github pages. Merge to main and it'll auto deploy.
 Site is hosted on github pages. Merge to main and it'll auto-deploy.
-

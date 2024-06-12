@@ -5,8 +5,11 @@ import { getReport } from "$lib/server/reports";
 export async function load({ params }) {
   try {
     const report = getReport(params.path);
-    return { report: report, path: params.path };
+    if (!report) {
+      throw error(404, { message: "Not found" });
+    }
+    return { report, path: params.path };
   } catch (err) {
-    return error(404, { message: "Not found" });
+    throw error(404, { message: "Not found" });
   }
 }
