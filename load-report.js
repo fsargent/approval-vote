@@ -43,7 +43,12 @@ function addReportAndCandidates(report, candidates) {
   });
 
   // Execute the transaction
-  transaction();
+  try {
+    transaction();
+    console.log("Transaction successful.");
+  } catch (error) {
+    console.error("Failed to execute transaction:", error);
+  }
 }
 
 // Example data to insert
