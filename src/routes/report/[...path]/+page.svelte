@@ -21,7 +21,7 @@
     content="{report.info.jurisdictionName} / {report.info.name}"
   />
   <meta property="twitter:card" content="summary" />
-  <meta property="twitter:creator" content="@fsargent" />
+  <meta property="twitter:creator" content="@felixsargent" />
   <meta
     property="twitter:title"
     content="{report.info.jurisdictionName} / {report.info.name}"
