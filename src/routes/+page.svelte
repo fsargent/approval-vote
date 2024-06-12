@@ -45,8 +45,9 @@
                 </h3>
               </div>
               {#each election.contests as contest}
-                <div class="race">
-                  <a href="{base}/report/{election.path}/{contest.office}">
+              <div class="race">
+                <a href="{base}/report/{election.path}/{contest.office}">
+                  <div class="race-content">
                     <div class="title">
                       <strong>{contest.officeName}</strong>
                       {#each contest.winners as winner, i}
@@ -54,11 +55,11 @@
                       {/each}
                     </div>
                     <div class="meta">
-                      <strong>{contest.numCandidates}</strong>
-                      candidates
+                      <strong>{contest.numCandidates}</strong> candidates
                     </div>
-                  </a>
-                </div>
+                  </div>
+                </a>
+              </div>
               {/each}
             {/each}
           </div>
