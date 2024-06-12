@@ -7,7 +7,11 @@
     <link rel="manifest" crossorigin="use-credentials" href="manifest.json" />
     <meta name="description" content="approval.vote: detailed reports on approval voting elections.">
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9FXGFEC813"></script>
+
+    %sveltekit.head%
+  </head>
+  <div style="display: contents">%sveltekit.body%</div>
+  <script defer async src="https://www.googletagmanager.com/gtag/js?id=G-9FXGFEC813"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -15,7 +19,4 @@
 
       gtag('config', 'G-9FXGFEC813');
     </script>
-    %sveltekit.head%
-  </head>
-  <div style="display: contents">%sveltekit.body%</div>
 </html>
