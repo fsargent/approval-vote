@@ -1,22 +1,7 @@
-body {
-  border-top: none;
-}
-
 .card {
-  border-top: 10px solid #1d4749;
-}
-
-h3 {
-  padding: 30px;
-  font-size: 200%;
-  margin-bottom: 20px;
+  padding: 1rem; /* 30px to em */
 }
 
 .segment {
-  float: left;
-  width: 49%;
-}
-
-.segment svg {
-  max-height: 550px;
+  width: 100%;
 }
