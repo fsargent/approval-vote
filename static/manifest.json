@@ -1,0 +1,27 @@
+{
+  "name": "Approval.Vote",
+  "short_name": "Approval.Vote",
+  "description": "approval.vote: detailed reports on approval voting elections.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#437527",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-US"
+}
