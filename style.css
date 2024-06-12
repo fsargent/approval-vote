@@ -1,6 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,400;0,600;1,400&display=fallback");
 
-
 body {
   margin: 0;
   padding: 0;
@@ -32,7 +31,8 @@ body {
   margin-bottom: 0;
 }
 
-@media (min-width: 68.75rem) { /* 1100px to rem */
+@media (min-width: 68.75rem) {
+  /* 1100px to rem */
   .container.wide {
     max-width: 62.5rem; /* 1000px to rem */
   }
@@ -141,10 +141,6 @@ h3 strong {
 
 .electionSection {
   flex: 1;
-}
-
-.race {
-  margin-bottom: 1rem;
 }
 
 .race a {
