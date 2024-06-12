@@ -3,7 +3,7 @@
 body {
   margin: 0;
   padding: 0;
-  border-top: 0.3125rem solid #1d4749; /* 5px to rem */
+  border-top: 0.5rem solid #437527; /* 5px to rem */
   font-family: "Source Sans Pro", sans-serif;
   color: #555;
 }
@@ -24,7 +24,7 @@ body {
 }
 
 .row {
-  margin-bottom: 3.75rem; /* 60px to rem */
+  margin-bottom: 2rem; /* 60px to rem */
 }
 
 .row:last-child {
@@ -102,7 +102,7 @@ h2 {
 
 h3 {
   margin: 0;
-  font-size: 1.5rem; /* 16pt to rem */
+  font-size: 1.75rem; /* 16pt to rem */
   font-weight: normal;
   color: #555555;
 }

@@ -62,12 +62,12 @@
 <div class="row">
   <p class="description" />
   <div class="electionHeader">
-    <h3>
+    <h1>
       <a href="{base}/">approval.vote</a>
       //
       <strong>{report.info.jurisdictionName}</strong>
       {report.info.officeName}
-    </h3>
+    </h1>
   </div>
 </div>
 
