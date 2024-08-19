@@ -16,7 +16,7 @@
     "svelte-check": "svelte-check"
   },
   "dependencies": {
-    "@sveltejs/adapter-static": "^3.0.1",
+    "@sveltejs/adapter-static": "^3.0.4",
     "better-sqlite3": "^11.0.0",
     "tippy.js": "^6.2.6",
     "tslib": "^2.0.0"
