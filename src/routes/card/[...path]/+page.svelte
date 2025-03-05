@@ -5,27 +5,38 @@
   export let data: PageData;
   const report: IContestReport = data.report;
 
-  // Get winner's approval percentage
-  const winner = report.candidates.find((c) => c.winner);
-  const winnerPercentage = winner
-    ? ((winner.votes / report.ballotCount) * 100).toFixed(1)
-    : null;
+  // Get all winners and their approval percentages
+  const winners = report.candidates
+    .filter((c) => c.winner)
+    .map(winner => ({
+      name: winner.name,
+      percentage: ((winner.votes / report.ballotCount) * 100).toFixed(1)
+    }));
 </script>
 
 <div class="card">
-  {#if report?.info && winner && winnerPercentage}
-    <div class="background-fill" style="width: {winnerPercentage}%"></div>
-    <div class="content">
+  {#if report?.info && winners.length > 0}
+    <div class="header">
       <div class="jurisdiction">{report.info.jurisdictionName}</div>
       <div class="office">{report.info.officeName}</div>
       <div class="election">
         {report.info.electionName} ({report.info.date.slice(0, 4)})
       </div>
-      <div class="winner-stats">
-        <div class="winner-name">{winner.name}</div>
-        <div class="percentage">{winnerPercentage}%</div>
-        <div class="approval">approval</div>
-      </div>
+    </div>
+    <div class="results">
+      {#each winners as winner, i}
+        <div class="result-row">
+          <div
+            class="background-fill"
+            style="width: {winner.percentage}%"
+          ></div>
+          <div class="winner-stats">
+            <div class="winner-name">{winner.name}</div>
+            <div class="percentage">{winner.percentage}%</div>
+            <div class="approval">approval</div>
+          </div>
+        </div>
+      {/each}
     </div>
   {:else}
     <div class="content">
@@ -42,28 +53,43 @@
     position: relative;
     overflow: hidden;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .header {
+    padding: 2rem 3rem;
+    text-align: center;
+    background: white;
+  }
+
+  .results {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .result-row {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .background-fill {
     position: absolute;
-    top: 0;
     left: 0;
+    top: 0;
     height: 100%;
     background-color: #437527;
     opacity: 0.15;
     transition: width 0.5s ease-out;
   }
 
-  .content {
+  .winner-stats {
     position: relative;
     z-index: 1;
-    height: 100%;
-    padding: 3rem;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     text-align: center;
   }
 
@@ -83,32 +109,26 @@
   .election {
     font-size: 1.5rem;
     color: #666;
-    margin-bottom: 3rem;
-  }
-
-  .winner-stats {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .winner-name {
-    font-size: 3rem;
-    font-weight: bold;
-    color: #437527;
-    margin-bottom: 1rem;
-  }
-
-  .percentage {
-    font-size: 6rem;
-    font-weight: bold;
-    color: #437527;
-    line-height: 1;
     margin-bottom: 0.5rem;
   }
 
+  .winner-name {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #437527;
+    margin-bottom: 0.5rem;
+  }
+
+  .percentage {
+    font-size: 4rem;
+    font-weight: bold;
+    color: #437527;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+
   .approval {
-    font-size: 2rem;
+    font-size: 1.5rem;
     color: #437527;
     text-transform: uppercase;
     letter-spacing: 0.1em;
