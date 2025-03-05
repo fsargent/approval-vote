@@ -45,8 +45,8 @@ async function generateCards() {
   let failureCount = 0;
 
   for (const report of reports) {
-    // Change the output path to static/image instead of build/image
-    const outputPath = `static/image/${report.path}/${report.office}.png`;
+    // Change the output path to static/images instead of build/images
+    const outputPath = `static/images/${report.path}/${report.office}.png`;
     const outputDir = path.dirname(outputPath);
 
     try {

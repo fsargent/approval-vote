@@ -35,7 +35,7 @@
   />
   <meta
     name="twitter:image"
-    content="https://approval.vote{base}/static/image/{path}.png"
+    content="https://approval.vote{base}/images/{path}.png"
   />
   <meta
     name="twitter:image:alt"
@@ -56,7 +56,7 @@
   />
   <meta
     property="og:image"
-    content="https://approval.vote{base}/static/image/{path}.png
+    content="https://approval.vote{base}/images/{path}.png
       "
   />
 </svelte:head>
