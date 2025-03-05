@@ -14,7 +14,10 @@ async function generateCards() {
       "--disable-dev-shm-usage",
       "--disable-gpu",
       "--disable-extensions",
+      "--single-process", // Important for CI
+      "--no-zygote", // Important for CI
     ],
+    executablePath: process.env.CI ? "google-chrome-stable" : undefined,
   });
 
   const db = new Database("data.db");
@@ -24,7 +27,6 @@ async function generateCards() {
 
   console.log(`Found ${reports.length} reports to process`);
 
-  // Just use a single page initially to debug
   let page = await browser.newPage();
   await page.setDefaultTimeout(30000);
   await page.setViewport({
@@ -33,7 +35,6 @@ async function generateCards() {
     deviceScaleFactor: 2,
   });
 
-  // Enable debug logging
   page.on("console", (msg) => console.log("Browser console:", msg.text()));
   page.on("pageerror", (err) => console.error("Browser error:", err));
 
@@ -41,7 +42,8 @@ async function generateCards() {
   let failureCount = 0;
 
   for (const report of reports) {
-    const outputPath = `build/image/${report.path}/${report.office}.png`;
+    // Change the output path to static/image instead of build/image
+    const outputPath = `static/image/${report.path}/${report.office}.png`;
     const outputDir = path.dirname(outputPath);
 
     try {
@@ -77,13 +79,11 @@ async function generateCards() {
         `✓ Generated: ${outputPath} (${successCount}/${reports.length})`,
       );
 
-      // Small delay between processing to prevent potential race conditions
       await new Promise((resolve) => setTimeout(resolve, 100));
     } catch (error) {
       failureCount++;
       console.error(`✗ Failed ${report.path}/${report.office}:`, error.message);
 
-      // Try to recover by reloading the page
       try {
         await page.reload({ waitUntil: "domcontentloaded", timeout: 5000 });
       } catch (reloadError) {
@@ -91,7 +91,6 @@ async function generateCards() {
       }
     }
 
-    // Every 10 reports, restart the browser to prevent memory issues
     if (successCount > 0 && successCount % 10 === 0) {
       console.log("Restarting browser to clear memory...");
       await page.close();
@@ -105,7 +104,10 @@ async function generateCards() {
           "--disable-dev-shm-usage",
           "--disable-gpu",
           "--disable-extensions",
+          "--single-process",
+          "--no-zygote",
         ],
+        executablePath: process.env.CI ? "google-chrome-stable" : undefined,
       });
 
       page = await browser.newPage();

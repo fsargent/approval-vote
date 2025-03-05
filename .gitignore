@@ -15,3 +15,4 @@ node_modules
 .env.*
 !.env.example
 .vscode/settings.json
+/static/image

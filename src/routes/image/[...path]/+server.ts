@@ -6,7 +6,13 @@ import type { RequestHandler } from "./$types";
 export const GET: RequestHandler = async ({ params }) => {
   try {
     const cleanPath = params.path.replace(/\.png$/, "");
-    const imagePath = join(process.cwd(), "build", "image", `${cleanPath}.png`);
+    // Change path to look in static/image instead of build/image
+    const imagePath = join(
+      process.cwd(),
+      "static",
+      "image",
+      `${cleanPath}.png`,
+    );
 
     try {
       const imageBuffer = await readFile(imagePath);
