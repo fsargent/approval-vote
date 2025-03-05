@@ -6,6 +6,9 @@ import Database from "better-sqlite3";
 async function generateCards() {
   console.log("Starting card generation...");
 
+  const chromePath = process.env.CHROME_PATH || "google-chrome-stable";
+  console.log("Using Chrome at:", chromePath);
+
   let browser = await puppeteer.launch({
     headless: "new",
     args: [
@@ -17,7 +20,7 @@ async function generateCards() {
       "--single-process", // Important for CI
       "--no-zygote", // Important for CI
     ],
-    executablePath: process.env.CI ? "google-chrome-stable" : undefined,
+    executablePath: process.env.CI ? chromePath : undefined,
   });
 
   const db = new Database("data.db");
@@ -107,7 +110,7 @@ async function generateCards() {
           "--single-process",
           "--no-zygote",
         ],
-        executablePath: process.env.CI ? "google-chrome-stable" : undefined,
+        executablePath: process.env.CI ? chromePath : undefined,
       });
 
       page = await browser.newPage();

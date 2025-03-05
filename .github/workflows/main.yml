@@ -16,12 +16,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 🟢
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
 
       - name: Setup Chrome 🌐
-        run: |
-          chmod +x .github/workflows/setup-chrome.sh
-          .github/workflows/setup-chrome.sh
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+        id: setup-chrome
 
       - name: Install Dependencies 📦
         run: |
@@ -29,6 +36,8 @@ jobs:
           npm install -g wait-on
 
       - name: Generate Cards and Build 🔧
+        env:
+          CHROME_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
         run: |
           # Start the dev server in the background
           npm run dev &
