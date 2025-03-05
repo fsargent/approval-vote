@@ -54,11 +54,7 @@
     content="Detailed approval voting election results for {report.info
       .jurisdictionName} {report.info.name} ({report.info.date.slice(0, 4)})"
   />
-  <meta
-    property="og:image"
-    content="https://approval.vote/images/{path}.png
-      "
-  />
+  <meta property="og:image" content="https://approval.vote/images/{path}.png" />
 </svelte:head>
 
 <div class="wide container">
