@@ -12,19 +12,46 @@ permissions:
 
 jobs:
   build-and-deploy:
-    concurrency: ci-${{ github.ref }} # Recommended if you intend to make multiple deployments in quick succession.
+    concurrency: ci-${{ github.ref }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Install and Build 🔧
+      - name: Setup Node.js 🟢
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Setup Chrome 🌐
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+        id: setup-chrome
+
+      - name: Install Dependencies 📦
         run: |
           npm ci
+          npm install -g wait-on
+
+      - name: Generate Cards and Build 🔧
+        env:
+          CHROME_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
+        run: |
+          # Start the dev server in the background
+          npm run dev &
+          # Wait for dev server to be ready (timeout after 30 seconds)
+          wait-on -t 30000 http://localhost:5173
+          # Generate card images
+          node scripts/generate-cards.js
+          # Kill the dev server
+          kill $(lsof -t -i:5173) || true
+          # Build the site
           npm run build
 
       - name: Deploy 🚀
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: build # The folder the action should deploy.
+          folder: build
