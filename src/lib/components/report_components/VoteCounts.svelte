@@ -1,12 +1,16 @@
 <script lang="ts">
   import type { ICandidate, IContestReport } from "$lib/server/report_types";
-  export let report: IContestReport;
 
   import tippy from 'tippy.js';
   import type { Props } from 'tippy.js';
   import { followCursor } from 'tippy.js';
   import 'tippy.js/themes/light-border.css';
   import 'tippy.js/dist/tippy.css';
+  interface Props_1 {
+    report: IContestReport;
+  }
+
+  let { report }: Props_1 = $props();
 
   function tooltip(elem: Element, content: string | null): void {
     if (content === null) {

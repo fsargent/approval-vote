@@ -10,7 +10,11 @@
 
   import { setContext } from 'svelte'
 
-  export let report: IContestReport
+  interface Props {
+    report: IContestReport;
+  }
+
+  let { report }: Props = $props();
 
   function getCandidate(cid: Allocatee): ICandidate {
     return report.candidates[cid]
@@ -60,7 +64,7 @@
 </script>
 
 <div class="row">
-  <p class="description" />
+  <p class="description"></p>
   <div class="electionHeader">
     <h1>
       <a href="{base}/">approval.vote</a>

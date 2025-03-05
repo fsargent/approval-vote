@@ -1,9 +1,14 @@
-<script lang='ts'>
-  import { base } from '$app/paths';
-  export let data;
+<script lang="ts">
+  import { base } from "$app/paths";
+  import VoteCounts from "$lib/components/report_components/VoteCounts.svelte";
+  import type { IContestReport } from "$lib/server/report_types";
+
+  interface Props {
+    data: import("./$types").PageData;
+  }
+
+  let { data } = $props();
   let report: IContestReport = data.report;
-  import VoteCounts from '$lib/components/report_components/VoteCounts.svelte';
-  import type { IContestReport } from "$lib/report_types";
 </script>
 
 <svelte:head>
@@ -21,6 +26,6 @@
   </div>
 
   <div class="segment">
-    <VoteCounts report={report} />
+    <VoteCounts {report} />
   </div>
 </div>
