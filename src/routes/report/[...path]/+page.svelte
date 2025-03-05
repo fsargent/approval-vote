@@ -20,21 +20,33 @@
     )}</title
   >
 
+  <!-- X (Twitter) Card Tags -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@felixsargent" />
+  <meta name="twitter:creator" content="@felixsargent" />
+  <meta
+    name="twitter:title"
+    content="{report.info.jurisdictionName} / {report.info.name}"
+  />
+  <meta
+    name="twitter:description"
+    content="Detailed approval voting election results for {report.info.jurisdictionName} {report.info.name} ({report.info.date.slice(0,4)})"
+  />
+  <meta name="twitter:image" content="https://approval.vote{base}/card/{path}" />
+  <meta name="twitter:image:alt" content="Election results visualization showing approval voting outcomes" />
+
+  <!-- Open Graph Tags (also used by X) -->
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://approval.vote{base}/report/{path}" />
   <meta
     property="og:title"
     content="{report.info.jurisdictionName} / {report.info.name}"
   />
-  <meta property="twitter:card" content="summary" />
-  <meta property="twitter:creator" content="@felixsargent" />
   <meta
-    property="twitter:title"
-    content="{report.info.jurisdictionName} / {report.info.name}"
+    property="og:description"
+    content="Detailed approval voting election results for {report.info.jurisdictionName} {report.info.name} ({report.info.date.slice(0,4)})"
   />
-  <meta name="twitter:description" content="approval.vote: {report.info.jurisdictionName} / {report.info.name} / {report.info.date.slice(
-      0,
-      4
-    )}" />
-    <meta name="twitter:image" content="{base}/icon.png" />
+  <meta property="og:image" content="https://approval.vote{base}/card/{path}" />
 </svelte:head>
 
 <div class="wide container">
