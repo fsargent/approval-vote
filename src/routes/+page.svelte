@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { base } from '$app/paths'
-  import type { IElectionIndexEntry } from '$lib/server/report_types'
+  import { base } from "$app/paths";
+  import type { IElectionIndexEntry } from "$lib/server/report_types";
 
   interface Props {
-    data: import('./$types').PageData;
+    data: import("./$types").PageData;
   }
 
   let { data }: Props = $props();
-  let index = data.index
+  let index = data.index;
 </script>
 
 <title>approval.vote: detailed reports on approval voting elections.</title>
@@ -16,13 +16,14 @@
   <div class="row">
     <div class="leftCol">
       <div class="description">
-        <h1>approval.vote</h1>: detailed reports on approval voting elections.
+        <h1>approval.vote</h1>
+        : detailed reports on approval voting elections.
       </div>
       <p>
-        In an <a href="https://en.wikipedia.org/wiki/Approval_Voting">
-          Approval Voting election</a
-        > voters can pick all the candidates that they like, which produces more
-        data on voter preferences than pick-one elections.
+        With <a href="https://en.wikipedia.org/wiki/Approval_Voting">
+          Approval Voting</a
+        > voters can choose as many candidates as they like, and the one receiving
+        the most votes wins.
       </p>
 
       <p>
@@ -32,6 +33,11 @@
         <a href="https://ranked.vote">ranked.vote</a>. It is non-partisan and
         has received no outside funding. For more information, see
         <a href="{base}/about">the about page</a>.
+      </p>
+
+      <p>
+        View the source code on
+        <a href="https://github.com/electionscience/approval-vote">GitHub</a>.
       </p>
     </div>
 
@@ -48,21 +54,25 @@
                 </h3>
               </div>
               {#each election.contests as contest}
-              <div class="race">
-                <a href="{base}/report/{election.path}/{contest.office}">
-                  <div class="race-content">
-                    <div class="title">
-                      <strong>{contest.officeName}</strong>
-                      {#each contest.winners as winner, i}
-                        <span class="winner">{winner}{i == contest.winners.length-1 ? '' : ', '}</span>
-                      {/each}
+                <div class="race">
+                  <a href="{base}/report/{election.path}/{contest.office}">
+                    <div class="race-content">
+                      <div class="title">
+                        <strong>{contest.officeName}</strong>
+                        {#each contest.winners as winner, i}
+                          <span class="winner"
+                            >{winner}{i == contest.winners.length - 1
+                              ? ""
+                              : ", "}</span
+                          >
+                        {/each}
+                      </div>
+                      <div class="meta">
+                        <strong>{contest.numCandidates}</strong> candidates
+                      </div>
                     </div>
-                    <div class="meta">
-                      <strong>{contest.numCandidates}</strong> candidates
-                    </div>
-                  </div>
-                </a>
-              </div>
+                  </a>
+                </div>
               {/each}
             {/each}
           </div>

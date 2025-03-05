@@ -20,15 +20,7 @@ import { base } from '$app/paths';
 </p>
 
 <p>
-  Approval voting is a voting system that allows voters to vote for as many
-  candidates as they like. It is a simple and intuitive system that
-  produces results that are easy to understand and verify.
-</p>
-
-<p>
-  All reports are generated from the raw ballot data, rather than using the
-  official tabulation. As a result, the reports also serve as an independent
-  tabulation of the results that can be reproduced using published source code.
+  With Approval Voting voters can choose as many candidates as they like, and the one receiving the most votes wins.
 </p>
 
 <p>
@@ -40,7 +32,7 @@ import { base } from '$app/paths';
 <h2>License</h2>
 
 <p>
-  This website and the data pipeline behind it (including the tabulator) are
+  This website is
   <a href="https://github.com/electionscience/approval-vote">open source</a> and liberally licensed. Website content and generated reports may
   be freely distributed with attribution under the <a href="https://creativecommons.org/licenses/by/2.0/">CC-BY</a> license.
 </p>
