@@ -1,7 +1,7 @@
 import Database from "better-sqlite3";
 
 // Path to your SQLite database file
-const db = new Database("data.db");
+const db = new Database("data.sqlite3");
 
 const insertReport = db.prepare(`
   INSERT INTO reports (name, date, jurisdictionPath, electionPath, office, officeName, jurisdictionName, electionName, website, notes, ballotCount, path, hidden)

@@ -23,7 +23,7 @@ async function generateCards() {
     executablePath: process.env.CI ? chromePath : undefined,
   });
 
-  const db = new Database("data.db");
+  const db = new Database("data.sqlite3");
   const reports = db
     .prepare(`SELECT DISTINCT path, office FROM reports WHERE hidden != 1`)
     .all();
