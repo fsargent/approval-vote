@@ -118,6 +118,13 @@ export function getIndex(): IReportIndex {
     {},
   );
 
+  // Sort contests within each election by ballotCount (descending)
+  for (const year in electionsByYear) {
+    for (const election of electionsByYear[year]) {
+      election.contests.sort((a, b) => b.ballotCount - a.ballotCount);
+    }
+  }
+
   const groupedArray = Object.entries(
     electionsByYear as IReportIndexByYear,
   ).sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
