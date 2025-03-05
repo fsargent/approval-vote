@@ -35,7 +35,7 @@
   />
   <meta
     name="twitter:image"
-    content="https://approval.vote{base}/images/{path}.png"
+    content="https://approval.vote/images/{path}.png"
   />
   <meta
     name="twitter:image:alt"
@@ -44,7 +44,7 @@
 
   <!-- Open Graph Tags (also used by X) -->
   <meta property="og:type" content="article" />
-  <meta property="og:url" content="https://approval.vote{base}/report/{path}" />
+  <meta property="og:url" content="https://approval.vote/report/{path}" />
   <meta
     property="og:title"
     content="{report.info.jurisdictionName} / {report.info.name}"
@@ -56,7 +56,7 @@
   />
   <meta
     property="og:image"
-    content="https://approval.vote{base}/images/{path}.png
+    content="https://approval.vote/images/{path}.png
       "
   />
 </svelte:head>
