@@ -55,37 +55,99 @@ function addReportAndCandidates(report, candidates) {
     console.error("Failed to execute transaction:", error);
   }
 }
+addReportAndCandidates(
+  {
+    name: "St. Louis Primary Municipal Election",
+    date: "2025-03-04",
+    jurisdictionPath: "us/mo/st_louis",
+    electionPath: "2025/03",
+    office: "mayor",
+    officeName: "Mayor",
+    jurisdictionName: "St. Louis, MO",
+    electionName: "Primary Municipal Election",
+    website:
+      "https://www.stlouis-mo.gov/government/departments/board-election-commissioners/elections/results/index.cfm",
+    notes: "Total Ballots had to be calculated from approval percentage.",
+    ballotCount: 34910,
+    path: "us/mo/st_louis/2025/03",
+    hidden: 0,
+  },
+  [
+    { name: 'Michael "Mike" Butler', votes: 8679, winner: 0 },
+    { name: "Tishaura O. Jones", votes: 11582, winner: 0 },
+    { name: "Cara Spencer", votes: 23785, winner: 1 },
+    { name: "Andrew Jones", votes: 4757, winner: 0 },
+  ],
+);
 
-// Example data to insert
-const report = {
-  name: "June 11, 2024 Commissioner Fargo",
-  date: "2024-06-11",
-  jurisdictionPath: "us/nd/fargo",
-  electionPath: "2024/06",
-  office: "commissioner",
-  officeName: "City Commissioner",
-  jurisdictionName: "Fargo, ND",
-  electionName: "Primary Election",
-  website:
-    "https://results.sos.nd.gov/resultsSW.aspx?text=All&type=CIALL&map=CTY&area=Fargo&name=Fargo",
-  notes: "",
-  ballotCount: 14781,
-  path: "us/nd/fargo/2024/06",
-  hidden: 0,
-};
+addReportAndCandidates(
+  {
+    name: "St. Louis Primary Municipal Election",
+    date: "2025-03-04",
+    jurisdictionPath: "us/mo/st_louis",
+    electionPath: "2025/03",
+    office: "comptroller",
+    officeName: "Comptroller",
+    jurisdictionName: "St. Louis, MO",
+    electionName: "Primary Municipal Election",
+    website:
+      "https://www.stlouis-mo.gov/government/departments/board-election-commissioners/elections/results/index.cfm",
+    notes: "Total Ballots had to be calculated from approval percentage.",
+    ballotCount: 34961,
+    path: "us/mo/st_louis/2025/03",
+    hidden: 0,
+  },
+  [
+    { name: "Donna M.C. Baringer", votes: 16664, winner: 1 },
+    { name: "Darlene Green", votes: 16117, winner: 0 },
+    { name: "Celeste Metcalf", votes: 8541, winner: 0 },
+  ],
+);
 
-const candidates = [
-  { name: "Michelle Turnberg", votes: 6850, winner: 1 },
-  { name: "John Strand", votes: 6579, winner: 1 },
-  { name: "Al Carlson", votes: 5746, winner: 0 },
-  { name: "Arlette Preston", votes: 5560, winner: 0 },
-  { name: "Anna Johnson", votes: 3545, winner: 0 },
-  { name: "Delson Saintal", votes: 2378, winner: 0 },
-  { name: "Nathan Pullen", votes: 1879, winner: 0 },
-  { name: "write-in", votes: 85, winner: 0 },
-];
+addReportAndCandidates(
+  {
+    name: "St. Louis Primary Municipal Election",
+    date: "2025-03-04",
+    jurisdictionPath: "us/mo/st_louis",
+    electionPath: "2025/03",
+    office: "alderman-ward3",
+    officeName: "Alderman - Ward 3",
+    jurisdictionName: "St. Louis, MO",
+    electionName: "Primary Municipal Election",
+    website:
+      "https://www.stlouis-mo.gov/government/departments/board-election-commissioners/elections/results/index.cfm",
+    notes: "Total Ballots had to be calculated from approval percentage.",
+    ballotCount: 1660,
+    path: "us/mo/st_louis/2025/03",
+    hidden: 0,
+  },
+  [
+    { name: "Dallas Adams", votes: 693, winner: 0 },
+    { name: "Shane Cohn", votes: 919, winner: 1 },
+    { name: "Inez Bordeaux", votes: 450, winner: 0 },
+  ],
+);
 
-// Add the report and candidates to the database
-addReportAndCandidates(report, candidates);
-
-console.log("Report and candidates added successfully");
+addReportAndCandidates(
+  {
+    name: "St. Louis Primary Municipal Election",
+    date: "2025-03-04",
+    jurisdictionPath: "us/mo/st_louis",
+    electionPath: "2025/03",
+    office: "alderman-ward11",
+    officeName: "Alderman - Ward 11",
+    jurisdictionName: "St. Louis, MO",
+    electionName: "Primary Municipal Election",
+    website:
+      "https://www.stlouis-mo.gov/government/departments/board-election-commissioners/elections/results/index.cfm",
+    notes: "Total Ballots had to be calculated from approval percentage.",
+    ballotCount: 1185,
+    path: "us/mo/st_louis/2025/03",
+    hidden: 0,
+  },
+  [
+    { name: "Melinda Long", votes: 140, winner: 0 },
+    { name: "Rebecca Mccloud", votes: 421, winner: 0 },
+    { name: "Laura M. Keys", votes: 743, winner: 1 },
+  ],
+);
