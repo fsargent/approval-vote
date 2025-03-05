@@ -14,7 +14,7 @@
 
 <div class="card">
   {#if report?.info && winner && winnerPercentage}
-    <div class="background-fill" style="width: {winnerPercentage}%" />
+    <div class="background-fill" style="width: {winnerPercentage}%"></div>
     <div class="content">
       <div class="jurisdiction">{report.info.jurisdictionName}</div>
       <div class="office">{report.info.officeName}</div>
