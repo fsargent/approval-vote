@@ -13,7 +13,8 @@
     "test": "run-p --race dev cy:run",
     "lint": "trunk check",
     "format": "prettier --write --plugin-search-dir=. .",
-    "svelte-check": "svelte-check"
+    "svelte-check": "svelte-check",
+    "postbuild": "npx svelte-sitemap --domain https://approval.vote"
   },
   "dependencies": {
     "@sveltejs/adapter-static": "^3.0.1",
@@ -32,6 +33,7 @@
     "svelte": "^5.0.0",
     "svelte-check": "^4.1.4",
     "svelte-preprocess": "^6.0.0",
+    "svelte-sitemap": "^2.7.0",
     "tslib": "^2.4.1",
     "typescript": "^5.5.0"
   }

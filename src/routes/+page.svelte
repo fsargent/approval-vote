@@ -10,7 +10,53 @@
   let index = data.index;
 </script>
 
-<title>approval.vote: detailed reports on approval voting elections.</title>
+<svelte:head>
+  <title>approval.vote: detailed reports on approval voting elections.</title>
+  <meta
+    name="description"
+    content="Explore detailed reports and analysis of approval voting elections. See how voters express their preferences when they can choose multiple candidates."
+  />
+
+  <!-- Open Graph Tags -->
+  <meta
+    property="og:title"
+    content="approval.vote: detailed reports on approval voting elections"
+  />
+  <meta
+    property="og:description"
+    content="Explore detailed reports and analysis of approval voting elections. See how voters express their preferences when they can choose multiple candidates."
+  />
+  <meta property="og:url" content="https://approval.vote" />
+  <meta
+    property="og:image"
+    content="https://approval.vote/icons/icon-512x512.png"
+  />
+
+  <!-- Twitter Tags -->
+  <meta name="twitter:title" content="approval.vote: Election Analysis" />
+  <meta
+    name="twitter:description"
+    content="Explore detailed reports and analysis of approval voting elections."
+  />
+  <meta
+    name="twitter:image"
+    content="https://approval.vote/icons/icon-512x512.png"
+  />
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "approval.vote",
+      "description": "Detailed reports on approval voting elections",
+      "url": "https://approval.vote",
+      "author": {
+        "@type": "Person",
+        "name": "Felix Sargent",
+        "url": "https://felixsargent.com"
+      }
+    }
+  </script>
+</svelte:head>
 
 <div class="wide container">
   <div class="row">
