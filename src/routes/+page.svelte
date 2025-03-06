@@ -8,6 +8,25 @@
 
   let { data }: Props = $props();
   let index = data.index;
+
+  // Calculate total number of races
+  let totalRaces = 0;
+  let totalApprovals = 0;
+  let totalBallots = 0;
+
+  for (const [_, elections] of index) {
+    for (const election of elections) {
+      for (const contest of election.contests) {
+        totalRaces++;
+        totalApprovals += contest.sumVotes || 0;
+        totalBallots += contest.ballotCount || 0;
+      }
+    }
+  }
+
+  const avgApprovalsPerBallot = totalBallots > 0
+    ? (totalApprovals / totalBallots).toFixed(1)
+    : "0.0";
 </script>
 
 <svelte:head>
@@ -70,6 +89,11 @@
           Approval Voting</a
         > voters can choose as many candidates as they like, and the one receiving
         the most votes wins.
+      </p>
+
+      <p>
+        This site contains detailed reports on <strong>{totalRaces}</strong> approval voting races.
+        Across all elections, voters selected an average of <strong>{avgApprovalsPerBallot}</strong> candidates per ballot.
       </p>
 
       <p>

@@ -23,8 +23,10 @@ export interface IContestIndexEntry {
   office: string;
   officeName: string;
   name: string;
-  winners: string;
+  winners: string[];
   numCandidates: number;
+  ballotCount: number;
+  sumVotes: number;
 }
 
 // report.json
