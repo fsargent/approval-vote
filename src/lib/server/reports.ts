@@ -11,13 +11,18 @@ import type {
 } from "$lib/report_types";
 
 // Helper function to create a contest object
-function createContest(row: IContestIndexEntry, winners: string[]) {
+function createContest(
+  row: IContestIndexEntry & { sumVotes: number },
+  winners: string[],
+) {
   return {
     office: row.office,
     officeName: row.officeName,
     name: row.name,
     winners: winners,
     numCandidates: row.numCandidates,
+    ballotCount: row.ballotCount,
+    sumVotes: row.sumVotes,
   };
 }
 
@@ -75,7 +80,8 @@ export function getIndex(): IReportIndex {
   const sqlCmd = `
     SELECT
       reports.*,
-      COUNT(candidates.name) AS numCandidates
+      COUNT(candidates.name) AS numCandidates,
+      SUM(candidates.votes) AS sumVotes
     FROM
       reports
     JOIN
@@ -93,10 +99,10 @@ export function getIndex(): IReportIndex {
   const electionsByYear = rows.reduce(
     (
       grouped: IReportIndexByYear,
-      row: IElectionIndexEntry,
+      row: IElectionIndexEntry & { sumVotes: number },
     ): IReportIndexByYear => {
       const year = new Date(row.date).getFullYear();
-      const winners = getWinners(row.id); // get winners for this report
+      const winners = getWinners(row.id);
       const contest = createContest(row, winners);
 
       if (!grouped[year]) {
