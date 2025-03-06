@@ -4,16 +4,36 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <meta name="theme-color" content="#437527" />
-    <link rel="manifest" crossorigin="use-credentials" href="/manifest.json" />
+
+    <!-- Preconnect to font domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+
+    <!-- Load main CSS -->
+    <link rel="stylesheet" href="/style.css" />
+
+    <!-- Defer font loading -->
+    <link
+      rel="stylesheet"
+      href="/fonts.css"
+      media="print"
+      onload="this.media='all'"
+    />
+
+    <!-- Fallback for no-JS -->
+    <noscript>
+      <link rel="stylesheet" href="/fonts.css" />
+    </noscript>
+
+    <link rel="manifest" crossorigin="use-credentials" href="/manifest.json" />
+    <link rel="icon" type="image/png" href="/icons/icon.png" />
     <meta
       name="description"
       content="approval.vote: detailed reports on approval voting elections."
     />
     %sveltekit.head%
   </head>
-  <div style="display: contents">%sveltekit.body%</div>
+  <body>
+    <div style="display: contents">%sveltekit.body%</div>
+  </body>
 </html>
