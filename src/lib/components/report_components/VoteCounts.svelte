@@ -32,7 +32,9 @@
   const labelSpace = 130;
   const width = 600;
 
-  const candidates: ICandidate[] = report.candidates;
+  // Sort candidates by votes in descending order
+  const candidates: ICandidate[] = [...report.candidates].sort((a, b) => b.votes - a.votes);
+
   const maxVotes: number = Math.max(
     ...candidates.map((candidate) => candidate.votes)
   );

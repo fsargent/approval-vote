@@ -5,13 +5,15 @@
   export let data: PageData;
   const report: IContestReport = data.report;
 
-  // Get all winners and their approval percentages
+  // Get all winners and their approval percentages, sorted by percentage
   const winners = report.candidates
     .filter((c) => c.winner)
     .map(winner => ({
       name: winner.name,
-      percentage: ((winner.votes / report.ballotCount) * 100).toFixed(1)
-    }));
+      percentage: ((winner.votes / report.ballotCount) * 100).toFixed(1),
+      votes: winner.votes // Keep votes for sorting
+    }))
+    .sort((a, b) => b.votes - a.votes); // Sort by votes in descending order
 </script>
 
 <div class="card">
