@@ -1,24 +1,50 @@
 <script lang="ts">
   import type { PageData } from "./$types";
   import type { IContestReport } from "$lib/server/report_types";
+  import QRCode from "qrcode";
+  import { onMount } from "svelte";
 
   export let data: PageData;
   const report: IContestReport = data.report;
 
-  // Get all winners and their approval percentages, sorted by percentage
-  const winners = report.candidates
-    .filter((c) => c.winner)
-    .map(winner => ({
-      name: winner.name,
-      percentage: ((winner.votes / report.ballotCount) * 100).toFixed(1),
-      votes: winner.votes // Keep votes for sorting
+  let qrCanvas: HTMLCanvasElement;
+
+  onMount(() => {
+    const url = `https://approval.vote/report/${data.path}`;
+    QRCode.toCanvas(qrCanvas, url, {
+      width: 48,
+      margin: 0,
+      color: {
+        dark: "#666666",
+        light: "#ffffff",
+      },
+    });
+  });
+
+  // Get all candidates and their approval percentages, sorted by votes
+  const candidates = report.candidates
+    .map((candidate) => ({
+      name: candidate.name,
+      percentage: ((candidate.votes / report.ballotCount) * 100).toFixed(1),
+      votes: candidate.votes,
+      winner: candidate.winner,
     }))
-    .sort((a, b) => b.votes - a.votes); // Sort by votes in descending order
+    .sort((a, b) => b.votes - a.votes);
+
+  // Calculate dynamic sizes based on number of candidates
+  $: headerHeight = Math.min(180, Math.max(120, 600 / (candidates.length + 2)));
+  $: rowHeight = (600 - headerHeight) / candidates.length;
+  // Adjusted font size calculation to be more generous in the middle range
+  $: fontSize = Math.min(2.5, Math.max(1, 8 / candidates.length));
 </script>
 
 <div class="card">
-  {#if report?.info && winners.length > 0}
-    <div class="header">
+  {#if report?.info && candidates.length > 0}
+    <div class="header" style="height: {headerHeight}px">
+      <div class="source-info">
+        <div class="watermark">approval.vote</div>
+        <canvas bind:this={qrCanvas} width="48" height="48"></canvas>
+      </div>
       <div class="jurisdiction">{report.info.jurisdictionName}</div>
       <div class="office">{report.info.officeName}</div>
       <div class="election">
@@ -26,16 +52,22 @@
       </div>
     </div>
     <div class="results">
-      {#each winners as winner, i}
-        <div class="result-row">
+      {#each candidates as candidate, i}
+        <div
+          class="result-row"
+          style="height: {rowHeight}px; font-size: {fontSize}rem;"
+        >
           <div
             class="background-fill"
-            style="width: {winner.percentage}%"
+            style="width: {candidate.percentage}%"
+            class:winner={candidate.winner}
           ></div>
-          <div class="winner-stats">
-            <div class="winner-name">{winner.name}</div>
-            <div class="percentage">{winner.percentage}%</div>
-            <div class="approval">approval</div>
+          <div class="winner-stats" class:winner={candidate.winner}>
+            <div class="candidate-name">{candidate.name}</div>
+            <div class="percentage-container">
+              <div class="percentage">{candidate.percentage}%</div>
+              <div class="approval">approval</div>
+            </div>
           </div>
         </div>
       {/each}
@@ -60,23 +92,26 @@
   }
 
   .header {
-    padding: 2rem 3rem;
+    padding: 1rem 2rem;
     text-align: center;
     background: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative; /* Added to ensure proper watermark positioning */
   }
 
   .results {
     flex: 1;
     display: flex;
     flex-direction: column;
+    padding: 0; /* Removed horizontal padding */
   }
 
   .result-row {
-    flex: 1;
     position: relative;
     display: flex;
     align-items: center;
-    justify-content: center;
   }
 
   .background-fill {
@@ -84,55 +119,90 @@
     left: 0;
     top: 0;
     height: 100%;
-    background-color: #437527;
+    background-color: #666;
     opacity: 0.15;
     transition: width 0.5s ease-out;
+  }
+
+  .background-fill.winner {
+    background-color: #437527;
   }
 
   .winner-stats {
     position: relative;
     z-index: 1;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0 2rem; /* Keep some padding for the text content */
+    color: #666;
+  }
+
+  .winner-stats.winner {
+    color: #437527;
   }
 
   .jurisdiction {
-    font-size: 2.5rem;
+    font-size: 1.75em;
     font-weight: bold;
     color: #333;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
   }
 
   .office {
-    font-size: 2rem;
+    font-size: 1.25em;
     color: #444;
     margin-bottom: 0.25rem;
   }
 
   .election {
-    font-size: 1.5rem;
+    font-size: 1.1em;
     color: #666;
-    margin-bottom: 0.5rem;
   }
 
-  .winner-name {
-    font-size: 2.5rem;
+  .candidate-name {
+    font-size: 1em;
     font-weight: bold;
-    color: #437527;
-    margin-bottom: 0.5rem;
+    flex: 1;
+    text-align: left;
+  }
+
+  .percentage-container {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    white-space: nowrap;
   }
 
   .percentage {
-    font-size: 4rem;
+    font-size: 1.2em;
     font-weight: bold;
-    color: #437527;
-    line-height: 1;
-    margin-bottom: 0.25rem;
   }
 
   .approval {
-    font-size: 1.5rem;
-    color: #437527;
+    font-size: 0.7em;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.05em;
+  }
+
+  .source-info {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    flex-direction: column; /* Changed to column layout */
+    align-items: flex-end; /* Align items to the right */
+    gap: 0.25rem; /* Reduced gap for vertical layout */
+  }
+
+  .watermark {
+    font-size: 0.8rem;
+    color: #666;
+    opacity: 0.5;
+    font-style: italic;
+  }
+
+  canvas {
+    opacity: 0.5;
   }
 </style>

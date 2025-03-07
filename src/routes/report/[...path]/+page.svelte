@@ -66,6 +66,9 @@
       and may be reproduced under
       <a href="https://creativecommons.org/licenses/by/2.0/">CC-BY</a>. Learn
       more <a href="{base}/about">about approval.vote</a>.
+      <span style="margin-left: 1em;">
+        <a href="{base}/images/{path}.png">View card image →</a>
+      </span>
     </p>
   </div>
 </div>
