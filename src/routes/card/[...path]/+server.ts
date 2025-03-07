@@ -30,7 +30,7 @@ export const GET: RequestHandler = async ({ url, params }) => {
     await page.setViewport({
       width: 1200,
       height: 630,
-      deviceScaleFactor: 2, // Retina quality
+      deviceScaleFactor: 4, // Increased from 2 to 4 for sharper text
     });
 
     // Get the card element
@@ -43,6 +43,7 @@ export const GET: RequestHandler = async ({ url, params }) => {
     const screenshot = await element.screenshot({
       type: "png",
       omitBackground: false,
+      encoding: "binary",
     });
     console.log("Screenshot taken");
 

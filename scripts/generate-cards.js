@@ -35,7 +35,7 @@ async function generateCards() {
   await page.setViewport({
     width: 1200,
     height: 630,
-    deviceScaleFactor: 2,
+    deviceScaleFactor: 4,
   });
 
   page.on("console", (msg) => console.log("Browser console:", msg.text()));
@@ -118,7 +118,7 @@ async function generateCards() {
       await page.setViewport({
         width: 1200,
         height: 630,
-        deviceScaleFactor: 2,
+        deviceScaleFactor: 4,
       });
       page.on("console", (msg) => console.log("Browser console:", msg.text()));
       page.on("pageerror", (err) => console.error("Browser error:", err));
