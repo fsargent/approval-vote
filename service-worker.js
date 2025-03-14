@@ -1,5 +1,5 @@
 const CACHE_NAME = "approval-vote-v1";
-const ASSETS_TO_CACHE = [
+const CORE_ASSETS = [
   "/",
   "/style.css",
   "/fonts.css",
@@ -7,20 +7,37 @@ const ASSETS_TO_CACHE = [
   "/icons/icon.png",
   "/icons/icon-192x192.png",
   "/icons/icon-512x512.png",
+  "/about",
 ];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    }),
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ASSETS)),
   );
 });
 
 self.addEventListener("fetch", (event) => {
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
+    caches.match(event.request).then((cachedResponse) => {
+      // Return cached response if found
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      // Otherwise, fetch from network and cache the response
+      return fetch(event.request).then((response) => {
+        // Cache only successful responses
+        if (!response || response.status !== 200 || response.type !== "basic") {
+          return response;
+        }
+
+        const responseToCache = response.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, responseToCache);
+        });
+
+        return response;
+      });
     }),
   );
 });
