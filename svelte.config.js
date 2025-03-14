@@ -47,7 +47,7 @@ const config = {
       base: "",
     },
     serviceWorker: {
-      register: false,
+      register: true,
       files: (filepath) => !/\.DS_Store/.test(filepath),
     },
     version: {
