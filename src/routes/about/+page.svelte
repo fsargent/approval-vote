@@ -45,4 +45,49 @@ import { base } from '$app/paths';
   The font is <a href="https://github.com/adobe-fonts/source-sans-pro">Source Sans Pro</a>.
 </p>
 
+<div class="space-y-4">
+	<h2 class="text-2xl font-bold">Academic Foundations</h2>
+	<p>
+		Approval voting has a rich history and is supported by a significant body of academic research. Here are some of the key papers that have shaped our understanding of this voting method:
+	</p>
+
+	<ul class="space-y-4 list-disc list-inside">
+		<li>
+			<span class="font-semibold">"Approval Voting" by Steven J. Brams and Peter C. Fishburn (1978)</span>
+			<p class="ml-4">
+				This foundational paper, published in the <i>American Political Science Review</i>, introduced approval voting to a wider audience. It lays out the basic principles and advantages of this voting system, arguing that it is more sincere and strategy-proof than other systems.
+				<a
+					href="https://www.cambridge.org/core/journals/american-political-science-review/article/approval-voting/7CE5DEEE235794B0B12F76ADAE621482"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="text-blue-500 hover:underline"
+				>
+					Read the paper
+				</a>
+			</p>
+		</li>
+		<li>
+			<span class="font-semibold">"Approval Voting" by Robert J. Weber (1995)</span>
+			<p class="ml-4">
+				Published in the <i>Journal of Economic Perspectives</i>, this paper provides a concise and accessible overview of approval voting. Weber discusses its history, properties, and compares it to other voting methods.
+				<a
+					href="https://www.aeaweb.org/articles?id=10.1257/jep.9.1.39"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="text-blue-500 hover:underline"
+				>
+					Read the paper
+				</a>
+			</p>
+		</li>
+		<li>
+			<span class="font-semibold"><i>Approval Voting</i> by Steven J. Brams and Peter C. Fishburn (1983)</span>
+			<p class="ml-4">
+				This comprehensive book delves deeper into the strategic aspects of voting, the social utility of different voting systems, and provides a wealth of evidence and analysis supporting the use of approval voting.
+			</p>
+		</li>
+	</ul>
+</div>
+
+
 </div>
