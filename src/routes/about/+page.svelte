@@ -53,37 +53,51 @@ import { base } from '$app/paths';
 
 	<ul class="space-y-4 list-disc list-inside">
 		<li>
-			<span class="font-semibold">"Approval Voting" by Steven J. Brams and Peter C. Fishburn (1978)</span>
+			<span class="font-semibold">Brams, S. J., & Fishburn, P. C. (1978). <a href="https://www.jstor.org/stable/1955105">Approval Voting</a>. <i>American Political Science Review, 72</i>(3), 831–847.</span>
 			<p class="ml-4">
-				This foundational paper, published in the <i>American Political Science Review</i>, introduced approval voting to a wider audience. It lays out the basic principles and advantages of this voting system, arguing that it is more sincere and strategy-proof than other systems.
-				<a
-					href="https://www.cambridge.org/core/journals/american-political-science-review/article/approval-voting/7CE5DEEE235794B0B12F76ADAE621482"
-					target="_blank"
-					rel="noopener noreferrer"
-					class="text-blue-500 hover:underline"
-				>
-					Read the paper
-				</a>
+				This is considered the seminal paper that introduced and formalized the concept of approval voting.
 			</p>
 		</li>
 		<li>
-			<span class="font-semibold">"Approval Voting" by Robert J. Weber (1995)</span>
+			<span class="font-semibold">Brams, S. J., & Fishburn, P. C. (1983). <a href="https://link.springer.com/book/10.1007/978-1-4612-5436-9"><i>Approval Voting</i></a>. Birkhäuser.</span>
 			<p class="ml-4">
-				Published in the <i>Journal of Economic Perspectives</i>, this paper provides a concise and accessible overview of approval voting. Weber discusses its history, properties, and compares it to other voting methods.
-				<a
-					href="https://www.aeaweb.org/articles?id=10.1257/jep.9.1.39"
-					target="_blank"
-					rel="noopener noreferrer"
-					class="text-blue-500 hover:underline"
-				>
-					Read the paper
-				</a>
+				A comprehensive book that expands on their original paper, providing a detailed analysis of the properties and potential effects of approval voting.
 			</p>
 		</li>
 		<li>
-			<span class="font-semibold"><i>Approval Voting</i> by Steven J. Brams and Peter C. Fishburn (1983)</span>
+			<span class="font-semibold">Weber, R. J. (1995). <a href="https://www.jstor.org/stable/2138378">Approval Voting</a>. <i>Journal of Economic Perspectives, 9</i>(1), 39–49.</span>
 			<p class="ml-4">
-				This comprehensive book delves deeper into the strategic aspects of voting, the social utility of different voting systems, and provides a wealth of evidence and analysis supporting the use of approval voting.
+				A paper that reviews the history and properties of approval voting, comparing it favorably to plurality and Borda count systems.
+			</p>
+		</li>
+		<li>
+			<span class="font-semibold">Brams, S. J., & Fishburn, P. C. (2005). <a href="https://link.springer.com/article/10.1007/s00355-005-0021-3">Going from theory to practice: the mixed success of approval voting</a>. <i>Social Choice and Welfare, 25</i>(2-3), 457–474.</span>
+			<p class="ml-4">
+				This paper discusses the practical applications and challenges of implementing approval voting in real-world scenarios.
+			</p>
+		</li>
+		<li>
+			<span class="font-semibold">Fishburn, P. C., & Brams, S. J. (1981). <a href="https://link.springer.com/article/10.1007/BF00127265">Approval voting, Condorcet's principle, and runoff elections</a>. <i>Public Choice, 36</i>(1), 89–114.</span>
+			<p class="ml-4">
+				An article that explores the relationship between approval voting and the Condorcet criterion, arguing its superiority in certain respects to runoff elections.
+			</p>
+		</li>
+		<li>
+			<span class="font-semibold">Ahn, D. S., & Oliveros, S. (2012). <a href="https://doi.org/10.1016/j.jet.2011.10.007">Approval voting and scoring rules with common values</a>. <i>Journal of Economic Theory, 147</i>(2), 773-790.</span>
+			<p class="ml-4">
+				This research delves into the efficiency of approval voting compared to other scoring rules in elections where voters have common, but privately known, values.
+			</p>
+		</li>
+		<li>
+			<span class="font-semibold">Laslier, J. F., & Sanver, R. M. (Eds.). (2010). <a href="https://link.springer.com/book/10.1007/978-3-642-02839-7"><i>Handbook on Approval Voting</i></a>. Springer.</span>
+			<p class="ml-4">
+				A collection of essays from various authors that covers many facets of approval voting, from theoretical to practical considerations.
+			</p>
+		</li>
+		<li>
+			<span class="font-semibold">Brams, S. J., & Kilgour, D. M. (2014). <a href="https://link.springer.com/chapter/10.1007/978-3-319-05158-1_15">Satisfaction Approval Voting</a>. In <i>Voting Power and Procedures</i> (pp. 323-346). Springer, Cham.</span>
+			<p class="ml-4">
+				This work introduces a variant of approval voting that aims to maximize voter satisfaction.
 			</p>
 		</li>
 	</ul>
