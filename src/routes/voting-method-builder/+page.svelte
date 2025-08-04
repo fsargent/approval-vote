@@ -1,5 +1,6 @@
 <script lang="ts">
 import { base } from '$app/paths';
+import { onMount } from 'svelte';
 
 // Type definition for our config
 interface VotingConfig {
@@ -875,12 +876,32 @@ function validatePartyVoting() {
 $: if (!config.hasParties) {
   config.hasPrimaries = false;
 }
+
+// Simple toggletip state management
+let activeTooltip: string | null = null;
+
+function toggleTooltip(id: string) {
+  activeTooltip = activeTooltip === id ? null : id;
+}
+
+function closeTooltip() {
+  activeTooltip = null;
+}
+
+// Close tooltip on escape key
+function handleKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape') {
+    closeTooltip();
+  }
+}
 </script>
 
 <svelte:head>
   <title>Voting Method Builder - Create Your Custom Voting System - approval.vote</title>
   <meta name="description" content="Interactive tool to design and analyze custom voting methods. Mix and match ballot types, tabulation methods, and multi-winner options to create your ideal voting system." />
 </svelte:head>
+
+<svelte:window on:keydown={handleKeydown} on:click={closeTooltip} />
 
 <div class="container wide-builder">
   <div class="description">
@@ -1114,32 +1135,72 @@ $: if (!config.hasParties) {
             <h3>System Analysis</h3>
             <div class="score-grid">
               <div class="score-item">
-                <span class="score-label tooltip-label" title="How well the election results reflect the proportion of support for different groups or parties - higher scores mean seats are allocated more fairly based on vote share">Proportionality</span>
-                <div class="score-bar">
-                  <div class="score-fill" data-score="{votingMethodScores.proportionality}" style="width: {(votingMethodScores.proportionality / 5) * 100}%"></div>
-                  <span class="score-value">{votingMethodScores.proportionality}/5</span>
+                <div class="score-bar-container">
+                  <div class="score-label-container">
+                    <span class="score-label">Proportionality</span>
+                    <button type="button" class="info-button" on:click={(e) => { e.stopPropagation(); toggleTooltip('proportionality'); }} aria-label="more info about proportionality">ⓘ</button>
+                  </div>
+                  <div class="score-bar">
+                    <div class="score-fill" data-score="{votingMethodScores.proportionality}" style="width: {(votingMethodScores.proportionality / 5) * 100}%"></div>
+                    <span class="score-value">{votingMethodScores.proportionality}/5</span>
+                  </div>
                 </div>
+                {#if activeTooltip === 'proportionality'}
+                  <div class="info-panel">
+                    How well the election results reflect the proportion of support for different groups or parties - higher scores mean seats are allocated more fairly based on vote share
+                  </div>
+                {/if}
               </div>
               <div class="score-item">
-                <span class="score-label tooltip-label" title="How easy it is for voters to understand and use the voting method - considers ballot complexity, cognitive load, and learning curve">Voter Simplicity</span>
-                <div class="score-bar">
-                  <div class="score-fill" data-score="{votingMethodScores.simplicity}" style="width: {(votingMethodScores.simplicity / 5) * 100}%"></div>
-                  <span class="score-value">{votingMethodScores.simplicity}/5</span>
+                <div class="score-bar-container">
+                  <div class="score-label-container">
+                    <span class="score-label">Voter Simplicity</span>
+                    <button type="button" class="info-button" on:click={(e) => { e.stopPropagation(); toggleTooltip('simplicity'); }} aria-label="more info about voter simplicity">ⓘ</button>
+                  </div>
+                  <div class="score-bar">
+                    <div class="score-fill" data-score="{votingMethodScores.simplicity}" style="width: {(votingMethodScores.simplicity / 5) * 100}%"></div>
+                    <span class="score-value">{votingMethodScores.simplicity}/5</span>
+                  </div>
                 </div>
+                {#if activeTooltip === 'simplicity'}
+                  <div class="info-panel">
+                    How easy it is for voters to understand and use the voting method - considers ballot complexity, cognitive load, and learning curve
+                  </div>
+                {/if}
               </div>
               <div class="score-item">
-                <span class="score-label tooltip-label" title="How resistant the method is to tactical voting and manipulation - higher scores mean voters can be more honest without being penalized">Strategy Resistance</span>
-                <div class="score-bar">
-                  <div class="score-fill" data-score="{votingMethodScores.strategyResistance}" style="width: {(votingMethodScores.strategyResistance / 5) * 100}%"></div>
-                  <span class="score-value">{votingMethodScores.strategyResistance}/5</span>
+                <div class="score-bar-container">
+                  <div class="score-label-container">
+                    <span class="score-label">Strategy Resistance</span>
+                    <button type="button" class="info-button" on:click={(e) => { e.stopPropagation(); toggleTooltip('resistance'); }} aria-label="more info about strategy resistance">ⓘ</button>
+                  </div>
+                  <div class="score-bar">
+                    <div class="score-fill" data-score="{votingMethodScores.strategyResistance}" style="width: {(votingMethodScores.strategyResistance / 5) * 100}%"></div>
+                    <span class="score-value">{votingMethodScores.strategyResistance}/5</span>
+                  </div>
                 </div>
+                {#if activeTooltip === 'resistance'}
+                  <div class="info-panel">
+                    How resistant the method is to tactical voting and manipulation - higher scores mean voters can be more honest without being penalized
+                  </div>
+                {/if}
               </div>
               <div class="score-item">
-                <span class="score-label tooltip-label" title="How well the elected candidates actually represent the preferences and will of the electorate - considers broad support, minority representation, and whether outcomes reflect voter intent">Representation Quality</span>
-                <div class="score-bar">
-                  <div class="score-fill" data-score="{votingMethodScores.representation}" style="width: {(votingMethodScores.representation / 5) * 100}%"></div>
-                  <span class="score-value">{votingMethodScores.representation}/5</span>
+                <div class="score-bar-container">
+                  <div class="score-label-container">
+                    <span class="score-label">Representation Quality</span>
+                    <button type="button" class="info-button" on:click={(e) => { e.stopPropagation(); toggleTooltip('quality'); }} aria-label="more info about representation quality">ⓘ</button>
+                  </div>
+                  <div class="score-bar">
+                    <div class="score-fill" data-score="{votingMethodScores.representation}" style="width: {(votingMethodScores.representation / 5) * 100}%"></div>
+                    <span class="score-value">{votingMethodScores.representation}/5</span>
+                  </div>
                 </div>
+                {#if activeTooltip === 'quality'}
+                  <div class="info-panel">
+                    How well the elected candidates actually represent the preferences and will of the electorate - considers broad support, minority representation, and whether outcomes reflect voter intent
+                  </div>
+                {/if}
               </div>
             </div>
           </div>
@@ -1416,20 +1477,63 @@ $: if (!config.hasParties) {
 
   .score-item {
     display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .score-label-container {
+    display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.5rem;
+    min-width: 140px;
   }
 
   .score-label {
-    min-width: 140px;
     font-weight: 500;
     color: #475569;
     font-size: 0.95rem;
   }
 
-  .tooltip-label {
-    cursor: help;
-    border-bottom: 1px dotted #94a3b8;
+  .info-button {
+    background: none;
+    border: none;
+    color: #0ea5e9;
+    cursor: pointer;
+    font-size: 0.875rem;
+    padding: 2px;
+    margin: 0;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .info-button:hover, .info-button:focus {
+    background: #e0f2fe;
+    outline: 2px solid #0ea5e9;
+    outline-offset: 1px;
+  }
+
+  .info-panel {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: #475569;
+    margin-top: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .score-bar-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
   }
 
 
