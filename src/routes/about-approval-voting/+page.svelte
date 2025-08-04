@@ -2,8 +2,8 @@
 import { base } from '$app/paths';
 
 // Interactive voting example state
-let fptpVote = '';
-let approvalVotes = [];
+let fptpVote = $state('');
+let approvalVotes = $state([]);
 
 const candidates = [
   { id: 'alice', name: 'Alice Johnson', party: 'Progressive' },
@@ -226,11 +226,14 @@ function handleApprovalVote(candidateId) {
   </div>
 
   <div class="cta-section">
-    <h2>Compare with Other Voting Systems</h2>
+    <h2>Explore More Voting Systems</h2>
     <p>
-      Want to see how approval voting compares to ranked choice voting? Check out our detailed comparison.
+      Learn about proportional representation with approval voting principles, or see how approval voting compares to ranked choice voting.
     </p>
-    <a href="{base}/rcv-vs-approval" class="cta-button">RCV vs Approval Voting</a>
+    <div class="cta-buttons">
+      <a href="{base}/fair-share-voting" class="cta-button">Fair Share Voting</a>
+      <a href="{base}/rcv-vs-approval" class="cta-button">RCV vs Approval Voting</a>
+    </div>
   </div>
 </div>
 
@@ -440,6 +443,14 @@ function handleApprovalVote(candidateId) {
   .cta-button:hover {
     background: #365a1f;
     text-decoration: none;
+  }
+
+  .cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
   }
 
 

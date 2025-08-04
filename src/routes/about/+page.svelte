@@ -46,7 +46,7 @@ import { base } from '$app/paths';
 </p>
 
 <p>
-  For more detailed information about approval voting, including academic research and comparisons with other voting systems, see our <a href="{base}/approval-voting">comprehensive guide to approval voting</a>.
+  For more detailed information about approval voting, including academic research and comparisons with other voting systems, see our <a href="{base}/about-approval-voting">comprehensive guide to approval voting</a>.
 </p>
 
 

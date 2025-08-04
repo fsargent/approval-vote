@@ -86,7 +86,7 @@
         : detailed reports on approval voting elections.
       </div>
       <p>
-        With <a href="{base}/approval-voting">
+        With <a href="{base}/about-approval-voting">
           Approval Voting</a
         > voters can choose as many candidates as they like, and the one receiving
         the most votes wins.
@@ -104,7 +104,7 @@
         <a href="https://ranked.vote">ranked.vote</a>. It is non-partisan and
         has received no outside funding.</p>
         <p>For more information, see
-        <a href="{base}/about">the about page</a>, learn about <a href="{base}/approval-voting">approval voting</a>, or compare
+        <a href="{base}/about">the about page</a>, learn about <a href="{base}/about-approval-voting">approval voting</a>, explore <a href="{base}/fair-share-voting">fair share voting</a>, or compare
         <a href="{base}/rcv-vs-approval">RCV vs approval voting</a>.
       </p>
 
