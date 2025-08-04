@@ -42,7 +42,7 @@ let config: VotingConfig = {
 
 // Option definitions
 const ballotTypes = [
-  { id: 'choose-x', name: 'Choose X', description: 'Select a limited number of candidates' },
+  { id: 'choose-x', name: 'Choose X', description: 'Pick candidates' },
   { id: 'ranking', name: 'Ranked', description: 'Rank candidates in order of preference' },
   { id: 'score', name: 'Score', description: 'Give each candidate a numerical score' }
 ];
@@ -63,8 +63,9 @@ const rankedTabulationMethods = [
 
 const approvalTabulationMethods = [
   { id: 'most-votes', name: 'Most Approvals', description: 'Candidate with most approvals wins' },
+  { id: 'sntv', name: 'SNTV (Single Non-Transferable Vote)', description: 'Semi-proportional method for choose-one ballots' },
   { id: 'satisfaction-approval', name: 'Satisfaction Approval', description: 'Semi-proportional method - splits votes equally between approved candidates' },
-  { id: 'pav', name: 'PAV (Proportional Approval)', description: 'Proportional method - splits votes between winning candidates' },
+  { id: 'spav', name: 'SPAV (Sequential Proportional Approval)', description: 'Proportional method using sequential selection algorithm' },
   { id: 'sequential-monroe', name: 'Sequential Monroe', description: 'Proportional method maximizing equal voter satisfaction' }
 ];
 
@@ -77,7 +78,10 @@ const scoreTabulationMethods = [
   { id: 'highest-total', name: 'Highest Total Score', description: 'Sum all scores, highest wins' },
   { id: 'highest-average', name: 'Highest Average', description: 'Best average score wins' },
   { id: 'star', name: 'STAR Voting', description: 'Score then automatic runoff' },
-  { id: 'majority-judgment', name: 'Majority Judgment', description: 'Based on median score' }
+  { id: 'majority-judgment', name: 'Majority Judgment', description: 'Based on median score' },
+  { id: 'equal-shares', name: 'Method of Equal Shares', description: 'Proportional method ensuring equal budget per voter' },
+  { id: 'reweighted-range', name: 'Reweighted Range Voting', description: 'Proportional score voting with vote reweighting' },
+  { id: 'sequentially-spent-score', name: 'Sequentially Spent Score', description: 'Proportional method spending voter budgets sequentially' }
 ];
 
 
@@ -111,6 +115,19 @@ $: {
   // Add party-based methods if parties are enabled and multi-winner
   if (config.hasParties && isMultiWinner) {
     methods = [...methods, ...partyBasedTabulationMethods];
+  }
+  
+  // Filter methods based on choice limitations and seat count
+  if (config.ballotType === 'choose-x' && config.limitedChoices === '1') {
+    // For "choose one" ballots, only allow SNTV (multi-winner) and Most Approvals among approval methods
+    methods = methods.filter(m =>
+      m.id === 'most-votes' ||
+      (m.id === 'sntv' && isMultiWinner) ||
+      partyBasedTabulationMethods.some(p => p.id === m.id)
+    );
+  } else if (config.ballotType === 'choose-x' && config.limitedChoices !== '1') {
+    // For approval ballots (unlimited or custom), exclude SNTV
+    methods = methods.filter(m => m.id !== 'sntv');
   }
   
   availableTabulationMethods = methods;
@@ -152,26 +169,78 @@ function generateVotingMethodName(config: VotingConfig) {
         }
       }
     } else {
-      // Non-proportional multi-winner
-      if (config.ballotType === 'choose-x') {
-        if (config.limitedChoices === '1') {
-          name = "Block Voting (FPTP)";
-        } else if (config.limitedChoices === 'unlimited') {
-          name = "Block Approval Voting";
-        } else if (config.limitedChoices === 'custom') {
-          name = `Block Voting (${config.customLimit})`;
+      // Non-proportional multi-winner - check tabulation method first
+      if (config.ballotType === 'choose-x' && config.tabulationMethod) {
+        const method = approvalTabulationMethods.find(m => m.id === config.tabulationMethod);
+        if (method) {
+          // Special case: "Most Approvals" in multi-winner becomes "Block Approval"
+          if (config.tabulationMethod === 'most-votes') {
+            if (config.limitedChoices === '1') {
+              name = "Block Voting (FPTP)";
+            } else if (config.limitedChoices === 'unlimited') {
+              name = "Block Approval Voting";
+            } else if (config.limitedChoices === 'custom') {
+              name = `Block Voting (${config.customLimit})`;
+            } else {
+              name = "Block Voting (Limited)";
+            }
+          } else {
+            name = method.name;
+          }
         } else {
-          name = "Block Voting (Limited)";
+          // Fallback to generic block voting names
+          if (config.limitedChoices === '1') {
+            name = "Block Voting (FPTP)";
+          } else if (config.limitedChoices === 'unlimited') {
+            name = "Block Approval Voting";
+          } else if (config.limitedChoices === 'custom') {
+            name = `Block Voting (${config.customLimit})`;
+          } else {
+            name = "Block Voting (Limited)";
+          }
         }
-      } else if (config.ballotType === 'ranking') {
-        name = "Block Voting (Ranked)";
-      } else if (config.ballotType === 'score') {
-        name = "Block Score Voting";
+      } else if (config.ballotType === 'ranking' && config.tabulationMethod) {
+        const method = rankedTabulationMethods.find(m => m.id === config.tabulationMethod);
+        name = method ? method.name : "Block Voting (Ranked)";
+      } else if (config.ballotType === 'score' && config.tabulationMethod) {
+        const method = scoreTabulationMethods.find(m => m.id === config.tabulationMethod);
+        name = method ? method.name : "Block Score Voting";
+      } else {
+        // Fallback when no tabulation method selected
+        if (config.ballotType === 'choose-x') {
+          if (config.limitedChoices === '1') {
+            name = "Block Voting (FPTP)";
+          } else if (config.limitedChoices === 'unlimited') {
+            name = "Block Approval Voting";
+          } else if (config.limitedChoices === 'custom') {
+            name = `Block Voting (${config.customLimit})`;
+          } else {
+            name = "Block Voting (Limited)";
+          }
+        } else if (config.ballotType === 'ranking') {
+          name = "Block Voting (Ranked)";
+        } else if (config.ballotType === 'score') {
+          name = "Block Score Voting";
+        }
       }
     }
   } else {
     // Single winner naming
-    if (config.ballotType === 'choose-x') {
+    if (config.ballotType === 'choose-x' && config.tabulationMethod) {
+      // Check if using "Most Approvals" with "Pick 1" - that's FPTP
+      if (config.tabulationMethod === 'most-votes' && config.limitedChoices === '1') {
+        name = "First Past The Post";
+      } else if (config.limitedChoices === '1') {
+        name = "First Past The Post";
+      } else if (config.limitedChoices === 'unlimited') {
+        name = "Approval Voting";
+      } else if (config.limitedChoices === 'custom') {
+        name = `Limited Voting (${config.customLimit})`;
+      } else {
+        name = "Limited Voting";
+      }
+    } else if (config.ballotType === 'choose-x') {
+      // Fallback when no tabulation method selected
       if (config.limitedChoices === '1') {
         name = "First Past The Post";
       } else if (config.limitedChoices === 'unlimited') {
@@ -214,7 +283,7 @@ function generateVotingMethodSummary(config: VotingConfig) {
     if (config.ballotType === 'score') {
       summary += ` (${config.scoreMin} to ${config.scoreMax}`;
       if (config.allowNegativeVotes) summary += ', negative scores allowed';
-      summary += ')';
+      summary += '). Score voting works best with many candidates and relatively few voters, where the expressivity helps prevent ties';
     }
     summary += '\n\n';
   }
@@ -300,7 +369,7 @@ function generateVotingMethodCritique(config: VotingConfig) {
       if (config.limitedChoices === '1') {
         critique += "**Strengths:** Simple and familiar. **Weaknesses:** Severe vote splitting, spoiler effects, doesn't capture full voter preferences.";
       } else if (config.limitedChoices === 'unlimited') {
-        critique += "**Strengths:** Simple, eliminates vote splitting, encourages honest voting. **Weaknesses:** No preference intensity, potential for bullet voting.";
+        critique += "**Strengths:** Simple, eliminates vote splitting, encourages honest voting. **Weaknesses:** No preference intensity";
       } else {
         critique += "**Strengths:** Reduces vote splitting compared to FPTP, allows some preference expression. **Weaknesses:** Arbitrary limit may not reflect true preferences, still susceptible to strategic voting.";
       }
@@ -337,8 +406,11 @@ function generateVotingMethodCritique(config: VotingConfig) {
       case 'satisfaction-approval':
         critique += "**Satisfaction Approval:** Semi-proportional system that splits each vote equally between all approved candidates. More proportional than block voting but requires strategic coordination - voters must know how many seats their party deserves and vote for exactly that many candidates. Vulnerable to 'wipeout' if strategy fails.";
         break;
-      case 'pav':
-        critique += "**PAV:** Proportional approval voting that encourages diverse representation, but can be computationally complex.";
+      case 'sntv':
+        critique += "**SNTV:** Semi-proportional method for choose-one ballots. Requires strategic nomination by parties to achieve proportionality - too many candidates splits the vote, too few wastes votes.";
+        break;
+      case 'spav':
+        critique += "**SPAV:** Sequential Proportional Approval Voting that encourages diverse representation. Much more practical to implement than the theoretical PAV optimization.";
         break;
       case 'sequential-monroe':
         critique += "**Sequential Monroe:** Maximizes equal voter satisfaction across all seats, ensuring minority representation.";
@@ -347,16 +419,25 @@ function generateVotingMethodCritique(config: VotingConfig) {
         critique += "**STV:** Provides proportional representation with ranked ballots, maintaining local representation while ensuring diversity.";
         break;
       case 'highest-total':
-        critique += "**Highest Total:** Simple sum of scores, but may favor candidates with broader but shallow support.";
+        critique += "**Highest Total:** Adds up all scores for each candidate - the candidate with the highest sum wins. Simple. Works best with many candidates and relatively few voters where expressivity helps prevent ties.";
         break;
       case 'highest-average':
-        critique += "**Highest Average:** Rewards quality over quantity of support, but can be skewed by few very high scores.";
+        critique += "**Highest Average:** Divides total score by number of voters who scored that candidate. Rewards candidates with passionate supporters but can be manipulated by supporters abstaining to boost their candidate's average. Like other score methods, most effective with many candidates and fewer voters.";
         break;
       case 'star':
-        critique += "**STAR:** Combines benefits of score voting with runoff security, but relatively new and untested at scale.";
+        critique += "**STAR:** Combines benefits of score voting with runoff security, eliminating strategic concerns. The scoring phase works best with many candidates and relatively few voters, while the runoff provides decisive results.";
         break;
       case 'majority-judgment':
-        critique += "**Majority Judgment:** Based on median scores, resistant to tactical voting but can have tie-breaking complexity.";
+        critique += "**Majority Judgment:** Uses the median (middle) score for each candidate rather than totals or averages. This makes it highly resistant to strategic manipulation since extreme scores (very high or very low) don't affect the median. However, it can lead to ties when candidates have the same median, requiring complex tie-breaking rules. The detailed scoring is most valuable when there are many candidates to differentiate.";
+        break;
+      case 'equal-shares':
+        critique += "**Method of Equal Shares:** Ensures each voter gets an equal 'budget' of representation. Excellent proportionality and fairness, but complex for voters to understand. The detailed scoring works best with many candidates and relatively few voters.";
+        break;
+      case 'reweighted-range':
+        critique += "**Reweighted Range Voting:** Achieves proportionality by reducing the weight of voters whose preferences are already represented. Good proportional outcomes but complex tabulation. Most effective when there are many candidates to score and differentiate.";
+        break;
+      case 'sequentially-spent-score':
+        critique += "**Sequentially Spent Score:** Selects winners by spending voter 'budgets' sequentially. Provides proportional representation with intuitive budget-based logic. Like other score methods, the expressivity is most valuable with many candidates and fewer voters.";
         break;
     }
     critique += "\n\n";
@@ -364,7 +445,7 @@ function generateVotingMethodCritique(config: VotingConfig) {
   
   // Multi-winner critique
   if (config.numberOfSeats > 1) {
-    if (['party-list-pr', 'mmp', 'pav', 'sequential-monroe', 'stv'].includes(config.tabulationMethod || '')) {
+    if (['party-list-pr', 'mmp', 'spav', 'sequential-monroe', 'stv', 'equal-shares', 'reweighted-range', 'sequentially-spent-score'].includes(config.tabulationMethod || '')) {
       critique += "**Proportional Representation:** Ensures fair party representation but may reduce local accountability.";
       
       // List type critique
@@ -432,11 +513,11 @@ function generateVotingMethodScores(config: VotingConfig) {
       scores.strategyResistance = 3; // Moderate strategy resistance
       break;
     case 'ranking':
-      scores.simplicity = 3; // Moderate complexity
-      scores.strategyResistance = 4; // Good strategy resistance
+      scores.simplicity = 1; // Complex for voters (ranking many candidates)
+      scores.strategyResistance = 3; // Moderate (doesn't eliminate spoiler effects)
       break;
     case 'score':
-      scores.simplicity = 4; // Fairly simple
+      scores.simplicity = 4; // Fairly simple, especially effective with many candidates
       scores.strategyResistance = 3; // Moderate strategy resistance
       break;
   }
@@ -450,10 +531,18 @@ function generateVotingMethodScores(config: VotingConfig) {
       scores.proportionality = 3; // Semi-proportional
       scores.representation = 4;
       break;
-    case 'pav':
+    case 'sntv':
+      scores.proportionality = 3; // Semi-proportional
+      scores.representation = 3;
+      scores.strategyResistance = 2; // Vulnerable to nomination strategy
+      break;
+    case 'spav':
     case 'sequential-monroe':
     case 'stv':
     case 'party-list-pr':
+    case 'equal-shares':
+    case 'reweighted-range':
+    case 'sequentially-spent-score':
       scores.proportionality = 5; // Fully proportional
       scores.representation = 5;
       break;
@@ -469,9 +558,28 @@ function generateVotingMethodScores(config: VotingConfig) {
       scores.strategyResistance = 2; // Vulnerable to strategy
       scores.representation = 3;
       break;
+    case 'highest-total':
+      scores.representation = config.numberOfSeats > 1 ? 3 : 4;
+      break;
+    case 'highest-average':
+      scores.representation = config.numberOfSeats > 1 ? 3 : 4;
+      break;
+    case 'majority-judgment':
+      scores.strategyResistance = 4; // More resistant to strategy
+      scores.representation = config.numberOfSeats > 1 ? 4 : 4;
+      break;
     case 'star':
       scores.strategyResistance = 4;
       scores.representation = 4;
+      break;
+    case 'equal-shares':
+      scores.strategyResistance = 4; // Good strategy resistance
+      scores.simplicity = Math.max(1, scores.simplicity - 1); // Slightly more complex
+      break;
+    case 'reweighted-range':
+    case 'sequentially-spent-score':
+      scores.strategyResistance = 3; // Moderate strategy resistance
+      scores.simplicity = Math.max(1, scores.simplicity - 1); // Slightly more complex
       break;
   }
 
@@ -482,19 +590,21 @@ function generateVotingMethodScores(config: VotingConfig) {
 
   // Adjust for choice limitations
   if (config.limitedChoices === '1' && config.ballotType === 'choose-x') {
-    scores.strategyResistance = 2; // FPTP is highly strategic
+    scores.strategyResistance = 0; // FPTP is extremely strategic
+    scores.representation = 1; // FPTP has terrible representation quality
   }
 
   return scores;
 }
 
 function isProportionalMethod(config: VotingConfig): boolean {
-  const proportionalMethods = ['pav', 'sequential-monroe', 'stv', 'party-list-pr', 'mmp'];
+  const proportionalMethods = ['spav', 'sequential-monroe', 'stv', 'party-list-pr', 'mmp', 'equal-shares', 'reweighted-range', 'sequentially-spent-score'];
   return config.numberOfSeats > 1 && proportionalMethods.includes(config.tabulationMethod || '');
 }
 
 function isSemiProportionalMethod(config: VotingConfig): boolean {
-  return config.numberOfSeats > 1 && config.tabulationMethod === 'satisfaction-approval';
+  const semiProportionalMethods = ['satisfaction-approval', 'sntv'];
+  return config.numberOfSeats > 1 && semiProportionalMethods.includes(config.tabulationMethod || '');
 }
 
 function selectOption(category: keyof VotingConfig, value: any) {
@@ -523,9 +633,11 @@ function selectOption(category: keyof VotingConfig, value: any) {
   if (category === 'numberOfSeats') {
     const isMulti = value > 1;
     if (config.ballotType === 'choose-x') {
-      config.tabulationMethod = isMulti ? 'pav' : 'most-votes';
+      config.tabulationMethod = isMulti ? 'spav' : 'most-votes';
     } else if (config.ballotType === 'ranking') {
       config.tabulationMethod = isMulti ? 'stv' : 'irv';
+    } else if (config.ballotType === 'score') {
+      config.tabulationMethod = isMulti ? 'equal-shares' : 'highest-total';
     }
     
     // Reset multi-winner specific options for single-winner
@@ -545,7 +657,7 @@ function selectOption(category: keyof VotingConfig, value: any) {
     if (['party-list-pr', 'mmp'].includes(config.tabulationMethod || '')) {
       // Revert to appropriate non-party method
       if (config.ballotType === 'choose-x' && config.numberOfSeats > 1) {
-        config.tabulationMethod = 'pav';
+        config.tabulationMethod = 'spav';
       } else if (config.ballotType === 'ranking' && config.numberOfSeats > 1) {
         config.tabulationMethod = 'stv';
       }
@@ -811,28 +923,28 @@ $: if (!config.hasParties) {
               <div class="score-item">
                 <span class="score-label">Proportionality</span>
                 <div class="score-bar">
-                  <div class="score-fill" style="width: {(votingMethodScores.proportionality / 5) * 100}%"></div>
+                  <div class="score-fill" data-score="{votingMethodScores.proportionality}" style="width: {(votingMethodScores.proportionality / 5) * 100}%"></div>
                   <span class="score-value">{votingMethodScores.proportionality}/5</span>
                 </div>
               </div>
               <div class="score-item">
                 <span class="score-label">Voter Simplicity</span>
                 <div class="score-bar">
-                  <div class="score-fill" style="width: {(votingMethodScores.simplicity / 5) * 100}%"></div>
+                  <div class="score-fill" data-score="{votingMethodScores.simplicity}" style="width: {(votingMethodScores.simplicity / 5) * 100}%"></div>
                   <span class="score-value">{votingMethodScores.simplicity}/5</span>
                 </div>
               </div>
               <div class="score-item">
                 <span class="score-label">Strategy Resistance</span>
                 <div class="score-bar">
-                  <div class="score-fill" style="width: {(votingMethodScores.strategyResistance / 5) * 100}%"></div>
+                  <div class="score-fill" data-score="{votingMethodScores.strategyResistance}" style="width: {(votingMethodScores.strategyResistance / 5) * 100}%"></div>
                   <span class="score-value">{votingMethodScores.strategyResistance}/5</span>
                 </div>
               </div>
               <div class="score-item">
                 <span class="score-label">Representation Quality</span>
                 <div class="score-bar">
-                  <div class="score-fill" style="width: {(votingMethodScores.representation / 5) * 100}%"></div>
+                  <div class="score-fill" data-score="{votingMethodScores.representation}" style="width: {(votingMethodScores.representation / 5) * 100}%"></div>
                   <span class="score-value">{votingMethodScores.representation}/5</span>
                 </div>
               </div>
@@ -1132,10 +1244,16 @@ $: if (!config.hasParties) {
 
   .score-fill {
     height: 100%;
-    background: linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #10b981 100%);
     border-radius: 12px;
-    transition: width 0.3s ease;
+    transition: all 0.3s ease;
   }
+  
+  :global(.score-fill[data-score="0"]) { background: #ef4444; } /* Red */
+  :global(.score-fill[data-score="1"]) { background: #f97316; } /* Orange-red */
+  :global(.score-fill[data-score="2"]) { background: #f59e0b; } /* Orange */
+  :global(.score-fill[data-score="3"]) { background: #eab308; } /* Yellow */
+  :global(.score-fill[data-score="4"]) { background: #84cc16; } /* Light green */
+  :global(.score-fill[data-score="5"]) { background: #10b981; } /* Green */
 
   .score-value {
     position: absolute;
