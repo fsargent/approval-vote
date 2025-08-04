@@ -5,7 +5,13 @@
     <loc>https://approval.vote/about</loc>
   </url>
   <url>
+    <loc>https://approval.vote/approval-voting</loc>
+  </url>
+  <url>
     <loc>https://approval.vote</loc>
+  </url>
+  <url>
+    <loc>https://approval.vote/rcv-vs-approval</loc>
   </url>
   <url>
     <loc>https://approval.vote/report/us/mo/st_louis/2025/03/alderman-ward11</loc>
