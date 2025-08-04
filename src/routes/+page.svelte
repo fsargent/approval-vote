@@ -82,8 +82,8 @@
   <div class="row">
     <div class="leftCol">
       <div class="description">
-        <h1>approval.vote</h1>
-        : detailed reports on approval voting elections.
+        <h1>approval.vote:</h1>
+        detailed reports on approval voting elections.
       </div>
       <p>
         With <a href="{base}/about-approval-voting">
@@ -104,8 +104,8 @@
         <a href="https://ranked.vote">ranked.vote</a>. It is non-partisan and
         has received no outside funding.</p>
         <p>For more information, see
-        <a href="{base}/about">the about page</a>, learn about <a href="{base}/about-approval-voting">approval voting</a>, explore <a href="{base}/fair-share-voting">fair share voting</a>, or compare
-        <a href="{base}/rcv-vs-approval">RCV vs approval voting</a>.
+        <a href="{base}/about">the about page</a>, learn about <a href="{base}/about-approval-voting">approval voting</a>, explore <a href="{base}/fair-share-voting">fair share voting</a>, compare
+        <a href="{base}/rcv-vs-approval">RCV vs approval voting</a>, or design your own system with the <a href="{base}/voting-method-builder">voting method builder</a>.
       </p>
 
       <p>

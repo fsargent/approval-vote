@@ -216,7 +216,7 @@ function handleApprovalVote(candidateId) {
       </li>
       <li>
         <span class="paper-title">
-          <strong>Brams, S. J., & Kilgour, D. M. (2014). <a href="https://link.springer.com/chapter/10.1007/978-3-319-05158-1_15">Satisfaction Approval Voting</a>. In <i>Voting Power and Procedures</i> (pp. 323-346). Springer, Cham.</strong>
+          <strong>Brams, S. J., & Kilgour, D. M. (2014). <a href="https://link.springer.com/chapter/10.1007/978-3-319-05158-1_18">Satisfaction Approval Voting</a>. In <i>Voting Power and Procedures</i> (pp. 323-346). Springer, Cham.</strong>
         </span>
         <p class="paper-description">
           This work introduces a variant of approval voting that aims to maximize voter satisfaction.
