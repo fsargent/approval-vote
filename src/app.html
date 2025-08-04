@@ -3,7 +3,6 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <meta name="theme-color" content="#437527" />
 
     <!-- Preconnect to font domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -25,7 +24,6 @@
       <link rel="stylesheet" href="/fonts.css" />
     </noscript>
 
-    <link rel="manifest" crossorigin="use-credentials" href="/manifest.json" />
     <link rel="icon" type="image/png" href="/icons/icon.png" />
     <meta
       name="description"
@@ -59,22 +57,6 @@
     />
 
     %sveltekit.head%
-
-    <!-- Add service worker registration -->
-    <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("/service-worker.js")
-            .then((registration) => {
-              console.log("ServiceWorker registration successful");
-            })
-            .catch((err) => {
-              console.log("ServiceWorker registration failed: ", err);
-            });
-        });
-      }
-    </script>
   </head>
   <body>
     <div style="display: contents">%sveltekit.body%</div>

@@ -9,21 +9,22 @@
   let { data }: Props = $props();
   let index = data.index;
 
-  // Calculate total number of races
-  let totalRaces = 0;
-  let totalApprovals = 0;
-  let totalBallots = 0;
+  // Calculate total statistics (using reduce to avoid mutation warnings)
+  const stats = Array.from(index).reduce(
+    (acc, [_, elections]) => {
+      elections.forEach(election => {
+        election.contests.forEach(contest => {
+          acc.totalRaces++;
+          acc.totalApprovals += contest.sumVotes || 0;
+          acc.totalBallots += contest.ballotCount || 0;
+        });
+      });
+      return acc;
+    },
+    { totalRaces: 0, totalApprovals: 0, totalBallots: 0 }
+  );
 
-  for (const [_, elections] of index) {
-    for (const election of elections) {
-      for (const contest of election.contests) {
-        totalRaces++;
-        totalApprovals += contest.sumVotes || 0;
-        totalBallots += contest.ballotCount || 0;
-      }
-    }
-  }
-
+  const { totalRaces, totalApprovals, totalBallots } = stats;
   const avgApprovalsPerBallot = totalBallots > 0
     ? (totalApprovals / totalBallots).toFixed(1)
     : "0.0";
@@ -85,7 +86,7 @@
         : detailed reports on approval voting elections.
       </div>
       <p>
-        With <a href="https://en.wikipedia.org/wiki/Approval_Voting">
+        With <a href="{base}/approval-voting">
           Approval Voting</a
         > voters can choose as many candidates as they like, and the one receiving
         the most votes wins.
@@ -101,8 +102,10 @@
         <a href="https://felixsargent.com">Felix Sargent</a>. It is a fork of
         <a href="https://paulbutler.org">Paul Butler's</a>
         <a href="https://ranked.vote">ranked.vote</a>. It is non-partisan and
-        has received no outside funding. For more information, see
-        <a href="{base}/about">the about page</a>.
+        has received no outside funding.</p>
+        <p>For more information, see
+        <a href="{base}/about">the about page</a>, learn about <a href="{base}/approval-voting">approval voting</a>, or compare
+        <a href="{base}/rcv-vs-approval">RCV vs approval voting</a>.
       </p>
 
       <p>
