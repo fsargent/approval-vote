@@ -462,6 +462,121 @@ const VOTING_METHODS: VotingMethod[] = [
     proportionalityDetails: "**Proportional Representation:** Ensures fair party representation but may reduce local accountability."
   },
   {
+    id: 'cpo-stv',
+    name: 'CPO-STV',
+    shortDescription: 'Condorcet-refined proportional ranked choice',
+    detailedCritique: 'Comparison of Pairs of Outcomes STV combines proportional representation with Condorcet-style optimality. More theoretically sound than traditional STV but significantly more complex to compute and explain.',
+    ballotType: 'ranking',
+    choiceLimitation: 'any',
+    minSeats: 2,
+    maxSeats: 'unlimited',
+    scores: { proportionality: 5, simplicity: 1, strategyResistance: 4, representation: 5 },
+    isProportional: true,
+    isSemiProportional: false,
+    category: 'ranked',
+    votingMachineCompatibility: {
+      existingMachines: false,
+      description: 'Requires specialized software for complex calculations'
+    },
+    ballotTypeCritique: {
+      'ranking': "**Strengths:** Captures preference order, eliminates spoiler effect. **Weaknesses:** Can be complex for voters, may have non-monotonic results."
+    },
+    tabulationCritique: "**CPO-STV:** Uses Condorcet-style comparisons to find the optimal proportional outcome. More theoretically sound than standard STV but requires exponentially complex calculations.",
+    proportionalityDetails: "**Proportional Representation:** Ensures optimal proportional outcomes by comparing all possible seat allocations, though at the cost of computational complexity."
+  },
+  {
+    id: 'schulze-stv',
+    name: 'Schulze STV',
+    shortDescription: 'Schulze method extended to proportional representation',
+    detailedCritique: 'Applies the Schulze method principles to multi-winner elections for proportional representation. Eliminates many strategic voting problems but is extremely complex to calculate and verify.',
+    ballotType: 'ranking',
+    choiceLimitation: 'any',
+    minSeats: 2,
+    maxSeats: 'unlimited',
+    scores: { proportionality: 5, simplicity: 1, strategyResistance: 5, representation: 5 },
+    isProportional: true,
+    isSemiProportional: false,
+    category: 'ranked',
+    votingMachineCompatibility: {
+      existingMachines: false,
+      description: 'Requires specialized software for very complex calculations'
+    },
+    ballotTypeCritique: {
+      'ranking': "**Strengths:** Captures preference order, eliminates spoiler effect. **Weaknesses:** Can be complex for voters, may have non-monotonic results."
+    },
+    tabulationCritique: "**Schulze STV:** Extends the Schulze method to achieve proportional representation. Excellent theoretical properties but extremely complex implementation.",
+    proportionalityDetails: "**Proportional Representation:** Provides optimal proportional representation using Schulze method principles, ensuring strong Condorcet-style criteria are met."
+  },
+  {
+    id: 'meek-stv',
+    name: 'Meek STV',
+    shortDescription: 'STV with iterative reweighting',
+    detailedCritique: 'Uses iterative reweighting instead of fractional vote transfers. More mathematically elegant than traditional STV and avoids some anomalies, but harder to verify by hand.',
+    ballotType: 'ranking',
+    choiceLimitation: 'any',
+    minSeats: 2,
+    maxSeats: 'unlimited',
+    scores: { proportionality: 5, simplicity: 2, strategyResistance: 4, representation: 5 },
+    isProportional: true,
+    isSemiProportional: false,
+    category: 'ranked',
+    votingMachineCompatibility: {
+      existingMachines: false,
+      description: 'Requires new software for iterative calculations'
+    },
+    ballotTypeCritique: {
+      'ranking': "**Strengths:** Captures preference order, eliminates spoiler effect. **Weaknesses:** Can be complex for voters, may have non-monotonic results."
+    },
+    tabulationCritique: "**Meek STV:** Uses iterative reweighting instead of fractional transfers. More mathematically sound than traditional STV but requires computer calculation.",
+    proportionalityDetails: "**Proportional Representation:** Achieves excellent proportional representation through continuous reweighting, avoiding some traditional STV anomalies."
+  },
+  {
+    id: 'pr-borda',
+    name: 'PR-Borda',
+    shortDescription: 'Proportional representation using Borda count',
+    detailedCritique: 'Allocates seats proportionally based on Borda count scores. Rewards consensus candidates and provides proportional representation, but highly vulnerable to strategic nomination and cloning.',
+    ballotType: 'ranking',
+    choiceLimitation: 'any',
+    minSeats: 2,
+    maxSeats: 'unlimited',
+    scores: { proportionality: 4, simplicity: 3, strategyResistance: 1, representation: 4 },
+    isProportional: true,
+    isSemiProportional: false,
+    category: 'ranked',
+    votingMachineCompatibility: {
+      existingMachines: false,
+      description: 'Requires new software for Borda calculations and proportional allocation'
+    },
+    ballotTypeCritique: {
+      'ranking': "**Strengths:** Captures preference order, eliminates spoiler effect. **Weaknesses:** Can be complex for voters, may have non-monotonic results."
+    },
+    tabulationCritique: "**PR-Borda:** Calculates Borda scores and allocates seats proportionally. Simple concept but extremely vulnerable to strategic nomination and candidate cloning.",
+    proportionalityDetails: "**Proportional Representation:** Provides proportional representation based on Borda scores, rewarding broadly acceptable candidates across party lines."
+  },
+  {
+    id: 'wright-stv',
+    name: 'Wright STV',
+    shortDescription: 'STV variant with refined transfer rules',
+    detailedCritique: 'A variant of STV that uses different vote transfer mechanisms to reduce some strategic voting opportunities. More complex than traditional STV but with better theoretical properties.',
+    ballotType: 'ranking',
+    choiceLimitation: 'any',
+    minSeats: 2,
+    maxSeats: 'unlimited',
+    scores: { proportionality: 5, simplicity: 1, strategyResistance: 4, representation: 5 },
+    isProportional: true,
+    isSemiProportional: false,
+    category: 'ranked',
+    votingMachineCompatibility: {
+      existingMachines: false,
+      description: 'Requires specialized software for refined transfer calculations'
+    },
+    ballotTypeCritique: {
+      'ranking': "**Strengths:** Captures preference order, eliminates spoiler effect. **Weaknesses:** Can be complex for voters, may have non-monotonic results."
+    },
+    tabulationCritique: "**Wright STV:** Uses refined transfer rules to improve upon traditional STV. Better theoretical properties but more complex implementation and verification.",
+    proportionalityDetails: "**Proportional Representation:** Achieves proportional representation with improved transfer mechanisms that reduce some strategic voting opportunities."
+  },
+  {
     id: 'party-list-pr',
     name: 'Party List PR',
     shortDescription: 'Proportional seats by party vote share',
@@ -1513,10 +1628,23 @@ function getSuggestedComparisons(config: VotingConfig): { title: string, methods
 
 <!-- Method Comparison Modal -->
 {#if showComparison}
-  <div class="comparison-overlay" on:click={closeComparison}>
-    <div class="comparison-modal" on:click={(e) => e.stopPropagation()}>
+  <div 
+    class="comparison-overlay" 
+    role="button" 
+    tabindex="0"
+    on:click={closeComparison}
+    on:keydown={(e) => e.key === 'Escape' && closeComparison()}
+  >
+    <div 
+      class="comparison-modal" 
+      role="dialog" 
+      tabindex="-1"
+      aria-labelledby="comparison-title"
+      on:click={(e) => e.stopPropagation()}
+      on:keydown={(e) => e.stopPropagation()}
+    >
       <div class="comparison-header">
-        <h2>Method Comparison</h2>
+        <h2 id="comparison-title">Method Comparison</h2>
         <button class="close-button" on:click={closeComparison}>×</button>
       </div>
       

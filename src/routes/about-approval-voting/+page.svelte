@@ -89,7 +89,7 @@ function handleApprovalVote(candidateId) {
                 type="checkbox" 
                 value={candidate.id}
                 checked={approvalVotes.includes(candidate.id)}
-                on:change={() => handleApprovalVote(candidate.id)}
+                onchange={() => handleApprovalVote(candidate.id)}
               />
               <span class="checkbox-label">
                 <strong>{candidate.name}</strong>
