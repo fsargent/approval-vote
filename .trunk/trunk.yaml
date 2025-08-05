@@ -8,11 +8,11 @@ plugins:
       uri: https://github.com/trunk-io/plugins
 lint:
   disabled:
-    - eslint
+    - checkov
     - gitleaks
   enabled:
+    - eslint@9.21.0
     - taplo@0.9.3
-    - checkov@3.2.379
     - osv-scanner@1.9.2
     - trufflehog@3.88.14
     - yamllint@1.35.1

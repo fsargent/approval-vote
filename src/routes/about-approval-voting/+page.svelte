@@ -1,30 +1,33 @@
 <script>
-import { base } from '$app/paths';
+  import { resolve } from '$app/paths';
 
-// Interactive voting example state
-let fptpVote = $state('');
-let approvalVotes = $state([]);
+  // Interactive voting example state
+  let fptpVote = $state('');
+  let approvalVotes = $state([]);
 
-const candidates = [
-  { id: 'alice', name: 'Alice Johnson', party: 'Progressive' },
-  { id: 'bob', name: 'Bob Smith', party: 'Conservative' },
-  { id: 'charlie', name: 'Charlie Davis', party: 'Independent' },
-  { id: 'diana', name: 'Diana Wilson', party: 'Moderate' }
-];
+  const candidates = [
+    { id: 'alice', name: 'Alice Johnson', party: 'Progressive' },
+    { id: 'bob', name: 'Bob Smith', party: 'Conservative' },
+    { id: 'charlie', name: 'Charlie Davis', party: 'Independent' },
+    { id: 'diana', name: 'Diana Wilson', party: 'Moderate' },
+  ];
 
-function handleApprovalVote(candidateId) {
-  const index = approvalVotes.indexOf(candidateId);
-  if (index > -1) {
-    approvalVotes = approvalVotes.filter(id => id !== candidateId);
-  } else {
-    approvalVotes = [...approvalVotes, candidateId];
+  function handleApprovalVote(candidateId) {
+    const index = approvalVotes.indexOf(candidateId);
+    if (index > -1) {
+      approvalVotes = approvalVotes.filter((id) => id !== candidateId);
+    } else {
+      approvalVotes = [...approvalVotes, candidateId];
+    }
   }
-}
 </script>
 
 <svelte:head>
   <title>About Approval Voting - approval.vote</title>
-  <meta name="description" content="Learn about approval voting, how it compares to other voting systems, and its academic foundations." />
+  <meta
+    name="description"
+    content="Learn about approval voting, how it compares to other voting systems, and its academic foundations."
+  />
 </svelte:head>
 
 <div class="container">
@@ -33,39 +36,37 @@ function handleApprovalVote(candidateId) {
   </div>
 
   <p>
-    <a href="https://en.wikipedia.org/wiki/Approval_Voting">Approval Voting</a> is a voting system where voters can select as many candidates as they approve of, and the candidate with the most votes wins. This simple change from traditional voting methods has profound implications for democracy.
+    <a href="https://en.wikipedia.org/wiki/Approval_Voting">Approval Voting</a> is a voting system where
+    voters can select as many candidates as they approve of, and the candidate with the most votes wins.
+    This simple change from traditional voting methods has profound implications for democracy.
   </p>
 
   <h2>How Approval Voting Works</h2>
   <p>
-    In approval voting, each voter can vote for (approve of) any number of candidates. You can vote for just one candidate, or you can vote for multiple candidates if you approve of them. The candidate who receives the most approval votes wins the election.
+    In approval voting, each voter can vote for (approve of) any number of candidates. You can vote
+    for just one candidate, or you can vote for multiple candidates if you approve of them. The
+    candidate who receives the most approval votes wins the election.
   </p>
 
   <p>
-    This system encourages voters to express their true preferences rather than strategically voting for a "lesser evil" to avoid helping their least favorite candidate win.
+    This system encourages voters to express their true preferences rather than strategically voting
+    for a "lesser evil" to avoid helping their least favorite candidate win.
   </p>
 
   <h2>Try Approval Voting</h2>
-  <p>
-    See how approval voting works compared to traditional voting:
-  </p>
+  <p>See how approval voting works compared to traditional voting:</p>
 
   <div class="voting-comparison">
     <div class="voting-system">
       <h3>Traditional Voting (FPTP)</h3>
       <p>Vote for exactly one candidate. The candidate with the most votes wins.</p>
-      
+
       <div class="voting-example">
         <h4>Your Vote:</h4>
         <div class="radio-group">
           {#each candidates as candidate}
             <label class="radio-option">
-              <input 
-                type="radio" 
-                name="fptp" 
-                value={candidate.id}
-                bind:group={fptpVote}
-              />
+              <input type="radio" name="fptp" value={candidate.id} bind:group={fptpVote} />
               <span class="radio-label">
                 <strong>{candidate.name}</strong>
                 <span class="party">({candidate.party})</span>
@@ -78,15 +79,17 @@ function handleApprovalVote(candidateId) {
 
     <div class="voting-system">
       <h3>Approval Voting</h3>
-      <p>Vote for any number of candidates you approve of. The candidate with the most votes wins.</p>
-      
+      <p>
+        Vote for any number of candidates you approve of. The candidate with the most votes wins.
+      </p>
+
       <div class="voting-example">
         <h4>Your Vote:</h4>
         <div class="checkbox-group">
           {#each candidates as candidate}
             <label class="checkbox-option">
-              <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 value={candidate.id}
                 checked={approvalVotes.includes(candidate.id)}
                 onchange={() => handleApprovalVote(candidate.id)}
@@ -153,73 +156,118 @@ function handleApprovalVote(candidateId) {
 
   <h2>Academic Foundations</h2>
   <p>
-    Approval voting has a rich history and is supported by a significant body of academic research. Here are some of the key papers that have shaped our understanding of this voting method:
+    Approval voting has a rich history and is supported by a significant body of academic research.
+    Here are some of the key papers that have shaped our understanding of this voting method:
   </p>
 
   <div class="academic-papers">
     <ul class="paper-list">
       <li>
         <span class="paper-title">
-          <strong>Brams, S. J., & Fishburn, P. C. (1978). <a href="https://www.jstor.org/stable/1955105">Approval Voting</a>. <i>American Political Science Review, 72</i>(3), 831–847.</strong>
+          <strong
+            >Brams, S. J., & Fishburn, P. C. (1978). <a href="https://www.jstor.org/stable/1955105"
+              >Approval Voting</a
+            >. <i>American Political Science Review, 72</i>(3), 831–847.</strong
+          >
         </span>
         <p class="paper-description">
-          This is considered the seminal paper that introduced and formalized the concept of approval voting.
+          This is considered the seminal paper that introduced and formalized the concept of
+          approval voting.
         </p>
       </li>
       <li>
         <span class="paper-title">
-          <strong>Brams, S. J., & Fishburn, P. C. (1983). <a href="https://link.springer.com/book/10.1007/978-1-4612-5436-9"><i>Approval Voting</i></a>. Birkhäuser.</strong>
+          <strong
+            >Brams, S. J., & Fishburn, P. C. (1983). <a
+              href="https://link.springer.com/book/10.1007/978-1-4612-5436-9"
+              ><i>Approval Voting</i></a
+            >. Birkhäuser.</strong
+          >
         </span>
         <p class="paper-description">
-          A comprehensive book that expands on their original paper, providing a detailed analysis of the properties and potential effects of approval voting.
+          A comprehensive book that expands on their original paper, providing a detailed analysis
+          of the properties and potential effects of approval voting.
         </p>
       </li>
       <li>
         <span class="paper-title">
-          <strong>Weber, R. J. (1995). <a href="https://www.jstor.org/stable/2138378">Approval Voting</a>. <i>Journal of Economic Perspectives, 9</i>(1), 39–49.</strong>
+          <strong
+            >Weber, R. J. (1995). <a href="https://www.jstor.org/stable/2138378">Approval Voting</a
+            >. <i>Journal of Economic Perspectives, 9</i>(1), 39–49.</strong
+          >
         </span>
         <p class="paper-description">
-          A paper that reviews the history and properties of approval voting, comparing it favorably to plurality and Borda count systems.
+          A paper that reviews the history and properties of approval voting, comparing it favorably
+          to plurality and Borda count systems.
         </p>
       </li>
       <li>
         <span class="paper-title">
-          <strong>Brams, S. J., & Fishburn, P. C. (2005). <a href="https://link.springer.com/article/10.1007/s00355-005-0021-3">Going from theory to practice: the mixed success of approval voting</a>. <i>Social Choice and Welfare, 25</i>(2-3), 457–474.</strong>
+          <strong
+            >Brams, S. J., & Fishburn, P. C. (2005). <a
+              href="https://link.springer.com/article/10.1007/s00355-005-0021-3"
+              >Going from theory to practice: the mixed success of approval voting</a
+            >. <i>Social Choice and Welfare, 25</i>(2-3), 457–474.</strong
+          >
         </span>
         <p class="paper-description">
-          This paper discusses the practical applications and challenges of implementing approval voting in real-world scenarios.
+          This paper discusses the practical applications and challenges of implementing approval
+          voting in real-world scenarios.
         </p>
       </li>
       <li>
         <span class="paper-title">
-          <strong>Fishburn, P. C., & Brams, S. J. (1981). <a href="https://link.springer.com/article/10.1007/BF00127265">Approval voting, Condorcet's principle, and runoff elections</a>. <i>Public Choice, 36</i>(1), 89–114.</strong>
+          <strong
+            >Fishburn, P. C., & Brams, S. J. (1981). <a
+              href="https://link.springer.com/article/10.1007/BF00127265"
+              >Approval voting, Condorcet's principle, and runoff elections</a
+            >. <i>Public Choice, 36</i>(1), 89–114.</strong
+          >
         </span>
         <p class="paper-description">
-          An article that explores the relationship between approval voting and the Condorcet criterion, arguing its superiority in certain respects to runoff elections.
+          An article that explores the relationship between approval voting and the Condorcet
+          criterion, arguing its superiority in certain respects to runoff elections.
         </p>
       </li>
       <li>
         <span class="paper-title">
-          <strong>Ahn, D. S., & Oliveros, S. (2012). <a href="https://doi.org/10.1016/j.jet.2011.10.007">Approval voting and scoring rules with common values</a>. <i>Journal of Economic Theory, 147</i>(2), 773-790.</strong>
+          <strong
+            >Ahn, D. S., & Oliveros, S. (2012). <a href="https://doi.org/10.1016/j.jet.2011.10.007"
+              >Approval voting and scoring rules with common values</a
+            >. <i>Journal of Economic Theory, 147</i>(2), 773-790.</strong
+          >
         </span>
         <p class="paper-description">
-          This research delves into the efficiency of approval voting compared to other scoring rules in elections where voters have common, but privately known, values.
+          This research delves into the efficiency of approval voting compared to other scoring
+          rules in elections where voters have common, but privately known, values.
         </p>
       </li>
       <li>
         <span class="paper-title">
-          <strong>Laslier, J. F., & Sanver, R. M. (Eds.). (2010). <a href="https://link.springer.com/book/10.1007/978-3-642-02839-7"><i>Handbook on Approval Voting</i></a>. Springer.</strong>
+          <strong
+            >Laslier, J. F., & Sanver, R. M. (Eds.). (2010). <a
+              href="https://link.springer.com/book/10.1007/978-3-642-02839-7"
+              ><i>Handbook on Approval Voting</i></a
+            >. Springer.</strong
+          >
         </span>
         <p class="paper-description">
-          A collection of essays from various authors that covers many facets of approval voting, from theoretical to practical considerations.
+          A collection of essays from various authors that covers many facets of approval voting,
+          from theoretical to practical considerations.
         </p>
       </li>
       <li>
         <span class="paper-title">
-          <strong>Brams, S. J., & Kilgour, D. M. (2014). <a href="https://link.springer.com/chapter/10.1007/978-3-319-05158-1_18">Satisfaction Approval Voting</a>. In <i>Voting Power and Procedures</i> (pp. 323-346). Springer, Cham.</strong>
+          <strong
+            >Brams, S. J., & Kilgour, D. M. (2014). <a
+              href="https://link.springer.com/chapter/10.1007/978-3-319-05158-1_18"
+              >Satisfaction Approval Voting</a
+            >. In <i>Voting Power and Procedures</i> (pp. 323-346). Springer, Cham.</strong
+          >
         </span>
         <p class="paper-description">
-          This work introduces a variant of approval voting that aims to maximize voter satisfaction.
+          This work introduces a variant of approval voting that aims to maximize voter
+          satisfaction.
         </p>
       </li>
     </ul>
@@ -228,11 +276,12 @@ function handleApprovalVote(candidateId) {
   <div class="cta-section">
     <h2>Explore More Voting Systems</h2>
     <p>
-      Learn about proportional representation with approval voting principles, or see how approval voting compares to ranked choice voting.
+      Learn about proportional representation with approval voting principles, or see how approval
+      voting compares to ranked choice voting.
     </p>
     <div class="cta-buttons">
-      <a href="{base}/fair-share-voting" class="cta-button">Fair Share Voting</a>
-      <a href="{base}/rcv-vs-approval" class="cta-button">RCV vs Approval Voting</a>
+      <a href="{resolve('/fair-share-voting')}" class="cta-button">Fair Share Voting</a>
+      <a href="{resolve('/rcv-vs-approval')}" class="cta-button">RCV vs Approval Voting</a>
     </div>
   </div>
 </div>
@@ -352,8 +401,6 @@ function handleApprovalVote(candidateId) {
     color: #6c757d;
   }
 
-
-
   .system-comparison {
     margin: 3rem 0;
   }
@@ -453,8 +500,6 @@ function handleApprovalVote(candidateId) {
     margin-top: 1rem;
   }
 
-
-
   @media (max-width: 768px) {
     .voting-comparison {
       grid-template-columns: 1fr;
@@ -468,7 +513,5 @@ function handleApprovalVote(candidateId) {
     .comparison-table td {
       padding: 0.5rem;
     }
-
-
   }
-</style> 
+</style>

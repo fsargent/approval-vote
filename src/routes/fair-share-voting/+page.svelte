@@ -1,51 +1,67 @@
 <script>
-import { base } from '$app/paths';
+  import { resolve } from '$app/paths';
 
-// Carousel state
-let currentSlide = 0;
-const totalSlides = 6; // 5 rounds + 1 final results
+  // Carousel state
+  let currentSlide = 0;
+  const totalSlides = 6; // 5 rounds + 1 final results
 
-function nextSlide() {
-  currentSlide = (currentSlide + 1) % totalSlides;
-}
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % totalSlides;
+  }
 
-function prevSlide() {
-  currentSlide = currentSlide === 0 ? totalSlides - 1 : currentSlide - 1;
-}
+  function prevSlide() {
+    currentSlide = currentSlide === 0 ? totalSlides - 1 : currentSlide - 1;
+  }
 
-function goToSlide(index) {
-  currentSlide = index;
-}
+  function goToSlide(index) {
+    currentSlide = index;
+  }
 </script>
 
 <svelte:head>
   <title>Fair Share Voting - A Proportional Form of Approval Voting - approval.vote</title>
-  <meta name="description" content="Learn about Fair Share Voting, a proportional form of approval voting that maintains local representation while ensuring fair party representation in parliament." />
+  <meta
+    name="description"
+    content="Learn about Fair Share Voting, a proportional form of approval voting that maintains local representation while ensuring fair party representation in parliament."
+  />
 </svelte:head>
 
 <div class="container">
   <div class="description">
     <h1>Fair Share Voting</h1>
-    <p class="subtitle">A proportional form of approval voting that still keeps local representation</p>
+    <p class="subtitle">
+      A proportional form of approval voting that still keeps local representation
+    </p>
   </div>
-
 
   <section class="basics-section">
     <div class="section-number">1</div>
     <h2>The Basics (For Everyone)</h2>
-    
+
     <div class="voting-basics">
       <div class="basic-section">
         <h3>🏛️ Voting for Leaders: Simple "Approve" Voting</h3>
-        <p>For executive roles like a city mayor, you'd use <a href="{base}/about-approval-voting">Approval Voting</a>. Instead of picking just one candidate, you simply vote "yes" (approve) for as many candidates as you like. The candidate with the most "approves" wins.</p>
+        <p>
+          For executive roles like a city mayor, you'd use <a href="{resolve('/about-approval-voting')}"
+            >Approval Voting</a
+          >. Instead of picking just one candidate, you simply vote "yes" (approve) for as many
+          candidates as you like. The candidate with the most "approves" wins.
+        </p>
       </div>
 
       <div class="basic-section">
         <h3>🏛️ Voting for Parliament: Proportional Representation</h3>
-        <p>For elections to Parliament, you would cast a vote for your preferred political party. The goal here is proportional representation, meaning that if your party gets 20% of the votes nationally, they should get roughly 20% of the seats.</p>
-        
+        <p>
+          For elections to Parliament, you would cast a vote for your preferred political party. The
+          goal here is proportional representation, meaning that if your party gets 20% of the votes
+          nationally, they should get roughly 20% of the seats.
+        </p>
+
         <div class="importance-note">
-          <strong>Why This Matters:</strong> Current polls show Reform UK at around 26%, but under First Past The Post they could win a large majority with just over a quarter of votes. Meanwhile, Liberal Democrats polling at 15% might win only a handful of seats, and Greens at 9% could be largely excluded. This system ensures representation that matches vote share.
+          <strong>Why This Matters:</strong> Current polls show Reform UK at around 26%, but under First
+          Past The Post they could win a large majority with just over a quarter of votes. Meanwhile,
+          Liberal Democrats polling at 15% might win only a handful of seats, and Greens at 9% could
+          be largely excluded. This system ensures representation that matches vote share.
         </div>
       </div>
     </div>
@@ -54,13 +70,17 @@ function goToSlide(index) {
   <section class="participation-section">
     <div class="section-number">2</div>
     <h2>Enhanced Participation (Optional Details)</h2>
-    
+
     <div class="feature">
       <h3>👥 Your Say on Party Candidates</h3>
-      <p>When you vote for a party, you can optionally approve individual candidates on their list. Your approvals help decide who gets elected from that party's list if they win seats.</p>
-      
+      <p>
+        When you vote for a party, you can optionally approve individual candidates on their list.
+        Your approvals help decide who gets elected from that party's list if they win seats.
+      </p>
+
       <div class="power-note">
-        <strong>The Power of Choice:</strong> You decide how much you want to engage - from simple party voting to detailed candidate approval.
+        <strong>The Power of Choice:</strong> You decide how much you want to engage - from simple party
+        voting to detailed candidate approval.
       </div>
     </div>
   </section>
@@ -68,7 +88,11 @@ function goToSlide(index) {
   <section class="process-section">
     <div class="section-number">3</div>
     <h2>The Complete Process (Advanced)</h2>
-    <p>This explains how every vote contributes to a seat. No votes are wasted - if your party doesn't get enough votes for a seat directly, your vote gets transferred to help elect someone else.</p>
+    <p>
+      This explains how every vote contributes to a seat. No votes are wasted - if your party
+      doesn't get enough votes for a seat directly, your vote gets transferred to help elect someone
+      else.
+    </p>
 
     <div class="flowchart">
       <div class="flow-step">
@@ -117,7 +141,8 @@ function goToSlide(index) {
     </div>
 
     <div class="result-note">
-      <strong>The Result:</strong> Every vote contributes to the final outcome, with transfers ensuring broad representation.
+      <strong>The Result:</strong> Every vote contributes to the final outcome, with transfers ensuring
+      broad representation.
     </div>
   </section>
 
@@ -135,10 +160,10 @@ function goToSlide(index) {
         <h4>MAYOR OF MANCHESTER</h4>
         <p><em>Approve as many candidates as you like</em></p>
         <div class="candidate-list">
-          <label><input type="checkbox" disabled> Sarah Chen (Labour)</label>
-          <label><input type="checkbox" disabled> James Wilson (Conservative)</label>
-          <label><input type="checkbox" disabled> Emma Roberts (Liberal Democrat)</label>
-          <label><input type="checkbox" disabled> David Kumar (Green)</label>
+          <label><input type="checkbox" disabled /> Sarah Chen (Labour)</label>
+          <label><input type="checkbox" disabled /> James Wilson (Conservative)</label>
+          <label><input type="checkbox" disabled /> Emma Roberts (Liberal Democrat)</label>
+          <label><input type="checkbox" disabled /> David Kumar (Green)</label>
         </div>
       </div>
 
@@ -146,27 +171,29 @@ function goToSlide(index) {
         <h4>HOUSE OF COMMONS</h4>
         <p><em>Choose ONE party, then optionally approve candidates</em></p>
         <div class="party-list">
-          <label><input type="radio" name="party" disabled> Labour Party</label>
-          <label><input type="radio" name="party" disabled> Conservative Party</label>
-          <label><input type="radio" name="party" disabled checked> Liberal Democrat Party</label>
-          <label><input type="radio" name="party" disabled> Green Party</label>
+          <label><input type="radio" name="party" disabled /> Labour Party</label>
+          <label><input type="radio" name="party" disabled /> Conservative Party</label>
+          <label><input type="radio" name="party" disabled checked /> Liberal Democrat Party</label>
+          <label><input type="radio" name="party" disabled /> Green Party</label>
         </div>
 
         <div class="candidate-approval">
           <h5>Liberal Democrat Candidates (Optional)</h5>
           <div class="candidate-list">
-            <label><input type="checkbox" disabled checked> 1. Emma Roberts</label>
-            <label><input type="checkbox" disabled checked> 2. Michael Thompson</label>
-            <label><input type="checkbox" disabled checked> 3. Lisa Patel</label>
-            <label><input type="checkbox" disabled> 4. John Clarke</label>
-            <label><input type="checkbox" disabled> 5. Rachel Ahmed</label>
+            <label><input type="checkbox" disabled checked /> 1. Emma Roberts</label>
+            <label><input type="checkbox" disabled checked /> 2. Michael Thompson</label>
+            <label><input type="checkbox" disabled checked /> 3. Lisa Patel</label>
+            <label><input type="checkbox" disabled /> 4. John Clarke</label>
+            <label><input type="checkbox" disabled /> 5. Rachel Ahmed</label>
             <p><em>And more candidates...</em></p>
           </div>
         </div>
       </div>
 
       <div class="voter-choice">
-        <strong>What This Voter Did:</strong> Approved 2 mayoral candidates, chose Liberal Democrats for Parliament, and approved 3 specific Lib Dem candidates who would be prioritized if the party wins seats.
+        <strong>What This Voter Did:</strong> Approved 2 mayoral candidates, chose Liberal Democrats
+        for Parliament, and approved 3 specific Lib Dem candidates who would be prioritized if the party
+        wins seats.
       </div>
     </div>
   </section>
@@ -174,17 +201,17 @@ function goToSlide(index) {
   <section class="example-section">
     <div class="section-number">4</div>
     <h2>A Worked Example: 650 Seats, 47 Million Votes</h2>
-    
+
     <div class="carousel-container">
       <!-- Carousel Navigation -->
       <div class="carousel-nav">
         <button class="nav-btn prev" on:click={prevSlide} disabled={currentSlide === 0}>
           ← Previous
         </button>
-        
+
         <div class="slide-indicators">
           {#each Array(totalSlides) as _, index}
-            <button 
+            <button
               class="indicator {currentSlide === index ? 'active' : ''}"
               on:click={() => goToSlide(index)}
             >
@@ -192,8 +219,12 @@ function goToSlide(index) {
             </button>
           {/each}
         </div>
-        
-        <button class="nav-btn next" on:click={nextSlide} disabled={currentSlide === totalSlides - 1}>
+
+        <button
+          class="nav-btn next"
+          on:click={nextSlide}
+          disabled={currentSlide === totalSlides - 1}
+        >
           Next →
         </button>
       </div>
@@ -201,323 +232,332 @@ function goToSlide(index) {
       <!-- Carousel Slides -->
       <div class="carousel-wrapper">
         <div class="carousel-track" style="transform: translateX(-{currentSlide * 100}%)">
-          
           <!-- Slide 1: Round 1 -->
           <div class="carousel-slide">
             <div class="round-container">
-      <div class="round-header">
-        <h3>🔄 Round 1: Initial Allocation</h3>
-        <div class="round-stats">
-          <div class="stat-item">
-            <span class="stat-label">Total votes:</span>
-            <span class="stat-value">47,000,000</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Seat cost:</span>
-            <span class="stat-value">72,308 votes</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Threshold:</span>
-            <span class="stat-value">5% (33 seats min)</span>
-          </div>
-        </div>
-      </div>
+              <div class="round-header">
+                <h3>🔄 Round 1: Initial Allocation</h3>
+                <div class="round-stats">
+                  <div class="stat-item">
+                    <span class="stat-label">Total votes:</span>
+                    <span class="stat-value">47,000,000</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">Seat cost:</span>
+                    <span class="stat-value">72,308 votes</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">Threshold:</span>
+                    <span class="stat-value">5% (33 seats min)</span>
+                  </div>
+                </div>
+              </div>
 
-      <div class="results-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Party</th>
-              <th>Votes</th>
-              <th>%</th>
-              <th>Seats Won</th>
-              <th>Unspent Votes</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="qualified">
-              <td><strong>Reform UK</strong></td>
-              <td>12,220,000</td>
-              <td>26%</td>
-              <td>169</td>
-              <td>2,608</td>
-            </tr>
-            <tr class="qualified">
-              <td><strong>Labour</strong></td>
-              <td>11,750,000</td>
-              <td>25%</td>
-              <td>162</td>
-              <td>26,004</td>
-            </tr>
-            <tr class="qualified">
-              <td><strong>Conservative</strong></td>
-              <td>9,870,000</td>
-              <td>21%</td>
-              <td>136</td>
-              <td>56,112</td>
-            </tr>
-            <tr class="qualified">
-              <td><strong>Liberal Democrats</strong></td>
-              <td>7,050,000</td>
-              <td>15%</td>
-              <td>97</td>
-              <td>37,724</td>
-            </tr>
-            <tr class="qualified">
-              <td><strong>Green Party</strong></td>
-              <td>4,230,000</td>
-              <td>9%</td>
-              <td>58</td>
-              <td>39,136</td>
-            </tr>
-            <tr class="below-threshold">
-              <td><strong>SNP</strong></td>
-              <td>1,880,000</td>
-              <td>4%</td>
-              <td>0</td>
-              <td>1,880,000</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+              <div class="results-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Party</th>
+                      <th>Votes</th>
+                      <th>%</th>
+                      <th>Seats Won</th>
+                      <th>Unspent Votes</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="qualified">
+                      <td><strong>Reform UK</strong></td>
+                      <td>12,220,000</td>
+                      <td>26%</td>
+                      <td>169</td>
+                      <td>2,608</td>
+                    </tr>
+                    <tr class="qualified">
+                      <td><strong>Labour</strong></td>
+                      <td>11,750,000</td>
+                      <td>25%</td>
+                      <td>162</td>
+                      <td>26,004</td>
+                    </tr>
+                    <tr class="qualified">
+                      <td><strong>Conservative</strong></td>
+                      <td>9,870,000</td>
+                      <td>21%</td>
+                      <td>136</td>
+                      <td>56,112</td>
+                    </tr>
+                    <tr class="qualified">
+                      <td><strong>Liberal Democrats</strong></td>
+                      <td>7,050,000</td>
+                      <td>15%</td>
+                      <td>97</td>
+                      <td>37,724</td>
+                    </tr>
+                    <tr class="qualified">
+                      <td><strong>Green Party</strong></td>
+                      <td>4,230,000</td>
+                      <td>9%</td>
+                      <td>58</td>
+                      <td>39,136</td>
+                    </tr>
+                    <tr class="below-threshold">
+                      <td><strong>SNP</strong></td>
+                      <td>1,880,000</td>
+                      <td>4%</td>
+                      <td>0</td>
+                      <td>1,880,000</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
 
-      <div class="round-summary">
-        <div class="seats-progress">
-          <span class="seats-filled">622 of 650 seats filled</span>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: 95.7%"></div>
-          </div>
-          <span class="seats-remaining">28 seats remaining</span>
-        </div>
-        <div class="next-action">
-          <strong>Next:</strong> SNP eliminated (below threshold) → 1,880,000 votes transfer to Labour
-        </div>
-      </div>
-    </div>
+              <div class="round-summary">
+                <div class="seats-progress">
+                  <span class="seats-filled">622 of 650 seats filled</span>
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: 95.7%"></div>
+                  </div>
+                  <span class="seats-remaining">28 seats remaining</span>
+                </div>
+                <div class="next-action">
+                  <strong>Next:</strong> SNP eliminated (below threshold) → 1,880,000 votes transfer
+                  to Labour
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Slide 2: Round 2 -->
           <div class="carousel-slide">
             <div class="round-container">
-      <div class="round-header">
-        <h3>🔄 Round 2: After SNP Transfer</h3>
-        <div class="round-stats">
-          <div class="stat-item">
-            <span class="stat-label">Seat cost:</span>
-            <span class="stat-value">72,914 votes</span>
-          </div>
-          <div class="stat-item transfer">
-            <span class="stat-label">Transfer:</span>
-            <span class="stat-value">SNP → Labour (1,880,000 votes)</span>
-          </div>
-        </div>
-      </div>
+              <div class="round-header">
+                <h3>🔄 Round 2: After SNP Transfer</h3>
+                <div class="round-stats">
+                  <div class="stat-item">
+                    <span class="stat-label">Seat cost:</span>
+                    <span class="stat-value">72,914 votes</span>
+                  </div>
+                  <div class="stat-item transfer">
+                    <span class="stat-label">Transfer:</span>
+                    <span class="stat-value">SNP → Labour (1,880,000 votes)</span>
+                  </div>
+                </div>
+              </div>
 
-      <div class="results-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Party</th>
-              <th>Seats</th>
-              <th>Unspent Votes</th>
-              <th>New Seats</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Reform UK</strong></td>
-              <td>169</td>
-              <td>2,608</td>
-              <td>0</td>
-              <td>Active</td>
-            </tr>
-            <tr class="gains-seats">
-              <td><strong>Labour</strong></td>
-              <td>162 → 188</td>
-              <td>1,906,004 → 10,240</td>
-              <td>+26</td>
-              <td>Active</td>
-            </tr>
-            <tr>
-              <td><strong>Conservative</strong></td>
-              <td>136</td>
-              <td>56,112</td>
-              <td>0</td>
-              <td>Active</td>
-            </tr>
-            <tr>
-              <td><strong>Liberal Democrats</strong></td>
-              <td>97</td>
-              <td>37,724</td>
-              <td>0</td>
-              <td>Active</td>
-            </tr>
-            <tr class="finalized">
-              <td><strong>Green Party</strong></td>
-              <td>58</td>
-              <td>39,136</td>
-              <td>0</td>
-              <td>Finalized</td>
-            </tr>
-            <tr class="finalized">
-              <td><strong>SNP</strong></td>
-              <td>0</td>
-              <td>0</td>
-              <td>0</td>
-              <td>Finalized</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+              <div class="results-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Party</th>
+                      <th>Seats</th>
+                      <th>Unspent Votes</th>
+                      <th>New Seats</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Reform UK</strong></td>
+                      <td>169</td>
+                      <td>2,608</td>
+                      <td>0</td>
+                      <td>Active</td>
+                    </tr>
+                    <tr class="gains-seats">
+                      <td><strong>Labour</strong></td>
+                      <td>162 → 188</td>
+                      <td>1,906,004 → 10,240</td>
+                      <td>+26</td>
+                      <td>Active</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Conservative</strong></td>
+                      <td>136</td>
+                      <td>56,112</td>
+                      <td>0</td>
+                      <td>Active</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Liberal Democrats</strong></td>
+                      <td>97</td>
+                      <td>37,724</td>
+                      <td>0</td>
+                      <td>Active</td>
+                    </tr>
+                    <tr class="finalized">
+                      <td><strong>Green Party</strong></td>
+                      <td>58</td>
+                      <td>39,136</td>
+                      <td>0</td>
+                      <td>Finalized</td>
+                    </tr>
+                    <tr class="finalized">
+                      <td><strong>SNP</strong></td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>Finalized</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
 
-      <div class="round-summary">
-        <div class="seats-progress">
-          <span class="seats-filled">648 of 650 seats filled</span>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: 99.7%"></div>
-          </div>
-          <span class="seats-remaining">2 seats remaining</span>
-        </div>
-        <div class="next-action">
-          <strong>Next:</strong> Green Party eliminated → 39,136 votes transfer to Labour
-        </div>
-      </div>
-    </div>
+              <div class="round-summary">
+                <div class="seats-progress">
+                  <span class="seats-filled">648 of 650 seats filled</span>
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: 99.7%"></div>
+                  </div>
+                  <span class="seats-remaining">2 seats remaining</span>
+                </div>
+                <div class="next-action">
+                  <strong>Next:</strong> Green Party eliminated → 39,136 votes transfer to Labour
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Slide 3: Round 3 -->
           <div class="carousel-slide">
             <div class="round-container">
-      <div class="round-header">
-        <h3>🔄 Round 3: Green Transfer</h3>
-        <div class="round-stats">
-          <div class="stat-item">
-            <span class="stat-label">Seat cost:</span>
-            <span class="stat-value">72,910 votes</span>
-          </div>
-          <div class="stat-item transfer">
-            <span class="stat-label">Transfer:</span>
-            <span class="stat-value">Green → Labour (39,136 votes)</span>
-          </div>
-        </div>
-      </div>
-      <div class="simple-summary">
-        <p><strong>No seats awarded this round</strong> - insufficient votes for remaining parties</p>
-        <div class="next-action">
-          <strong>Next:</strong> Liberal Democrats eliminated → 37,724 votes transfer to Labour
-        </div>
-      </div>
-    </div>
+              <div class="round-header">
+                <h3>🔄 Round 3: Green Transfer</h3>
+                <div class="round-stats">
+                  <div class="stat-item">
+                    <span class="stat-label">Seat cost:</span>
+                    <span class="stat-value">72,910 votes</span>
+                  </div>
+                  <div class="stat-item transfer">
+                    <span class="stat-label">Transfer:</span>
+                    <span class="stat-value">Green → Labour (39,136 votes)</span>
+                  </div>
+                </div>
+              </div>
+              <div class="simple-summary">
+                <p>
+                  <strong>No seats awarded this round</strong> - insufficient votes for remaining parties
+                </p>
+                <div class="next-action">
+                  <strong>Next:</strong> Liberal Democrats eliminated → 37,724 votes transfer to Labour
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Slide 4: Round 4 -->
           <div class="carousel-slide">
             <div class="round-container">
-      <div class="round-header">
-        <h3>🔄 Round 4: LibDem Transfer</h3>
-        <div class="round-stats">
-          <div class="stat-item">
-            <span class="stat-label">Seat cost:</span>
-            <span class="stat-value">72,910 votes</span>
-          </div>
-          <div class="stat-item transfer">
-            <span class="stat-label">Transfer:</span>
-            <span class="stat-value">LibDem → Labour (37,724 votes)</span>
-          </div>
-        </div>
-      </div>
-      <div class="simple-summary">
-        <p><strong>Labour gains 1 seat</strong> (87,100 ÷ 72,910 = 1), has 14,190 unspent left</p>
-        <div class="seats-progress">
-          <span class="seats-filled">649 of 650 seats filled</span>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: 99.8%"></div>
-          </div>
-          <span class="seats-remaining">1 seat remaining</span>
-        </div>
-        <div class="next-action">
-          <strong>Next:</strong> Conservative eliminated → 56,112 votes transfer to Reform
-        </div>
-      </div>
-    </div>
+              <div class="round-header">
+                <h3>🔄 Round 4: LibDem Transfer</h3>
+                <div class="round-stats">
+                  <div class="stat-item">
+                    <span class="stat-label">Seat cost:</span>
+                    <span class="stat-value">72,910 votes</span>
+                  </div>
+                  <div class="stat-item transfer">
+                    <span class="stat-label">Transfer:</span>
+                    <span class="stat-value">LibDem → Labour (37,724 votes)</span>
+                  </div>
+                </div>
+              </div>
+              <div class="simple-summary">
+                <p>
+                  <strong>Labour gains 1 seat</strong> (87,100 ÷ 72,910 = 1), has 14,190 unspent left
+                </p>
+                <div class="seats-progress">
+                  <span class="seats-filled">649 of 650 seats filled</span>
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: 99.8%"></div>
+                  </div>
+                  <span class="seats-remaining">1 seat remaining</span>
+                </div>
+                <div class="next-action">
+                  <strong>Next:</strong> Conservative eliminated → 56,112 votes transfer to Reform
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Slide 5: Round 5 -->
           <div class="carousel-slide">
             <div class="round-container final-round">
-      <div class="round-header">
-        <h3>🔄 Round 5: Final Allocation</h3>
-        <div class="round-stats">
-          <div class="stat-item transfer">
-            <span class="stat-label">Transfer:</span>
-            <span class="stat-value">Conservative → Reform (56,112 votes)</span>
-          </div>
-          <div class="stat-item transfer">
-            <span class="stat-label">Final Transfer:</span>
-            <span class="stat-value">Reform → Labour (58,720 votes)</span>
-          </div>
-        </div>
-      </div>
-      <div class="simple-summary">
-        <p><strong>Labour gets final seat</strong> with exactly 72,910 votes</p>
-        <div class="seats-progress">
-          <span class="seats-filled">650 of 650 seats filled</span>
-          <div class="progress-bar">
-            <div class="progress-fill complete" style="width: 100%"></div>
-          </div>
-          <span class="seats-remaining">✅ Complete</span>
-        </div>
-      </div>
-    </div>
+              <div class="round-header">
+                <h3>🔄 Round 5: Final Allocation</h3>
+                <div class="round-stats">
+                  <div class="stat-item transfer">
+                    <span class="stat-label">Transfer:</span>
+                    <span class="stat-value">Conservative → Reform (56,112 votes)</span>
+                  </div>
+                  <div class="stat-item transfer">
+                    <span class="stat-label">Final Transfer:</span>
+                    <span class="stat-value">Reform → Labour (58,720 votes)</span>
+                  </div>
+                </div>
+              </div>
+              <div class="simple-summary">
+                <p><strong>Labour gets final seat</strong> with exactly 72,910 votes</p>
+                <div class="seats-progress">
+                  <span class="seats-filled">650 of 650 seats filled</span>
+                  <div class="progress-bar">
+                    <div class="progress-fill complete" style="width: 100%"></div>
+                  </div>
+                  <span class="seats-remaining">✅ Complete</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Slide 6: Final Results -->
           <div class="carousel-slide">
             <div class="final-results">
-      <h3>🏆 Final Results</h3>
-      <div class="results-grid">
-        <div class="result-item">
-          <div class="party-name">Labour Party</div>
-          <div class="seats">190 seats (29.2%)</div>
-          <div class="votes">25% of votes</div>
-        </div>
-        <div class="result-item">
-          <div class="party-name">Reform UK</div>
-          <div class="seats">169 seats (26.0%)</div>
-          <div class="votes">26% of votes</div>
-        </div>
-        <div class="result-item">
-          <div class="party-name">Conservative</div>
-          <div class="seats">136 seats (20.9%)</div>
-          <div class="votes">21% of votes</div>
-        </div>
-        <div class="result-item">
-          <div class="party-name">Liberal Democrats</div>
-          <div class="seats">97 seats (14.9%)</div>
-          <div class="votes">15% of votes</div>
-        </div>
-        <div class="result-item">
-          <div class="party-name">Green Party</div>
-          <div class="seats">58 seats (8.9%)</div>
-          <div class="votes">9% of votes</div>
-        </div>
-        <div class="result-item">
-          <div class="party-name">SNP</div>
-          <div class="seats">0 seats (0%)</div>
-          <div class="votes">4% of votes</div>
-        </div>
-      </div>
+              <h3>🏆 Final Results</h3>
+              <div class="results-grid">
+                <div class="result-item">
+                  <div class="party-name">Labour Party</div>
+                  <div class="seats">190 seats (29.2%)</div>
+                  <div class="votes">25% of votes</div>
+                </div>
+                <div class="result-item">
+                  <div class="party-name">Reform UK</div>
+                  <div class="seats">169 seats (26.0%)</div>
+                  <div class="votes">26% of votes</div>
+                </div>
+                <div class="result-item">
+                  <div class="party-name">Conservative</div>
+                  <div class="seats">136 seats (20.9%)</div>
+                  <div class="votes">21% of votes</div>
+                </div>
+                <div class="result-item">
+                  <div class="party-name">Liberal Democrats</div>
+                  <div class="seats">97 seats (14.9%)</div>
+                  <div class="votes">15% of votes</div>
+                </div>
+                <div class="result-item">
+                  <div class="party-name">Green Party</div>
+                  <div class="seats">58 seats (8.9%)</div>
+                  <div class="votes">9% of votes</div>
+                </div>
+                <div class="result-item">
+                  <div class="party-name">SNP</div>
+                  <div class="seats">0 seats (0%)</div>
+                  <div class="votes">4% of votes</div>
+                </div>
+              </div>
 
-      <div class="democratic-result">
-        <strong>The Result:</strong> Each party's seat share closely matches their vote share. Labour benefits from vote transfers to form a government, but no party gains a disproportionate majority from a minority of votes. The Lib Dems receive representation matching their support, and smaller parties like the Greens gain a voice in Parliament.
-      </div>
-    </div>
+              <div class="democratic-result">
+                <strong>The Result:</strong> Each party's seat share closely matches their vote share.
+                Labour benefits from vote transfers to form a government, but no party gains a disproportionate
+                majority from a minority of votes. The Lib Dems receive representation matching their
+                support, and smaller parties like the Greens gain a voice in Parliament.
+              </div>
+            </div>
           </div>
-          
-        </div> <!-- carousel-track -->
-      </div> <!-- carousel-wrapper -->
-    </div> <!-- carousel-container -->
+        </div>
+        <!-- carousel-track -->
+      </div>
+      <!-- carousel-wrapper -->
+    </div>
+    <!-- carousel-container -->
   </section>
 
   <section class="why-matters-section">
@@ -526,33 +566,41 @@ function goToSlide(index) {
     <div class="benefits">
       <div class="benefit">
         <h3>🎯 Proportional Representation</h3>
-        <p>Every vote counts toward the final outcome. Fewer "safe seats" or "wasted votes" - your voice matters wherever you live and whoever you support.</p>
+        <p>
+          Every vote counts toward the final outcome. Fewer "safe seats" or "wasted votes" - your
+          voice matters wherever you live and whoever you support.
+        </p>
       </div>
 
       <div class="benefit">
         <h3>🤝 Collaborative Government</h3>
-        <p>Encourages parties to work together and find common ground, leading to more moderate, consensus-based policies.</p>
+        <p>
+          Encourages parties to work together and find common ground, leading to more moderate,
+          consensus-based policies.
+        </p>
       </div>
 
       <div class="benefit">
         <h3>📈 Higher Turnout</h3>
-        <p>When every vote matters, more people participate. Countries with proportional systems consistently see higher voter turnout.</p>
+        <p>
+          When every vote matters, more people participate. Countries with proportional systems
+          consistently see higher voter turnout.
+        </p>
       </div>
     </div>
 
     <div class="bottom-line">
-      <strong>The Bottom Line:</strong> This system provides government that better represents the electorate, moving beyond the limitations of First Past The Post.
+      <strong>The Bottom Line:</strong> This system provides government that better represents the electorate,
+      moving beyond the limitations of First Past The Post.
     </div>
   </section>
 
   <div class="cta-section">
     <h2>Learn More About Voting Systems</h2>
-    <p>
-      Interested in exploring different approaches to democratic representation?
-    </p>
+    <p>Interested in exploring different approaches to democratic representation?</p>
     <div class="cta-buttons">
-      <a href="{base}/about-approval-voting" class="cta-button">Learn About Approval Voting</a>
-      <a href="{base}/rcv-vs-approval" class="cta-button">Compare RCV vs Approval</a>
+      <a href="{resolve('/about-approval-voting')}" class="cta-button">Learn About Approval Voting</a>
+      <a href="{resolve('/rcv-vs-approval')}" class="cta-button">Compare RCV vs Approval</a>
     </div>
   </div>
 </div>
@@ -581,8 +629,6 @@ function goToSlide(index) {
     font-style: italic;
     margin: 0;
   }
-
-
 
   section {
     margin: 3rem 0;
@@ -651,7 +697,11 @@ function goToSlide(index) {
     margin-bottom: 1rem;
   }
 
-  .importance-note, .power-note, .result-note, .democratic-result, .bottom-line {
+  .importance-note,
+  .power-note,
+  .result-note,
+  .democratic-result,
+  .bottom-line {
     background: #e3f2fd;
     border-left: 4px solid #2196f3;
     padding: 1rem;
@@ -672,8 +722,6 @@ function goToSlide(index) {
     margin: 1rem 0;
     position: relative;
   }
-
-
 
   .step-number {
     width: 2.5rem;
@@ -727,17 +775,17 @@ function goToSlide(index) {
     .flowchart {
       max-width: 100%;
     }
-    
+
     .flow-step {
       flex-direction: column;
       align-items: flex-start;
     }
-    
+
     .step-number {
       margin-right: 0;
       margin-bottom: 0.5rem;
     }
-    
+
     .flow-arrow {
       position: static;
       margin: 0.5rem 0;
@@ -776,14 +824,16 @@ function goToSlide(index) {
     border-bottom: none;
   }
 
-  .candidate-list, .party-list {
+  .candidate-list,
+  .party-list {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     margin: 1rem 0;
   }
 
-  .candidate-list label, .party-list label {
+  .candidate-list label,
+  .party-list label {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -1230,7 +1280,7 @@ function goToSlide(index) {
       flex-direction: column;
       align-items: center;
     }
-    
+
     .basic-section {
       margin: 1.5rem 0;
     }

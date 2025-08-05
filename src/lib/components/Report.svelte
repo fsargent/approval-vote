@@ -1,14 +1,10 @@
 <script lang="ts">
-  import { base } from '$app/paths'
+  import { resolve } from '$app/paths';
 
-  import type {
-    IContestReport,
-    Allocatee,
-    ICandidate,
-  } from '$lib/server/report_types'
-  import VoteCounts from './report_components/VoteCounts.svelte'
+  import type { IContestReport, Allocatee, ICandidate } from '$lib/server/report_types';
+  import VoteCounts from './report_components/VoteCounts.svelte';
 
-  import { setContext } from 'svelte'
+  import { setContext } from 'svelte';
 
   interface Props {
     report: IContestReport;
@@ -17,23 +13,23 @@
   let { report }: Props = $props();
 
   function getCandidate(cid: Allocatee): ICandidate {
-    return report.candidates[cid]
+    return report.candidates[cid];
   }
 
   function getWinners(candidates: ICandidate[]): ICandidate[] {
     if (candidates.length == 1) {
-      return [report.candidates[0]]
+      return [report.candidates[0]];
     }
 
-    return candidates.filter(candidate => candidate.winner === true)
+    return candidates.filter((candidate) => candidate.winner === true);
   }
 
   setContext('candidates', {
     getCandidate,
-  })
+  });
 
   function formatDate(dateStr: string): string {
-    let date = new Date(dateStr)
+    let date = new Date(dateStr);
     const months = [
       'January',
       'February',
@@ -47,27 +43,21 @@
       'October',
       'November',
       'December',
-    ]
+    ];
 
-    return `${
-      months[date.getUTCMonth()]
-    } ${date.getUTCDate()}, ${date.getUTCFullYear()}`
+    return `${months[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}`;
   }
 
-  const sumVotes = report.candidates
-    .map((candidate) => candidate.votes)
-    .reduce((a, b) => a + b)
+  const sumVotes = report.candidates.map((candidate) => candidate.votes).reduce((a, b) => a + b);
 
-  const numCandidates = report.candidates.filter(
-    (candidate) => !candidate.writeIn
-  ).length
+  const numCandidates = report.candidates.filter((candidate) => !candidate.writeIn).length;
 </script>
 
 <div class="row">
   <p class="description"></p>
   <div class="electionHeader">
     <h1>
-      <a href="{base}/">approval.vote</a>
+      <a href="{resolve('/')}">approval.vote</a>
       //
       <strong>{report.info.jurisdictionName}</strong>
       {report.info.officeName}
@@ -103,14 +93,14 @@
         was the winner out of
       {:else}were the winners out of{/if}
       <strong>{numCandidates}</strong>
-      {#if numCandidates == 1}candidate{:else}candidates{/if}. {#if report.info.notes}{report
-          .info.notes}{/if}
+      {#if numCandidates == 1}candidate{:else}candidates{/if}. {#if report.info.notes}{report.info
+          .notes}{/if}
     </p>
     <p>
-      There were <strong>{report.ballotCount.toLocaleString()}</strong> ballots,
-      with <strong>{sumVotes.toLocaleString()}</strong> approvals. There was an
-      average of <strong>{(sumVotes / report.ballotCount).toFixed(1)}</strong> approvals
-      per ballot in this race.
+      There were <strong>{report.ballotCount.toLocaleString()}</strong> ballots, with
+      <strong>{sumVotes.toLocaleString()}</strong>
+      approvals. There was an average of
+      <strong>{(sumVotes / report.ballotCount).toFixed(1)}</strong> approvals per ballot in this race.
     </p>
   </div>
   <div class="rightCol">

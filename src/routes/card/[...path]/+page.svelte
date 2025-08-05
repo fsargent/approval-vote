@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { PageData } from "./$types";
-  import type { IContestReport } from "$lib/server/report_types";
-  import QRCode from "qrcode";
-  import { onMount } from "svelte";
+  import type { PageData } from './$types';
+  import type { IContestReport } from '$lib/server/report_types';
+  import QRCode from 'qrcode';
+  import { onMount } from 'svelte';
 
   export let data: PageData;
   const report: IContestReport = data.report;
@@ -15,8 +15,8 @@
       width: 48,
       margin: 0,
       color: {
-        dark: "#666666",
-        light: "#ffffff",
+        dark: '#666666',
+        light: '#ffffff',
       },
     });
   });
@@ -53,10 +53,7 @@
     </div>
     <div class="results">
       {#each candidates as candidate, i}
-        <div
-          class="result-row"
-          style="height: {rowHeight}px; font-size: {fontSize}rem;"
-        >
+        <div class="result-row" style="height: {rowHeight}px; font-size: {fontSize}rem;">
           <div
             class="background-fill"
             style="width: {candidate.percentage}%"

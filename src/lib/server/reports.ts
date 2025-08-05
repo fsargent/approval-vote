@@ -1,5 +1,5 @@
-import Database from "better-sqlite3";
-const db = new Database("data.sqlite3");
+import Database from 'better-sqlite3';
+const db = new Database('data.sqlite3');
 
 import type {
   IReportIndex,
@@ -8,13 +8,10 @@ import type {
   ICandidate,
   IContestIndexEntry,
   IElectionIndexEntry,
-} from "$lib/report_types";
+} from '$lib/report_types';
 
 // Helper function to create a contest object
-function createContest(
-  row: IContestIndexEntry & { sumVotes: number },
-  winners: string[],
-) {
+function createContest(row: IContestIndexEntry & { sumVotes: number }, winners: string[]) {
   return {
     office: row.office,
     officeName: row.officeName,
@@ -56,10 +53,7 @@ function createElection(row: IElectionIndexEntry, contest: IContestIndexEntry) {
 }
 
 // Helper function to add a contest to an existing election
-function addContestToElection(
-  election: IElectionIndexEntry,
-  contest: IContestIndexEntry,
-) {
+function addContestToElection(election: IElectionIndexEntry, contest: IContestIndexEntry) {
   election.contests.push(contest);
   election.contests.sort((b: IContestIndexEntry, a: IContestIndexEntry) => {
     // Extract numeric part from office names surrounded by spaces
@@ -99,7 +93,7 @@ export function getIndex(): IReportIndex {
   const electionsByYear = rows.reduce(
     (
       grouped: IReportIndexByYear,
-      row: IElectionIndexEntry & { sumVotes: number },
+      row: IElectionIndexEntry & { sumVotes: number }
     ): IReportIndexByYear => {
       const year = new Date(row.date).getFullYear();
       const winners = getWinners(row.id);
@@ -110,7 +104,7 @@ export function getIndex(): IReportIndex {
       }
 
       const existingElectionIndex = grouped[year].findIndex(
-        (election: IElectionIndexEntry) => election.path === row.path,
+        (election: IElectionIndexEntry) => election.path === row.path
       );
 
       if (existingElectionIndex === -1) {
@@ -121,7 +115,7 @@ export function getIndex(): IReportIndex {
 
       return grouped;
     },
-    {},
+    {}
   );
 
   // Sort contests within each election by ballotCount (descending)
@@ -131,9 +125,9 @@ export function getIndex(): IReportIndex {
     }
   }
 
-  const groupedArray = Object.entries(
-    electionsByYear as IReportIndexByYear,
-  ).sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
+  const groupedArray = Object.entries(electionsByYear as IReportIndexByYear).sort(
+    (a, b) => parseInt(b[0]) - parseInt(a[0])
+  );
 
   // Convert the reversed array back to a Map
   const groupedMap = new Map(groupedArray);
@@ -142,10 +136,10 @@ export function getIndex(): IReportIndex {
 }
 
 export function getReport(path: string): IContestReport {
-  let office = path.split("/").slice(-1);
-  path = path.split("/").slice(0, -1).join("/");
+  let office = path.split('/').slice(-1);
+  path = path.split('/').slice(0, -1).join('/');
   const reportRow = db
-    .prepare("SELECT * FROM reports WHERE path = ? AND office = ?")
+    .prepare('SELECT * FROM reports WHERE path = ? AND office = ?')
     .get(path, office) as IContestReport;
 
   if (!reportRow) {
@@ -153,12 +147,12 @@ export function getReport(path: string): IContestReport {
   }
 
   const candidateRows = db
-    .prepare("SELECT * FROM candidates WHERE report_id = ?")
+    .prepare('SELECT * FROM candidates WHERE report_id = ?')
     .all(reportRow.id) as ICandidate[];
 
   // Make the winners array by getting all the candidates with winner = 1
   const winners = db
-    .prepare("SELECT name FROM candidates WHERE report_id = ? AND winner = 1")
+    .prepare('SELECT name FROM candidates WHERE report_id = ? AND winner = 1')
     .all(reportRow.id) as ICandidate[];
 
   const winnerNames = winners.map((candidate: ICandidate) => candidate.name);
@@ -167,8 +161,8 @@ export function getReport(path: string): IContestReport {
     info: {
       name: reportRow.name,
       date: reportRow.date,
-      dataFormat: "unknown", // adjust as needed
-      tabulation: "unknown", // adjust as needed
+      dataFormat: 'unknown', // adjust as needed
+      tabulation: 'unknown', // adjust as needed
       jurisdictionPath: reportRow.jurisdictionPath,
       electionPath: reportRow.electionPath,
       office: reportRow.office,
@@ -180,7 +174,7 @@ export function getReport(path: string): IContestReport {
       notes: reportRow.notes,
     },
     ballotCount: reportRow.ballotCount,
-    candidates: candidateRows.map((row, index) => ({
+    candidates: candidateRows.map((row, _index) => ({
       name: row.name,
       writeIn: row.writeIn || false,
       votes: row.votes,

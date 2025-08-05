@@ -1,22 +1,22 @@
 /** @type {import('@sveltejs/kit').Config} */
-import adapter from "@sveltejs/adapter-static";
-import preprocess from "svelte-preprocess";
+import adapter from '@sveltejs/adapter-static';
+import preprocess from 'svelte-preprocess';
 
 const config = {
   // options passed to svelte.compile (https://svelte.dev/docs#compile-time-svelte-compile)
   compilerOptions: {},
 
   // an array of file extensions that should be treated as Svelte components
-  extensions: [".svelte"],
+  extensions: ['.svelte'],
 
   kit: {
     adapter: adapter(),
     alias: {},
-    appDir: "_app",
+    appDir: '_app',
     csp: {
-      mode: "auto",
+      mode: 'auto',
       directives: {
-        "default-src": undefined,
+        'default-src': undefined,
         // ...
       },
     },
@@ -25,26 +25,26 @@ const config = {
     },
     env: {
       dir: process.cwd(),
-      publicPrefix: "PUBLIC_",
+      publicPrefix: 'PUBLIC_',
     },
     files: {
-      assets: "static",
+      assets: 'static',
       hooks: {
-        client: "src/hooks.client",
-        server: "src/hooks.server",
+        client: 'src/hooks.client',
+        server: 'src/hooks.server',
       },
-      lib: "src/lib",
-      params: "src/params",
-      routes: "src/routes",
-      appTemplate: "src/app.html",
-      errorTemplate: "src/error.html",
+      lib: 'src/lib',
+      params: 'src/params',
+      routes: 'src/routes',
+      appTemplate: 'src/app.html',
+      errorTemplate: 'src/error.html',
     },
     inlineStyleThreshold: 0,
-    moduleExtensions: [".js", ".ts"],
-    outDir: ".svelte-kit",
+    moduleExtensions: ['.js', '.ts'],
+    outDir: '.svelte-kit',
     paths: {
-      assets: "",
-      base: "",
+      assets: '',
+      base: '',
     },
     serviceWorker: {
       register: false,
@@ -57,8 +57,8 @@ const config = {
 
   // options passed to @sveltejs/package
   package: {
-    source: "value of kit.files.lib, if available, else src/lib",
-    dir: "package",
+    source: 'value of kit.files.lib, if available, else src/lib',
+    dir: 'package',
     emitTypes: true,
     // excludes all .d.ts and files starting with _ as the name
     exports: (filepath) => !/^_|\/_|\.d\.ts$/.test(filepath),

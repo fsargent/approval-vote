@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ICandidate, IContestReport } from "$lib/server/report_types";
+  import type { ICandidate, IContestReport } from '$lib/server/report_types';
 
   import tippy from 'tippy.js';
   import type { Props } from 'tippy.js';
@@ -35,9 +35,7 @@
   // Sort candidates by votes in descending order
   const candidates: ICandidate[] = [...report.candidates].sort((a, b) => b.votes - a.votes);
 
-  const maxVotes: number = Math.max(
-    ...candidates.map((candidate) => candidate.votes)
-  );
+  const maxVotes: number = Math.max(...candidates.map((candidate) => candidate.votes));
   const ballotsCast: number = report.ballotCount;
   const scale = (width - labelSpace - 50) / maxVotes;
 
@@ -66,11 +64,7 @@
             ).toFixed(1)}% of the total ballots cast.</g>`}
           />
         </g>
-        <text
-          font-size="90%"
-          dominant-baseline="middle"
-          x={10 + scale * candidate.votes}
-        >
+        <text font-size="90%" dominant-baseline="middle" x={10 + scale * candidate.votes}>
           {((candidate.votes / ballotsCast) * 100).toFixed(1)}%</text
         >
       </g>

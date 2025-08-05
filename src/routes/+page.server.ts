@@ -1,11 +1,11 @@
-import { error } from "@sveltejs/kit";
-import { getIndex } from "$lib/server/reports";
+import { error } from '@sveltejs/kit';
+import { getIndex } from '$lib/server/reports';
 
 /** @type {import('./$types').PageServerLoad} */
-export async function load({ params }) {
+export async function load({ params: _params }) {
   try {
     return { index: await getIndex() };
-  } catch (err) {
-    return error(404, { message: "Not found" });
+  } catch {
+    return error(404, { message: 'Not found' });
   }
 }
