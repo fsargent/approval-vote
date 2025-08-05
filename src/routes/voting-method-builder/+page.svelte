@@ -42,7 +42,8 @@ interface VotingMethod {
   scores: {
     proportionality: number;
     simplicity: number;
-    strategyResistance: number;
+    honestStrategyResistance: number;
+    strategicStraightforwardness: number;
     representation: number;
   };
   // Classification
@@ -74,16 +75,16 @@ interface VotingMethod {
 
 // Voting method configuration state
 let config: VotingConfig = {
-  ballotType: null,
-  limitedChoices: null,
+  ballotType: 'choose-x',
+  limitedChoices: '1',
   customLimit: 3,
-  tabulationMethod: null,
+  tabulationMethod: 'fptp',
   numberOfSeats: 1,
   hasParties: true, // Always assume parties exist
   canVoteForParties: true,
   canVoteForCandidates: true,
   hasPrimaries: false,
-  listType: null,
+  listType: 'closed', // Default to closed list
   mixedMember: false,
   singleWinnerProportion: 50,
   allowNegativeVotes: false,
@@ -93,9 +94,13 @@ let config: VotingConfig = {
 
 // Election type options
 const electionTypes = [
+  { id: 'all', name: 'Show All', description: 'Show both single winner and multi winner elections' },
   { id: 'single', name: 'Single Winner', description: 'Choose one person for a role (President, Mayor, etc.)' },
   { id: 'multi', name: 'Multi Winner', description: 'Choose multiple people for a body (Council, Parliament, etc.) or for Top X Primaries' }
 ];
+
+// Current election type filter
+let electionTypeFilter = 'all';
 
 // Helper to get election type from numberOfSeats
 function getElectionType(numberOfSeats: number): string {
@@ -133,12 +138,12 @@ const VOTING_METHODS: VotingMethod[] = [
       existingMachines: true,
       description: 'Compatible with existing voting machines'
     },
-    scores: { proportionality: 0, simplicity: 5, strategyResistance: 0, representation: 1 },
+    scores: { proportionality: 0, simplicity: 5, honestStrategyResistance: 0, strategicStraightforwardness: 0, representation: 1 },
     isProportional: false,
     isSemiProportional: false,
     category: 'plurality',
     ballotTypeCritique: {
-      'choose-x-1': "**Strengths:** Simple and familiar. **Weaknesses:** Severe vote splitting, spoiler effects, doesn't capture full voter preferences."
+              'choose-x-1': "**Strengths:** Simple and familiar. **Weaknesses:** Severe vote splitting, spoiler effects, doesn't capture full voter preferences."
     },
     tabulationCritique: "**FPTP:** Simple but suffers from vote splitting and spoiler effects with multiple candidates.",
     proportionalityDetails: "**Non-Proportional Multi-Winner:** May lead to sweep victories and poor minority representation."
@@ -156,7 +161,7 @@ const VOTING_METHODS: VotingMethod[] = [
       existingMachines: true,
       description: 'Compatible with existing voting machines'
     },
-    scores: { proportionality: 0, simplicity: 5, strategyResistance: 5, representation: 4 },
+    scores: { proportionality: 0, simplicity: 5, honestStrategyResistance: 5, strategicStraightforwardness: 1, representation: 4 },
     isProportional: false,
     isSemiProportional: false,
     category: 'approval',
@@ -179,7 +184,7 @@ const VOTING_METHODS: VotingMethod[] = [
       existingMachines: true,
       description: 'Compatible with existing voting machines'
     },
-    scores: { proportionality: 0, simplicity: 4, strategyResistance: 2, representation: 3 },
+    scores: { proportionality: 0, simplicity: 4, honestStrategyResistance: 2, strategicStraightforwardness: 2, representation: 3 },
     isProportional: false,
     isSemiProportional: false,
     category: 'approval',
@@ -202,7 +207,7 @@ const VOTING_METHODS: VotingMethod[] = [
       existingMachines: false,
       description: 'Requires new voting machines and ballot software'
     },
-    scores: { proportionality: 0, simplicity: 1, strategyResistance: 3, representation: 4 },
+    scores: { proportionality: 0, simplicity: 1, honestStrategyResistance: 3, strategicStraightforwardness: 4, representation: 4 },
     isProportional: false,
     isSemiProportional: false,
     category: 'ranked',
@@ -221,7 +226,7 @@ const VOTING_METHODS: VotingMethod[] = [
     choiceLimitation: 'any',
     minSeats: 1,
     maxSeats: 1,
-    scores: { proportionality: 0, simplicity: 1, strategyResistance: 2, representation: 3 },
+    scores: { proportionality: 0, simplicity: 1, honestStrategyResistance: 0, strategicStraightforwardness: 0, representation: 3 },
     isProportional: false,
     isSemiProportional: false,
     category: 'ranked',
@@ -240,7 +245,7 @@ const VOTING_METHODS: VotingMethod[] = [
     choiceLimitation: 'any',
     minSeats: 1,
     maxSeats: 1,
-    scores: { proportionality: 0, simplicity: 1, strategyResistance: 4, representation: 4 },
+    scores: { proportionality: 0, simplicity: 1, honestStrategyResistance: 5, strategicStraightforwardness: 5, representation: 4 },
     isProportional: false,
     isSemiProportional: false,
     category: 'ranked',
@@ -265,7 +270,7 @@ const VOTING_METHODS: VotingMethod[] = [
       existingMachines: false,
       description: 'Requires new voting machines and ballot software'
     },
-    scores: { proportionality: 0, simplicity: 4, strategyResistance: 5, representation: 4 },
+    scores: { proportionality: 0, simplicity: 4, honestStrategyResistance: 2, strategicStraightforwardness: 2, representation: 4 },
     isProportional: false,
     isSemiProportional: false,
     category: 'score',
@@ -289,7 +294,7 @@ const VOTING_METHODS: VotingMethod[] = [
       existingMachines: false,
       description: 'Requires new voting machines and ballot software'
     },
-    scores: { proportionality: 0, simplicity: 4, strategyResistance: 4, representation: 4 },
+    scores: { proportionality: 0, simplicity: 4, honestStrategyResistance: 3, strategicStraightforwardness: 4, representation: 4 },
     isProportional: false,
     isSemiProportional: false,
     category: 'score',
@@ -314,12 +319,12 @@ const VOTING_METHODS: VotingMethod[] = [
       existingMachines: true,
       description: 'Compatible with existing voting machines'
     },
-    scores: { proportionality: 0, simplicity: 5, strategyResistance: 0, representation: 1 },
+    scores: { proportionality: 0, simplicity: 5, honestStrategyResistance: 0, strategicStraightforwardness: 0, representation: 1 },
     isProportional: false,
     isSemiProportional: false,
     category: 'plurality',
     ballotTypeCritique: {
-      'choose-x-1': "**Strengths:** Simple and familiar. **Weaknesses:** Severe vote splitting, spoiler effects, doesn't capture full voter preferences."
+              'choose-x-1': "**Strengths:** Simple and familiar. **Weaknesses:** Severe vote splitting, spoiler effects, doesn't capture full voter preferences."
     },
     tabulationCritique: "**Block Voting:** Simple plurality system for multiple seats. Tends to give all seats to the most popular party - very poor minority representation.",
     proportionalityDetails: "**Non-Proportional Multi-Winner:** May lead to sweep victories and poor minority representation."
@@ -337,7 +342,7 @@ const VOTING_METHODS: VotingMethod[] = [
       existingMachines: true,
       description: 'Compatible with existing voting machines'
     },
-    scores: { proportionality: 0, simplicity: 5, strategyResistance: 5, representation: 2 },
+    scores: { proportionality: 0, simplicity: 5, honestStrategyResistance: 5, strategicStraightforwardness: 1, representation: 2 },
     isProportional: false,
     isSemiProportional: false,
     category: 'approval',
@@ -356,7 +361,7 @@ const VOTING_METHODS: VotingMethod[] = [
     choiceLimitation: 'custom',
     minSeats: 2,
     maxSeats: 'unlimited',
-    scores: { proportionality: 0, simplicity: 4, strategyResistance: 1, representation: 3 },
+    scores: { proportionality: 0, simplicity: 4, honestStrategyResistance: 1, strategicStraightforwardness: 2, representation: 3 },
     isProportional: false,
     isSemiProportional: true,
     category: 'approval',
@@ -375,7 +380,7 @@ const VOTING_METHODS: VotingMethod[] = [
     choiceLimitation: 'custom',
     minSeats: 2,
     maxSeats: 'unlimited',
-    scores: { proportionality: 0, simplicity: 3, strategyResistance: 1, representation: 3 },
+    scores: { proportionality: 0, simplicity: 3, honestStrategyResistance: 1, strategicStraightforwardness: 2, representation: 3 },
     isProportional: false,
     isSemiProportional: true,
     category: 'approval',
@@ -394,12 +399,12 @@ const VOTING_METHODS: VotingMethod[] = [
     choiceLimitation: '1',
     minSeats: 2,
     maxSeats: 'unlimited',
-    scores: { proportionality: 3, simplicity: 5, strategyResistance: 2, representation: 3 },
+    scores: { proportionality: 3, simplicity: 5, honestStrategyResistance: 2, strategicStraightforwardness: 2, representation: 3 },
     isProportional: false,
     isSemiProportional: true,
     category: 'approval',
     ballotTypeCritique: {
-      'choose-x-1': "**Strengths:** Simple and familiar. **Weaknesses:** Severe vote splitting, spoiler effects, doesn't capture full voter preferences."
+              'choose-x-1': "**Strengths:** Simple and familiar. **Weaknesses:** Severe vote splitting, spoiler effects, doesn't capture full voter preferences."
     },
     tabulationCritique: "**SNTV:** Semi-proportional method for choose-one ballots. Requires strategic nomination by parties to achieve proportionality - too many candidates splits the vote, too few wastes votes.",
     proportionalityDetails: "**Semi-Proportional:** Provides some minority representation but not full proportional representation."
@@ -413,7 +418,7 @@ const VOTING_METHODS: VotingMethod[] = [
     choiceLimitation: 'unlimited',
     minSeats: 2,
     maxSeats: 'unlimited',
-    scores: { proportionality: 3, simplicity: 5, strategyResistance: 3, representation: 4 },
+    scores: { proportionality: 3, simplicity: 5, honestStrategyResistance: 3, strategicStraightforwardness: 3, representation: 4 },
     isProportional: false,
     isSemiProportional: true,
     category: 'approval',
@@ -432,7 +437,7 @@ const VOTING_METHODS: VotingMethod[] = [
     choiceLimitation: 'unlimited',
     minSeats: 2,
     maxSeats: 'unlimited',
-    scores: { proportionality: 5, simplicity: 4, strategyResistance: 3, representation: 5 },
+    scores: { proportionality: 5, simplicity: 4, honestStrategyResistance: 3, strategicStraightforwardness: 3, representation: 5 },
     isProportional: true,
     isSemiProportional: false,
     category: 'approval',
@@ -451,7 +456,7 @@ const VOTING_METHODS: VotingMethod[] = [
     choiceLimitation: 'any',
     minSeats: 2,
     maxSeats: 'unlimited',
-    scores: { proportionality: 5, simplicity: 1, strategyResistance: 3, representation: 5 },
+    scores: { proportionality: 5, simplicity: 1, honestStrategyResistance: 3, strategicStraightforwardness: 3, representation: 5 },
     isProportional: true,
     isSemiProportional: false,
     category: 'ranked',
@@ -470,7 +475,7 @@ const VOTING_METHODS: VotingMethod[] = [
     choiceLimitation: 'any',
     minSeats: 2,
     maxSeats: 'unlimited',
-    scores: { proportionality: 5, simplicity: 1, strategyResistance: 4, representation: 5 },
+    scores: { proportionality: 5, simplicity: 1, honestStrategyResistance: 4, strategicStraightforwardness: 3, representation: 5 },
     isProportional: true,
     isSemiProportional: false,
     category: 'ranked',
@@ -493,7 +498,7 @@ const VOTING_METHODS: VotingMethod[] = [
     choiceLimitation: 'any',
     minSeats: 2,
     maxSeats: 'unlimited',
-    scores: { proportionality: 5, simplicity: 1, strategyResistance: 5, representation: 5 },
+    scores: { proportionality: 5, simplicity: 1, honestStrategyResistance: 5, strategicStraightforwardness: 4, representation: 5 },
     isProportional: true,
     isSemiProportional: false,
     category: 'ranked',
@@ -516,7 +521,7 @@ const VOTING_METHODS: VotingMethod[] = [
     choiceLimitation: 'any',
     minSeats: 2,
     maxSeats: 'unlimited',
-    scores: { proportionality: 5, simplicity: 2, strategyResistance: 4, representation: 5 },
+    scores: { proportionality: 5, simplicity: 2, honestStrategyResistance: 4, strategicStraightforwardness: 3, representation: 5 },
     isProportional: true,
     isSemiProportional: false,
     category: 'ranked',
@@ -539,7 +544,7 @@ const VOTING_METHODS: VotingMethod[] = [
     choiceLimitation: 'any',
     minSeats: 2,
     maxSeats: 'unlimited',
-    scores: { proportionality: 4, simplicity: 3, strategyResistance: 1, representation: 4 },
+    scores: { proportionality: 4, simplicity: 1, honestStrategyResistance: 0, strategicStraightforwardness: 0, representation: 4 },
     isProportional: true,
     isSemiProportional: false,
     category: 'ranked',
@@ -562,7 +567,7 @@ const VOTING_METHODS: VotingMethod[] = [
     choiceLimitation: 'any',
     minSeats: 2,
     maxSeats: 'unlimited',
-    scores: { proportionality: 5, simplicity: 1, strategyResistance: 4, representation: 5 },
+    scores: { proportionality: 5, simplicity: 1, honestStrategyResistance: 4, strategicStraightforwardness: 3, representation: 5 },
     isProportional: true,
     isSemiProportional: false,
     category: 'ranked',
@@ -580,22 +585,22 @@ const VOTING_METHODS: VotingMethod[] = [
     id: 'party-list-pr',
     name: 'Party List PR',
     shortDescription: 'Proportional seats by party vote share',
-    detailedCritique: 'Direct proportional representation based on party vote shares.',
+    detailedCritique: 'Pure proportional representation where voters choose parties, and seats are allocated based on each party\'s share of the vote. Ensures fair representation but can reduce individual candidate accountability. Used in many European countries like Netherlands, Israel, and Finland.',
     ballotType: 'choose-x',
     choiceLimitation: 'any',
     minSeats: 2,
     maxSeats: 'unlimited',
-    scores: { proportionality: 5, simplicity: 4, strategyResistance: 4, representation: 5 },
+    scores: { proportionality: 5, simplicity: 4, honestStrategyResistance: 4, strategicStraightforwardness: 3, representation: 5 },
     isProportional: true,
     isSemiProportional: false,
     category: 'mixed',
     hasVariants: true,
     variants: { listType: true },
     ballotTypeCritique: {
-      'choose-x-1': "**Strengths:** Simple and familiar. **Weaknesses:** Severe vote splitting, spoiler effects, doesn't capture full voter preferences.",
+        'choose-x-1': "**Strengths:** Simple and familiar. **Weaknesses:** Severe vote splitting, spoiler effects, doesn't capture full voter preferences.",
       'choose-x-unlimited': "**Strengths:** Simple, eliminates vote splitting, encourages honest voting. **Weaknesses:** No preference intensity"
     },
-    tabulationCritique: "**Party List PR:** Direct proportional representation based on party vote shares. Simple and effective for achieving proportionality.",
+    tabulationCritique: "**Party List PR:** Direct proportional representation where parties receive seats based on their vote share. Achieves excellent proportionality but may weaken the link between voters and individual representatives. Works best with diverse multi-party systems.",
     proportionalityDetails: "**Proportional Representation:** Ensures fair party representation but may reduce local accountability.",
     listTypeCritique: {
       closed: "**Closed Lists:** Give parties full control over candidate selection and ordering, which can strengthen party discipline but reduce voter choice.",
@@ -611,23 +616,23 @@ const VOTING_METHODS: VotingMethod[] = [
     id: 'mmp',
     name: 'MMP (Mixed Member Proportional)',
     shortDescription: 'Combines districts with party lists',
-    detailedCritique: 'Combines single-winner districts with party lists to ensure proportionality while maintaining local representation.',
+    detailedCritique: 'Hybrid system combining local districts with party lists. Voters cast two ballots: one for a local representative and one for a party. Additional "top-up" seats ensure overall proportionality while preserving local representation. Successfully used in Germany, New Zealand, and Scotland.',
     ballotType: 'choose-x',
     choiceLimitation: 'any',
     minSeats: 2,
     maxSeats: 'unlimited',
     requiresParties: true,
-    scores: { proportionality: 5, simplicity: 3, strategyResistance: 4, representation: 5 },
+    scores: { proportionality: 5, simplicity: 3, honestStrategyResistance: 4, strategicStraightforwardness: 3, representation: 5 },
     isProportional: true,
     isSemiProportional: false,
     category: 'mixed',
     hasVariants: true,
     variants: { listType: true, mixedMember: true },
     ballotTypeCritique: {
-      'choose-x-1': "**Strengths:** Simple and familiar. **Weaknesses:** Severe vote splitting, spoiler effects, doesn't capture full voter preferences.",
+        'choose-x-1': "**Strengths:** Simple and familiar. **Weaknesses:** Severe vote splitting, spoiler effects, doesn't capture full voter preferences.",
       'choose-x-unlimited': "**Strengths:** Simple, eliminates vote splitting, encourages honest voting. **Weaknesses:** No preference intensity"
     },
-    tabulationCritique: "**MMP:** Combines single-winner districts with party lists to ensure proportionality while maintaining local representation.",
+    tabulationCritique: "**MMP:** Combines the best of both worlds - local accountability through districts and fair representation through proportional top-up seats. More complex to implement but provides excellent balance between local representation and proportionality. May create two classes of representatives.",
     proportionalityDetails: "**Proportional Representation:** Ensures fair party representation but may reduce local accountability.",
     listTypeCritique: {
       closed: "**Closed Lists:** Give parties full control over candidate selection and ordering, which can strengthen party discipline but reduce voter choice.",
@@ -648,7 +653,7 @@ const VOTING_METHODS: VotingMethod[] = [
     choiceLimitation: 'any',
     minSeats: 2,
     maxSeats: 'unlimited',
-    scores: { proportionality: 0, simplicity: 5, strategyResistance: 2, representation: 2 },
+    scores: { proportionality: 0, simplicity: 5, honestStrategyResistance: 2, strategicStraightforwardness: 2, representation: 2 },
     isProportional: false,
     isSemiProportional: false,
     category: 'score',
@@ -667,7 +672,7 @@ const VOTING_METHODS: VotingMethod[] = [
     choiceLimitation: 'any',
     minSeats: 2,
     maxSeats: 'unlimited',
-    scores: { proportionality: 5, simplicity: 3, strategyResistance: 4, representation: 5 },
+    scores: { proportionality: 5, simplicity: 3, honestStrategyResistance: 4, strategicStraightforwardness: 3, representation: 5 },
     isProportional: true,
     isSemiProportional: false,
     category: 'score',
@@ -686,7 +691,7 @@ const VOTING_METHODS: VotingMethod[] = [
     choiceLimitation: 'unlimited',
     minSeats: 2,
     maxSeats: 'unlimited',
-    scores: { proportionality: 5, simplicity: 2, strategyResistance: 4, representation: 5 },
+    scores: { proportionality: 5, simplicity: 2, honestStrategyResistance: 4, strategicStraightforwardness: 3, representation: 5 },
     isProportional: true,
     isSemiProportional: false,
     category: 'approval',
@@ -705,7 +710,7 @@ const VOTING_METHODS: VotingMethod[] = [
     choiceLimitation: 'any',
     minSeats: 2,
     maxSeats: 'unlimited',
-    scores: { proportionality: 5, simplicity: 3, strategyResistance: 4, representation: 5 },
+    scores: { proportionality: 5, simplicity: 3, honestStrategyResistance: 4, strategicStraightforwardness: 3, representation: 5 },
     isProportional: true,
     isSemiProportional: false,
     category: 'score',
@@ -724,7 +729,7 @@ const VOTING_METHODS: VotingMethod[] = [
     choiceLimitation: 'any',
     minSeats: 2,
     maxSeats: 'unlimited',
-    scores: { proportionality: 4, simplicity: 4, strategyResistance: 3, representation: 4 },
+    scores: { proportionality: 4, simplicity: 4, honestStrategyResistance: 3, strategicStraightforwardness: 3, representation: 4 },
     isProportional: true,
     isSemiProportional: false,
     category: 'score',
@@ -743,7 +748,7 @@ const VOTING_METHODS: VotingMethod[] = [
     choiceLimitation: 'any',
     minSeats: 1,
     maxSeats: 1,
-    scores: { proportionality: 0, simplicity: 4, strategyResistance: 2, representation: 4 },
+    scores: { proportionality: 0, simplicity: 4, honestStrategyResistance: 2, strategicStraightforwardness: 2, representation: 4 },
     isProportional: false,
     isSemiProportional: false,
     category: 'score',
@@ -762,7 +767,7 @@ const VOTING_METHODS: VotingMethod[] = [
     choiceLimitation: 'any',
     minSeats: 1,
     maxSeats: 1,
-    scores: { proportionality: 0, simplicity: 4, strategyResistance: 4, representation: 4 },
+    scores: { proportionality: 0, simplicity: 4, honestStrategyResistance: 4, strategicStraightforwardness: 3, representation: 4 },
     isProportional: false,
     isSemiProportional: false,
     category: 'score',
@@ -781,7 +786,7 @@ const VOTING_METHODS: VotingMethod[] = [
     choiceLimitation: 'any',
     minSeats: 1,
     maxSeats: 1,
-    scores: { proportionality: 0, simplicity: 3, strategyResistance: 5, representation: 4 },
+    scores: { proportionality: 0, simplicity: 3, honestStrategyResistance: 2, strategicStraightforwardness: 1, representation: 4 },
     isProportional: false,
     isSemiProportional: false,
     category: 'score',
@@ -800,14 +805,14 @@ const VOTING_METHODS: VotingMethod[] = [
     choiceLimitation: '1',
     minSeats: 1,
     maxSeats: 1,
-    scores: { proportionality: 0, simplicity: 4, strategyResistance: 1, representation: 2 },
+    scores: { proportionality: 0, simplicity: 4, honestStrategyResistance: 1, strategicStraightforwardness: 2, representation: 2 },
     isProportional: false,
     isSemiProportional: false,
     category: 'plurality',
     ballotTypeCritique: {
-      'choose-x-1': "**Strengths:** Simple and familiar. **Weaknesses:** Severe vote splitting, spoiler effects, doesn't capture full voter preferences."
+              'choose-x-1': "**Strengths:** Simple and familiar. **Weaknesses:** Severe vote splitting, spoiler effects, doesn't capture full voter preferences."
     },
-    tabulationCritique: "**Top-Two Runoff:** Ensures the winner has majority support in the final round, but can eliminate popular candidates who don't make the top two.",
+    tabulationCritique: "**Top-Two Runoff:** Ensures the winner has majority support in the final round, but can eliminate popular candidates who don't make the top two. Technically not a different tabulation method, but just block voting then FPTP",
     proportionalityDetails: "**Non-Proportional Multi-Winner:** May lead to sweep victories and poor minority representation.",
     votingMachineCompatibility: {
       existingMachines: true,
@@ -843,9 +848,23 @@ function getAvailableMethods(config: VotingConfig): VotingMethod[] {
     if (method.choiceLimitation !== 'any' &&
         method.choiceLimitation !== config.limitedChoices) return false;
 
-    // Seat count compatibility
-    if (config.numberOfSeats < method.minSeats ||
-        (method.maxSeats !== 'unlimited' && config.numberOfSeats > method.maxSeats)) return false;
+    // Election type filter (if not 'all')
+    if (electionTypeFilter !== 'all') {
+      const currentElectionType = getElectionType(config.numberOfSeats);
+      if (electionTypeFilter === 'single') {
+        // Only show single winner methods
+        if (method.minSeats > 1) return false;
+      } else if (electionTypeFilter === 'multi') {
+        // Only show multi winner methods
+        if (method.maxSeats === 1) return false;
+      }
+    }
+
+    // Seat count compatibility (skip when showing all elections)
+    if (electionTypeFilter !== 'all') {
+      if (config.numberOfSeats < method.minSeats ||
+          (method.maxSeats !== 'unlimited' && config.numberOfSeats > method.maxSeats)) return false;
+    }
 
     // No party requirements check - always assume parties exist
     return true;
@@ -854,7 +873,9 @@ function getAvailableMethods(config: VotingConfig): VotingMethod[] {
 
 // Build available tabulation methods based on current config
 $: {
+  // Include electionTypeFilter in reactive dependencies
   const methods = getAvailableMethods(config);
+  electionTypeFilter; // Add to reactive dependencies
   // Convert to legacy format for compatibility with existing UI
   availableTabulationMethods = methods.map(m => ({
     id: m.id,
@@ -1026,7 +1047,7 @@ function generateVotingMethodCritiqueFromData(config: VotingConfig) {
                           method.ballotTypeCritique['choose-x-unlimited']; // fallback
     
     if (ballotCritique) {
-      critique += ballotCritique + "\n\n";
+      critique += "**Ballot Type Analysis:** " + ballotCritique + "\n\n";
     }
   }
 
@@ -1080,7 +1101,8 @@ function generateVotingMethodScores(config: VotingConfig) {
   const defaultScores = {
     proportionality: 0,
     simplicity: 0,
-    strategyResistance: 0,
+    honestStrategyResistance: 0,
+    strategicStraightforwardness: 0,
     representation: 0
   };
 
@@ -1102,7 +1124,8 @@ function generateVotingMethodScores(config: VotingConfig) {
 
   // Adjust for choice limitations (FPTP override)
   if (config.limitedChoices === '1' && config.ballotType === 'choose-x') {
-    scores.strategyResistance = 0; // FPTP is extremely strategic
+    scores.honestStrategyResistance = 0; // FPTP is extremely vulnerable to tactical voting
+    scores.strategicStraightforwardness = 0; // FPTP requires heavy strategic thinking - worst case
     scores.representation = 1; // FPTP has terrible representation quality
   }
 
@@ -1135,6 +1158,17 @@ function selectElectionType(selectedType: string) {
   }
 }
 
+function selectElectionTypeFilter(filterType: string) {
+  electionTypeFilter = filterType;
+  // Update numberOfSeats based on filter to ensure compatibility
+  if (filterType === 'single') {
+    selectOption('numberOfSeats', 1);
+  } else if (filterType === 'multi') {
+    selectOption('numberOfSeats', 10);
+  }
+  // If 'all', keep current numberOfSeats
+}
+
 function selectOption(category: keyof VotingConfig, value: any) {
   (config as any)[category] = value;
   
@@ -1142,7 +1176,7 @@ function selectOption(category: keyof VotingConfig, value: any) {
   if (category === 'ballotType') {
     config.tabulationMethod = null;
     if (value === 'choose-x') {
-      config.limitedChoices = 'unlimited'; // Default to approval voting
+      config.limitedChoices = '1'; // Default to FPTP (Pick 1)
     }
   }
 
@@ -1151,10 +1185,17 @@ function selectOption(category: keyof VotingConfig, value: any) {
     config.tabulationMethod = config.numberOfSeats > 1 ? 'sntv' : 'fptp';
   }
   
+  // Set default list type for party-based methods
+  if (category === 'tabulationMethod' && ['party-list-pr', 'mmp'].includes(value)) {
+    if (!config.listType) {
+      config.listType = 'closed';
+    }
+  }
+  
   // Auto-select appropriate tabulation for some ballot types
   if (category === 'ballotType') {
     if (value === 'choose-x') {
-      config.tabulationMethod = config.numberOfSeats > 1 ? 'spav' : 'approval';
+      config.tabulationMethod = config.numberOfSeats > 1 ? 'sntv' : 'fptp';
     } else if (value === 'score') {
       config.tabulationMethod = 'highest-total';
     } else if (value === 'ranking') {
@@ -1335,23 +1376,6 @@ function getSuggestedComparisons(config: VotingConfig): { title: string, methods
     <!-- Configuration Panel -->
     <div class="config-panel">
       
-      <!-- Election Type Section -->
-      <section class="config-section">
-        <h2>🏛️ Election Type</h2>
-        <p class="section-description">Are you electing one person or multiple people?</p>
-        <div class="option-grid">
-          {#each electionTypes as option}
-            <button 
-              class="option-button" 
-              class:selected={selectedElectionType === option.id}
-              on:click={() => selectElectionType(option.id)}
-            >
-              <div class="option-name">{option.name}</div>
-              <div class="option-description">{option.description}</div>
-            </button>
-          {/each}
-        </div>
-      </section>
       
       <!-- Ballot Type Section -->
       <section class="config-section">
@@ -1416,6 +1440,23 @@ function getSuggestedComparisons(config: VotingConfig): { title: string, methods
         </section>
       {/if}
 
+      <!-- Election Type Section -->
+      <section class="config-section">
+        <h2>🏛️ Election Type</h2>
+        <p class="section-description">Are you electing one person or multiple people?</p>
+        <div class="option-grid">
+          {#each electionTypes as option}
+            <button 
+              class="option-button small" 
+              class:selected={electionTypeFilter === option.id}
+              on:click={() => selectElectionTypeFilter(option.id)}
+            >
+              <div class="option-name">{option.name}</div>
+              <div class="option-description">{option.description}</div>
+            </button>
+          {/each}
+        </div>
+      </section>
 
       <!-- Tabulation Method Section -->
       {#if config.ballotType}
@@ -1514,8 +1555,7 @@ function getSuggestedComparisons(config: VotingConfig): { title: string, methods
               <div class="score-item">
                 <div class="score-bar-container">
                   <div class="score-label-container">
-                    <span class="score-label">Proportionality</span>
-                    <button type="button" class="info-button" on:click={(e) => { e.stopPropagation(); toggleTooltip('proportionality'); }} aria-label="more info about proportionality">ⓘ</button>
+                    <span class="score-label clickable" on:click={(e) => { e.stopPropagation(); toggleTooltip('proportionality'); }}>Proportionality</span>
                   </div>
                   <div class="score-bar">
                     <div class="score-fill" data-score="{votingMethodScores.proportionality}" style="width: {(votingMethodScores.proportionality / 5) * 100}%"></div>
@@ -1531,8 +1571,7 @@ function getSuggestedComparisons(config: VotingConfig): { title: string, methods
               <div class="score-item">
                 <div class="score-bar-container">
                   <div class="score-label-container">
-                    <span class="score-label">Voter Simplicity</span>
-                    <button type="button" class="info-button" on:click={(e) => { e.stopPropagation(); toggleTooltip('simplicity'); }} aria-label="more info about voter simplicity">ⓘ</button>
+                    <span class="score-label clickable" on:click={(e) => { e.stopPropagation(); toggleTooltip('simplicity'); }}>Voter Simplicity</span>
                   </div>
                   <div class="score-bar">
                     <div class="score-fill" data-score="{votingMethodScores.simplicity}" style="width: {(votingMethodScores.simplicity / 5) * 100}%"></div>
@@ -1548,25 +1587,23 @@ function getSuggestedComparisons(config: VotingConfig): { title: string, methods
               <div class="score-item">
                 <div class="score-bar-container">
                   <div class="score-label-container">
-                    <span class="score-label">Strategy Resistance</span>
-                    <button type="button" class="info-button" on:click={(e) => { e.stopPropagation(); toggleTooltip('resistance'); }} aria-label="more info about strategy resistance">ⓘ</button>
+                    <span class="score-label clickable" on:click={(e) => { e.stopPropagation(); toggleTooltip('honest-resistance'); }}>Honest Strategy Resistance</span>
                   </div>
                   <div class="score-bar">
-                    <div class="score-fill" data-score="{votingMethodScores.strategyResistance}" style="width: {(votingMethodScores.strategyResistance / 5) * 100}%"></div>
-                    <span class="score-value">{votingMethodScores.strategyResistance}/5</span>
+                    <div class="score-fill" data-score="{votingMethodScores.honestStrategyResistance}" style="width: {(votingMethodScores.honestStrategyResistance / 5) * 100}%"></div>
+                    <span class="score-value">{votingMethodScores.honestStrategyResistance}/5</span>
                   </div>
                 </div>
-                {#if activeTooltip === 'resistance'}
+                {#if activeTooltip === 'honest-resistance'}
                   <div class="info-panel">
-                    How resistant the method is to tactical voting and manipulation - higher scores mean voters can be more honest without being penalized
+                    How well the method resists dishonest strategies where you support a less-preferred candidate more than a preferred one - higher scores mean less incentive for tactical voting
                   </div>
                 {/if}
               </div>
               <div class="score-item">
                 <div class="score-bar-container">
                   <div class="score-label-container">
-                    <span class="score-label">Representation Quality</span>
-                    <button type="button" class="info-button" on:click={(e) => { e.stopPropagation(); toggleTooltip('quality'); }} aria-label="more info about representation quality">ⓘ</button>
+                    <span class="score-label clickable" on:click={(e) => { e.stopPropagation(); toggleTooltip('quality'); }}>Representation Quality</span>
                   </div>
                   <div class="score-bar">
                     <div class="score-fill" data-score="{votingMethodScores.representation}" style="width: {(votingMethodScores.representation / 5) * 100}%"></div>
@@ -1576,6 +1613,22 @@ function getSuggestedComparisons(config: VotingConfig): { title: string, methods
                 {#if activeTooltip === 'quality'}
                   <div class="info-panel">
                     How well the elected candidates actually represent the preferences and will of the electorate - considers broad support, minority representation, and whether outcomes reflect voter intent
+                  </div>
+                {/if}
+              </div>
+              <div class="score-item">
+                <div class="score-bar-container">
+                  <div class="score-label-container">
+                    <span class="score-label clickable" on:click={(e) => { e.stopPropagation(); toggleTooltip('straightforwardness'); }}>Strategic Straightforwardness</span>
+                  </div>
+                  <div class="score-bar">
+                    <div class="score-fill" data-score="{votingMethodScores.strategicStraightforwardness}" style="width: {(votingMethodScores.strategicStraightforwardness / 5) * 100}%"></div>
+                    <span class="score-value">{votingMethodScores.strategicStraightforwardness}/5</span>
+                  </div>
+                </div>
+                {#if activeTooltip === 'straightforwardness'}
+                  <div class="info-panel">
+                    How easy it is to vote your true preferences without needing to consider strategy or candidate viability - higher scores mean less mental burden on voters
                   </div>
                 {/if}
               </div>
@@ -1679,11 +1732,18 @@ function getSuggestedComparisons(config: VotingConfig): { title: string, methods
                   <span class="score-num">{method.scores.simplicity}/5</span>
                 </div>
                 <div class="score-row">
-                  <span class="score-name">Strategy Resist.</span>
+                  <span class="score-name">Honest Strategy</span>
                   <div class="score-bar-small">
-                    <div class="score-fill-small" style="width: {(method.scores.strategyResistance / 5) * 100}%"></div>
+                    <div class="score-fill-small" style="width: {(method.scores.honestStrategyResistance / 5) * 100}%"></div>
                   </div>
-                  <span class="score-num">{method.scores.strategyResistance}/5</span>
+                  <span class="score-num">{method.scores.honestStrategyResistance}/5</span>
+                </div>
+                <div class="score-row">
+                  <span class="score-name">Straightforward</span>
+                  <div class="score-bar-small">
+                    <div class="score-fill-small" style="width: {(method.scores.strategicStraightforwardness / 5) * 100}%"></div>
+                  </div>
+                  <span class="score-num">{method.scores.strategicStraightforwardness}/5</span>
                 </div>
                 <div class="score-row">
                   <span class="score-name">Representation</span>
@@ -1961,13 +2021,26 @@ function getSuggestedComparisons(config: VotingConfig): { title: string, methods
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    min-width: 140px;
+    width: 200px;
+    flex-shrink: 0;
   }
 
   .score-label {
     font-weight: 500;
     color: #475569;
     font-size: 0.95rem;
+  }
+
+  .score-label.clickable {
+    cursor: help;
+    transition: border-bottom 0.2s ease;
+    user-select: none;
+    border-bottom: 1px dashed #94a3b8;
+    padding-bottom: 1px;
+  }
+
+  .score-label.clickable:hover {
+    border-bottom: 1px dashed #475569;
   }
 
   .info-button {
