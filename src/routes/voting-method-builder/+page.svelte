@@ -1,6 +1,7 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
   import { onMount } from 'svelte';
+  import mermaid from 'mermaid';
 
   // Type definition for our config
   interface VotingConfig {
@@ -23,8 +24,6 @@
   }
 
   interface VotingMethod {
-    // Identity
-    id: string;
     name: string;
     shortDescription: string;
     detailedCritique: string;
@@ -34,7 +33,7 @@
     minSeats: number;
     maxSeats: number | 'unlimited';
     // Voting Machine Compatibility
-    votingMachineCompatibility: {
+    votingMachineCompatibility?: {
       existingMachines: boolean;
       description: string;
     };
@@ -71,6 +70,8 @@
       withPrimaries?: string;
       withoutPrimaries?: string;
     };
+    flowchart?: string; // Mermaid flowchart diagram
+    tags?: string[]; // Tags for grouping and categorization
   }
 
   // Voting method configuration state
@@ -140,14 +141,14 @@
     },
   ];
 
-  const VOTING_METHODS: VotingMethod[] = [
+  // Store methods as both array and dictionary for optimal access patterns
+  const VOTING_METHODS: Record<string, VotingMethod> = {
     // Single-winner methods
-    {
-      id: 'fptp',
+    'fptp': {
       name: 'First Past The Post',
       shortDescription: 'Most votes wins',
       detailedCritique:
-        "Simple and familiar. Severe vote splitting, spoiler effects, doesn't capture full voter preferences.",
+        'First Past The Post (FPTP) is the most widely used voting system globally, where voters select one candidate and the candidate with the most votes wins. While its simplicity makes it easy to understand and implement, FPTP suffers from severe limitations that can undermine democratic representation. The system is highly susceptible to vote splitting, where similar candidates divide their shared voter base, potentially allowing a less popular candidate to win. This creates the spoiler effect, forcing voters to strategically vote for a "lesser evil" rather than their true preference. FPTP tends to produce two-party dominance over time, as voters abandon third parties to avoid wasting their votes. In multi-candidate races, winners can have surprisingly low vote shares - sometimes under 30% - meaning the majority of voters preferred someone else. The system also leads to gerrymandering concerns and can produce highly disproportionate results when used for legislative elections.',
       ballotType: 'choose-x',
       choiceLimitation: '1',
       minSeats: 1,
@@ -174,13 +175,13 @@
         '**FPTP:** Simple but suffers from vote splitting and spoiler effects with multiple candidates.',
       proportionalityDetails:
         '**Non-Proportional Multi-Winner:** May lead to sweep victories and poor minority representation.',
+      tags: ['simple', 'plurality', 'majoritarian', 'single-mark'],
     },
-    {
-      id: 'approval',
+    'approval': {
       name: 'Approval Voting',
       shortDescription: 'Approve any number of candidates',
       detailedCritique:
-        'Simple, eliminates vote splitting, encourages honest voting. No preference intensity.',
+        'Approval Voting represents a minimal yet powerful reform to plurality voting, allowing voters to select as many candidates as they approve of, with the candidate receiving the most approvals winning. This elegantly simple change eliminates the spoiler effect entirely - voters can support both their favorite candidate and a more viable alternative without harming either. The system encourages honest voting since supporting additional candidates never hurts those you\'ve already selected. Studies and real-world implementations show Approval Voting tends to elect broadly acceptable consensus candidates rather than polarizing figures. It requires no new voting equipment, as it uses the same ballots as plurality voting. The main limitation is the lack of preference expression - you cannot indicate that you prefer one approved candidate over another. However, this simplicity is also a strength, making the system transparent and easy to understand. Approval Voting has been successfully used by the UN, various professional societies, and the cities of Fargo and St. Louis.',
       ballotType: 'choose-x',
       choiceLimitation: 'unlimited',
       minSeats: 1,
@@ -207,9 +208,9 @@
         '**Most Approvals:** Simple and intuitive, encourages honest voting without strategic downsides.',
       proportionalityDetails:
         '**Non-Proportional Multi-Winner:** May lead to sweep victories and poor minority representation.',
+      tags: ['simple', 'consensus', 'binary-choice', 'spoiler-free'],
     },
-    {
-      id: 'limited-voting-single',
+    'limited-voting-single': {
       name: 'Limited Voting (Single Winner)',
       shortDescription: 'Pick up to X candidates, most votes wins',
       detailedCritique:
@@ -241,12 +242,11 @@
       proportionalityDetails:
         '**Non-Proportional Multi-Winner:** May lead to sweep victories and poor minority representation.',
     },
-    {
-      id: 'irv',
+    'irv': {
       name: 'IRV (Instant Runoff)',
       shortDescription: 'Eliminate lowest, transfer votes',
       detailedCritique:
-        'Eliminates some spoiler effects but not all. Can eliminate a candidate who is more popular than the winner.',
+        'Instant Runoff Voting (IRV), also called Ranked Choice Voting in single-winner contexts, allows voters to rank candidates in order of preference. If no candidate receives a majority of first-choice votes, the candidate with the fewest votes is eliminated and their voters\' ballots are transferred to their next choice. This process continues until someone has a majority. While IRV does eliminate the most basic spoiler effects between similar candidates, it suffers from several paradoxes that can produce counterintuitive results. The system can eliminate centrist candidates who would beat any other candidate head-to-head (the "center squeeze" problem), and in some cases, getting more first-choice votes can actually cause a candidate to lose (non-monotonicity). IRV is also vulnerable to strategic voting - "bullet voting" (only ranking one candidate) can sometimes help your favorite candidate. The sequential elimination process makes results difficult to predict and can take days to tabulate in close races. Despite these flaws, IRV does ensure majority support (among remaining candidates) and allows voters to express preferences.',
       ballotType: 'ranking',
       choiceLimitation: 'any',
       minSeats: 1,
@@ -273,9 +273,26 @@
         '**IRV:** Good at eliminating spoiler effects but can eliminate Condorcet winners and has center-squeeze problems.',
       proportionalityDetails:
         '**Non-Proportional Multi-Winner:** May lead to sweep victories and poor minority representation.',
+      flowchart: `flowchart TD
+    A["Start: Count first-choice votes"] --> B{"Any candidate has<br/>majority (>50%)?"}
+    B -->|Yes| C["Winner: Candidate with majority"]
+    B -->|No| D["Identify candidate with<br/>fewest first-choice votes"]
+    D --> E["Eliminate candidate<br/>with fewest votes"]
+    E --> F["Transfer votes to voters'<br/>next ranked choice"]
+    F --> G["Recount all remaining votes"]
+    G --> H{"Any candidate has<br/>majority (>50%)?"}
+    H -->|Yes| I["Winner: Candidate with majority"]
+    H -->|No| J{"Only 2 candidates<br/>remain?"}
+    J -->|Yes| K["Winner: Candidate with<br/>more votes"]
+    J -->|No| D
+
+    style A fill:#e1f5fe
+    style C fill:#c8e6c9
+    style I fill:#c8e6c9
+    style K fill:#c8e6c9`,
+      tags: ['ranked', 'runoff', 'instant-runoff', 'elimination', 'transfers'],
     },
-    {
-      id: 'borda',
+    'borda': {
       name: 'Borda Count',
       shortDescription: 'Points based on ranking position',
       detailedCritique:
@@ -294,6 +311,10 @@
       isProportional: false,
       isSemiProportional: false,
       category: 'ranked',
+      votingMachineCompatibility: {
+        existingMachines: false,
+        description: 'Requires new voting machines and ballot software',
+      },
       ballotTypeCritique: {
         ranking:
           '**Strengths:** Captures preference order, eliminates spoiler effect. **Weaknesses:** Can be complex for voters, may have non-monotonic results.',
@@ -302,9 +323,9 @@
         '**Borda:** Rewards broadly acceptable candidates but highly vulnerable to strategic nomination.',
       proportionalityDetails:
         '**Non-Proportional Multi-Winner:** May lead to sweep victories and poor minority representation.',
+      tags: ['ranked', 'positional', 'compromise', 'strategic-vulnerable', 'summable'],
     },
-    {
-      id: 'condorcet',
+    'condorcet': {
       name: 'Condorcet',
       shortDescription: 'Head-to-head winner if exists',
       detailedCritique:
@@ -323,6 +344,10 @@
       isProportional: false,
       isSemiProportional: false,
       category: 'ranked',
+      votingMachineCompatibility: {
+        existingMachines: false,
+        description: 'Requires new voting machines and ballot software',
+      },
       ballotTypeCritique: {
         ranking:
           '**Strengths:** Captures preference order, eliminates spoiler effect. **Weaknesses:** Can be complex for voters, may have non-monotonic results.',
@@ -331,11 +356,11 @@
         '**Condorcet:** Elects the candidate who beats all others head-to-head, but may have no winner in some cases.',
       proportionalityDetails:
         '**Non-Proportional Multi-Winner:** May lead to sweep victories and poor minority representation.',
+      tags: ['ranked', 'condorcet-compliant', 'pairwise', 'head-to-head', 'complex'],
     },
 
     // Score voting single-winner
-    {
-      id: 'highest-total',
+    'highest-total': {
       name: 'Highest Total Score',
       shortDescription: 'Sum all scores, highest wins',
       detailedCritique:
@@ -368,9 +393,9 @@
         '**Highest Total:** Adds up all scores for each candidate - the candidate with the highest sum wins. Simple. Works best with many candidates and relatively few voters where expressivity helps prevent ties.',
       proportionalityDetails:
         '**Non-Proportional Multi-Winner:** May lead to sweep victories and poor minority representation.',
+      tags: ['score', 'cardinal', 'expressive', 'simple', 'summable'],
     },
-    {
-      id: 'star',
+    'star': {
       name: 'STAR Voting',
       shortDescription: 'Score then automatic runoff',
       detailedCritique:
@@ -401,11 +426,11 @@
         '**STAR:** Combines benefits of score voting with runoff security, eliminating strategic concerns. The scoring phase works best with many candidates and relatively few voters, while the runoff provides decisive results.',
       proportionalityDetails:
         '**Non-Proportional Multi-Winner:** May lead to sweep victories and poor minority representation.',
+      tags: ['score', 'cardinal', 'hybrid', 'runoff', 'two-phase', 'consensus', 'spoiler-resistant'],
     },
 
     // Multi-winner methods
-    {
-      id: 'block-voting',
+    'block-voting': {
       name: 'Block Voting',
       shortDescription: 'Choose one, top candidates win multiple seats',
       detailedCritique:
@@ -436,9 +461,9 @@
         '**Block Voting:** Simple plurality system for multiple seats. Tends to give all seats to the most popular party - very poor minority representation.',
       proportionalityDetails:
         '**Non-Proportional Multi-Winner:** May lead to sweep victories and poor minority representation.',
+      tags: ['simple', 'majoritarian', 'plurality', 'single-mark', 'bloc-voting', 'sweep-prone'],
     },
-    {
-      id: 'block-approval',
+    'block-approval': {
       name: 'Block Approval Voting',
       shortDescription: 'Approve any number, top candidates win multiple seats',
       detailedCritique:
@@ -470,8 +495,7 @@
       proportionalityDetails:
         '**Non-Proportional Multi-Winner:** May lead to sweep victories and poor minority representation.',
     },
-    {
-      id: 'limited-voting',
+    'limited-voting': {
       name: 'Limited Voting',
       shortDescription: 'Voters pick fewer candidates than seats available',
       detailedCritique:
@@ -490,6 +514,10 @@
       isProportional: false,
       isSemiProportional: true,
       category: 'approval',
+      votingMachineCompatibility: {
+        existingMachines: true,
+        description: 'Compatible with existing voting machines',
+      },
       ballotTypeCritique: {
         'choose-x-custom':
           '**Strengths:** Reduces vote splitting compared to FPTP, allows some preference expression. **Weaknesses:** Arbitrary limit may not reflect true preferences, still susceptible to strategic voting.',
@@ -499,8 +527,7 @@
       proportionalityDetails:
         '**Semi-Proportional:** Provides some minority representation but not full proportional representation.',
     },
-    {
-      id: 'cumulative-voting',
+    'cumulative-voting': {
       name: 'Cumulative Voting',
       shortDescription: 'Voters get points equal to seats and distribute them freely',
       detailedCritique:
@@ -519,6 +546,10 @@
       isProportional: false,
       isSemiProportional: true,
       category: 'approval',
+      votingMachineCompatibility: {
+        existingMachines: true,
+        description: 'Compatible with existing voting machines',
+      },
       ballotTypeCritique: {
         'choose-x-custom':
           '**Strengths:** Reduces vote splitting compared to FPTP, allows some preference expression. **Weaknesses:** Arbitrary limit may not reflect true preferences, still susceptible to strategic voting.',
@@ -528,8 +559,7 @@
       proportionalityDetails:
         '**Semi-Proportional:** Provides some minority representation but not full proportional representation.',
     },
-    {
-      id: 'sntv',
+    'sntv': {
       name: 'SNTV (Single Non-Transferable Vote)',
       shortDescription: 'Semi-proportional for choose-one ballots',
       detailedCritique:
@@ -548,6 +578,10 @@
       isProportional: false,
       isSemiProportional: true,
       category: 'approval',
+      votingMachineCompatibility: {
+        existingMachines: true,
+        description: 'Compatible with existing voting machines',
+      },
       ballotTypeCritique: {
         'choose-x-1':
           "**Strengths:** Simple and familiar. **Weaknesses:** Severe vote splitting, spoiler effects, doesn't capture full voter preferences.",
@@ -557,8 +591,7 @@
       proportionalityDetails:
         '**Semi-Proportional:** Provides some minority representation but not full proportional representation.',
     },
-    {
-      id: 'satisfaction-approval',
+    'satisfaction-approval': {
       name: 'Satisfaction Approval',
       shortDescription: 'Semi-proportional splits votes equally',
       detailedCritique:
@@ -577,6 +610,10 @@
       isProportional: false,
       isSemiProportional: true,
       category: 'approval',
+      votingMachineCompatibility: {
+        existingMachines: true,
+        description: 'Compatible with existing voting machines',
+      },
       ballotTypeCritique: {
         'choose-x-unlimited':
           '**Strengths:** Simple, eliminates vote splitting, encourages honest voting. **Weaknesses:** No preference intensity',
@@ -586,8 +623,7 @@
       proportionalityDetails:
         '**Semi-Proportional:** Provides some minority representation but not full proportional representation.',
     },
-    {
-      id: 'spav',
+    'spav': {
       name: 'SPAV (Sequential Proportional Approval)',
       shortDescription: 'Proportional approval using sequential selection',
       detailedCritique:
@@ -615,8 +651,7 @@
       proportionalityDetails:
         '**Proportional Representation:** Ensures fair party representation but may reduce local accountability.',
     },
-    {
-      id: 'stv',
+    'stv': {
       name: 'STV (Single Transferable Vote)',
       shortDescription: 'Proportional ranked choice voting',
       detailedCritique:
@@ -643,9 +678,9 @@
         '**STV:** Provides proportional representation with ranked ballots, maintaining local representation while ensuring diversity.',
       proportionalityDetails:
         '**Proportional Representation:** Ensures fair party representation but may reduce local accountability.',
+      tags: ['proportional', 'ranked', 'transfers', 'quota-based', 'complex', 'candidate-based', 'surplus-transfer'],
     },
-    {
-      id: 'cpo-stv',
+    'cpo-stv': {
       name: 'CPO-STV',
       shortDescription: 'Condorcet-refined proportional ranked choice',
       detailedCritique:
@@ -677,8 +712,7 @@
       proportionalityDetails:
         '**Proportional Representation:** Ensures optimal proportional outcomes by comparing all possible seat allocations, though at the cost of computational complexity.',
     },
-    {
-      id: 'schulze-stv',
+    'schulze-stv': {
       name: 'Schulze STV',
       shortDescription: 'Schulze method extended to proportional representation',
       detailedCritique:
@@ -710,8 +744,7 @@
       proportionalityDetails:
         '**Proportional Representation:** Provides optimal proportional representation using Schulze method principles, ensuring strong Condorcet-style criteria are met.',
     },
-    {
-      id: 'meek-stv',
+    'meek-stv': {
       name: 'Meek STV',
       shortDescription: 'STV with iterative reweighting',
       detailedCritique:
@@ -743,8 +776,7 @@
       proportionalityDetails:
         '**Proportional Representation:** Achieves excellent proportional representation through continuous reweighting, avoiding some traditional STV anomalies.',
     },
-    {
-      id: 'pr-borda',
+    'pr-borda': {
       name: 'PR-Borda',
       shortDescription: 'Proportional representation using Borda count',
       detailedCritique:
@@ -776,8 +808,7 @@
       proportionalityDetails:
         '**Proportional Representation:** Provides proportional representation based on Borda scores, rewarding broadly acceptable candidates across party lines.',
     },
-    {
-      id: 'wright-stv',
+    'wright-stv': {
       name: 'Wright STV',
       shortDescription: 'STV variant with refined transfer rules',
       detailedCritique:
@@ -809,8 +840,7 @@
       proportionalityDetails:
         '**Proportional Representation:** Achieves proportional representation with improved transfer mechanisms that reduce some strategic voting opportunities.',
     },
-    {
-      id: 'party-list-pr',
+    'party-list-pr': {
       name: 'Party List PR',
       shortDescription: 'Proportional seats by party vote share',
       detailedCritique:
@@ -855,8 +885,7 @@
           '**No Primaries:** Parties select candidates internally (conventions, appointments, etc.). This gives party leadership more control but may reduce grassroots democracy and voter input in candidate selection.',
       },
     },
-    {
-      id: 'mmp',
+    'mmp': {
       name: 'MMP (Mixed Member Proportional)',
       shortDescription: 'Combines districts with party lists',
       detailedCritique:
@@ -865,7 +894,6 @@
       choiceLimitation: 'any',
       minSeats: 2,
       maxSeats: 'unlimited',
-      requiresParties: true,
       scores: {
         proportionality: 5,
         simplicity: 3,
@@ -902,8 +930,7 @@
           '**No Primaries:** Parties select candidates internally (conventions, appointments, etc.). This gives party leadership more control but may reduce grassroots democracy and voter input in candidate selection.',
       },
     },
-    {
-      id: 'block-score',
+    'block-score': {
       name: 'Block Score Voting',
       shortDescription: 'Highest total scores win multiple seats',
       detailedCritique:
@@ -931,8 +958,7 @@
       proportionalityDetails:
         '**Non-Proportional Multi-Winner:** May lead to sweep victories and poor minority representation.',
     },
-    {
-      id: 'equal-shares',
+    'equal-shares': {
       name: 'Method of Equal Shares',
       shortDescription: 'Equal budget per voter',
       detailedCritique:
@@ -960,8 +986,7 @@
       proportionalityDetails:
         '**Proportional Representation:** Ensures fair party representation but may reduce local accountability.',
     },
-    {
-      id: 'pav',
+    'pav': {
       name: 'PAV (Proportional Approval Voting)',
       shortDescription: 'Optimal approval-based proportional representation',
       detailedCritique:
@@ -988,9 +1013,9 @@
         '**PAV:** The theoretical optimum for proportional representation using approval ballots. Maximizes voter satisfaction but requires complex optimization algorithms that are computationally intensive for large elections.',
       proportionalityDetails:
         '**Proportional Representation:** Ensures fair party representation but may reduce local accountability.',
+      tags: ['proportional', 'approval', 'optimization', 'theoretically-optimal', 'computationally-complex', 'np-hard'],
     },
-    {
-      id: 'star-pr',
+    'star-pr': {
       name: 'STAR-PR',
       shortDescription: 'Proportional STAR voting',
       detailedCritique:
@@ -1018,8 +1043,7 @@
       proportionalityDetails:
         '**Proportional Representation:** Ensures fair party representation but may reduce local accountability.',
     },
-    {
-      id: 'allocated-score',
+    'allocated-score': {
       name: 'Allocated Score',
       shortDescription: 'Practical proportional score voting',
       detailedCritique:
@@ -1047,8 +1071,7 @@
       proportionalityDetails:
         '**Proportional Representation:** Ensures fair party representation but may reduce local accountability.',
     },
-    {
-      id: 'range-voting',
+    'range-voting': {
       name: 'Range Voting',
       shortDescription: 'Pure score voting without runoff',
       detailedCritique:
@@ -1076,8 +1099,7 @@
       proportionalityDetails:
         '**Non-Proportional Multi-Winner:** May lead to sweep victories and poor minority representation.',
     },
-    {
-      id: '3-2-1-voting',
+    '3-2-1-voting': {
       name: '3-2-1 Voting',
       shortDescription: 'Score 3-2-1, advance top 2, pick winner',
       detailedCritique:
@@ -1105,8 +1127,7 @@
       proportionalityDetails:
         '**Non-Proportional Multi-Winner:** May lead to sweep victories and poor minority representation.',
     },
-    {
-      id: 'majority-judgment',
+    'majority-judgment': {
       name: 'Majority Judgment',
       shortDescription: 'Winner has highest median score',
       detailedCritique:
@@ -1134,8 +1155,7 @@
       proportionalityDetails:
         '**Non-Proportional Multi-Winner:** May lead to sweep victories and poor minority representation.',
     },
-    {
-      id: 'top-two-runoff',
+    'top-two-runoff': {
       name: 'Top-Two Runoff',
       shortDescription: 'Top 2 candidates advance to runoff election',
       detailedCritique:
@@ -1167,7 +1187,8 @@
         description: 'Compatible with existing voting machines',
       },
     },
-  ];
+  };
+
 
   const listTypes = [
     {
@@ -1197,51 +1218,47 @@
   let availableTabulationMethods: any[] = [];
 
   // Get available methods based on current configuration
-  function getAvailableMethods(config: VotingConfig): VotingMethod[] {
-    return VOTING_METHODS.filter((method) => {
-      // Ballot type match
-      if (method.ballotType !== config.ballotType) return false;
+  function getAvailableMethods(config: VotingConfig): string[] {
+    const isCompatibleWithBallotType = ([id, method]: [string, VotingMethod]) => 
+      method.ballotType === config.ballotType;
 
-      // Choice limitation compatibility
-      if (method.choiceLimitation !== 'any' && method.choiceLimitation !== config.limitedChoices)
-        return false;
+    const isCompatibleWithChoiceLimit = ([id, method]: [string, VotingMethod]) =>
+      method.choiceLimitation === 'any' || method.choiceLimitation === config.limitedChoices;
 
-      // Election type filter (if not 'all')
-      if (electionTypeFilter !== 'all') {
-        const currentElectionType = getElectionType(config.numberOfSeats);
-        if (electionTypeFilter === 'single') {
-          // Only show single winner methods
-          if (method.minSeats > 1) return false;
-        } else if (electionTypeFilter === 'multi') {
-          // Only show multi winner methods
-          if (method.maxSeats === 1) return false;
-        }
-      }
+    const isCompatibleWithElectionType = ([id, method]: [string, VotingMethod]) => {
+      if (electionTypeFilter === 'all') return true;
+      
+      const currentElectionType = getElectionType(config.numberOfSeats);
+      return electionTypeFilter === 'single' 
+        ? method.minSeats <= 1 
+        : method.maxSeats !== 1;
+    };
 
-      // Seat count compatibility (skip when showing all elections)
-      if (electionTypeFilter !== 'all') {
-        if (
-          config.numberOfSeats < method.minSeats ||
-          (method.maxSeats !== 'unlimited' && config.numberOfSeats > method.maxSeats)
-        )
-          return false;
-      }
+    const isCompatibleWithSeatCount = ([id, method]: [string, VotingMethod]) => {
+      if (electionTypeFilter === 'all') return true;
+      
+      return config.numberOfSeats >= method.minSeats &&
+        (method.maxSeats === 'unlimited' || config.numberOfSeats <= method.maxSeats);
+    };
 
-      // No party requirements check - always assume parties exist
-      return true;
-    });
+    return Object.entries(VOTING_METHODS)
+      .filter(isCompatibleWithBallotType)
+      .filter(isCompatibleWithChoiceLimit)
+      .filter(isCompatibleWithElectionType)
+      .filter(isCompatibleWithSeatCount)
+      .map(([id]) => id);
   }
 
   // Build available tabulation methods based on current config
   $: {
     // Include electionTypeFilter in reactive dependencies
-    const methods = getAvailableMethods(config);
+    const methodIds = getAvailableMethods(config);
     electionTypeFilter; // Add to reactive dependencies
     // Convert to legacy format for compatibility with existing UI
-    availableTabulationMethods = methods.map((m) => ({
-      id: m.id,
-      name: m.name,
-      description: m.shortDescription,
+    availableTabulationMethods = methodIds.map(id => ({
+      id: id,
+      name: VOTING_METHODS[id].name,
+      description: VOTING_METHODS[id].shortDescription,
     }));
   }
 
@@ -1265,7 +1282,7 @@
     }
 
     // Get the base method name from VOTING_METHODS
-    const method = VOTING_METHODS.find((m) => m.id === config.tabulationMethod);
+    const method = VOTING_METHODS[config.tabulationMethod || ''];
     if (!method) return 'Unknown Method';
 
     let name = method.name;
@@ -1309,7 +1326,7 @@
 
       if (config.ballotType === 'score') {
         summary += ` (${config.scoreMin} to ${config.scoreMax}`;
-        if (config.allowNegativeVotes) summary += ', negative scores allowed';
+        if (config.allowNegativeVotes) summary += ', negative scores allowed. Negative values ';
         summary +=
           '). Score voting works best with many candidates and relatively few voters, where the expressivity helps prevent ties';
       }
@@ -1336,7 +1353,7 @@
       }
 
       // Voting machine compatibility
-      const fullMethod = VOTING_METHODS.find((m) => m.id === config.tabulationMethod);
+      const fullMethod = VOTING_METHODS[config.tabulationMethod || ''];
       if (fullMethod && fullMethod.votingMachineCompatibility) {
         const icon = fullMethod.votingMachineCompatibility.existingMachines ? '✅' : '❌';
         summary += `**Voting Machines:** ${icon} ${fullMethod.votingMachineCompatibility.description}\n\n`;
@@ -1393,7 +1410,7 @@
   function generateVotingMethodCritiqueFromData(config: VotingConfig) {
     if (!config.ballotType || !config.tabulationMethod) return '';
 
-    const method = VOTING_METHODS.find((m) => m.id === config.tabulationMethod);
+    const method = VOTING_METHODS[config.tabulationMethod || ''];
     if (!method) return '';
 
     let critique = '';
@@ -1424,8 +1441,23 @@
     if (config.numberOfSeats > 1 && method.proportionalityDetails) {
       critique += method.proportionalityDetails;
 
-      // Add list type critique for party-based methods
-      if (config.listType && method.listTypeCritique) {
+      // Add general list methods section for party-based methods
+      if (config.hasParties && ['party-list-pr', 'mmp'].includes(config.tabulationMethod || '')) {
+        critique += '\n\n**List Method Types:**\n\n';
+        critique += '**Open List:** Voters can choose specific candidates within a party. This maximizes voter choice and allows popular candidates to rise regardless of party ranking. However, it can lead to intra-party competition, potentially fragmenting party unity and making campaigns more expensive as candidates compete against their own party members.\n\n';
+        critique += '**Closed List:** The party determines the order of candidates, and voters can only vote for the party as a whole. This strengthens party discipline and cohesion, ensures balanced representation (parties can guarantee diversity), and simplifies voting. However, it reduces voter choice and can lead to party elites having too much control over who gets elected.\n\n';
+        critique += '**Hybrid/Flexible List:** Combines elements of both systems. Voters can either vote for the party (accepting its ranking) or for specific candidates. If enough voters choose a candidate, they can move up the list. This balances party cohesion with voter choice, though it adds complexity to both voting and vote counting.\n\n';
+
+        // Add specific list type critique if available
+        if (config.listType && method.listTypeCritique) {
+          const listCritique =
+            method.listTypeCritique[config.listType as keyof typeof method.listTypeCritique];
+          if (listCritique) {
+            critique += '**Your Selected ' + (config.listType === 'flexible' ? 'Flexible' : config.listType.charAt(0).toUpperCase() + config.listType.slice(1)) + ' List System:** ' + listCritique.replace(/^\*\*[^:]+:\*\*\s*/, '');
+          }
+        }
+      } else if (config.listType && method.listTypeCritique) {
+        // For non-party methods that still have list type critique
         const listCritique =
           method.listTypeCritique[config.listType as keyof typeof method.listTypeCritique];
         if (listCritique) {
@@ -1477,7 +1509,7 @@
     }
 
     // Find the method in our database
-    const method = VOTING_METHODS.find((m) => m.id === config.tabulationMethod);
+    const method = VOTING_METHODS[config.tabulationMethod || ''];
     if (!method) return defaultScores;
 
     // Start with the method's base scores
@@ -1505,13 +1537,13 @@
 
   function isProportionalMethod(config: VotingConfig): boolean {
     if (config.numberOfSeats <= 1) return false;
-    const method = VOTING_METHODS.find((m) => m.id === config.tabulationMethod);
+    const method = VOTING_METHODS[config.tabulationMethod || ''];
     return method?.isProportional || false;
   }
 
   function isSemiProportionalMethod(config: VotingConfig): boolean {
     if (config.numberOfSeats <= 1) return false;
-    const method = VOTING_METHODS.find((m) => m.id === config.tabulationMethod);
+    const method = VOTING_METHODS[config.tabulationMethod || ''];
     return method?.isSemiProportional || false;
   }
 
@@ -1609,182 +1641,163 @@
 
   // Method comparison state
   let showComparison = false;
-  let comparisonMethods: VotingMethod[] = [];
+  // Store method IDs for comparison
+  let comparisonMethodIds: string[] = [];
 
   function showMethodComparison(methodIds: string[]) {
-    comparisonMethods = VOTING_METHODS.filter((m) => methodIds.includes(m.id));
+    comparisonMethodIds = methodIds.filter(id => id in VOTING_METHODS);
     showComparison = true;
   }
 
   function closeComparison() {
     showComparison = false;
-    comparisonMethods = [];
+    comparisonMethodIds = [];
   }
 
   // Get suggested comparisons based on current method
   function getSuggestedComparisons(
     config: VotingConfig
   ): { title: string; methods: string[]; description: string }[] {
-    const currentMethod = VOTING_METHODS.find((m) => m.id === config.tabulationMethod);
-    if (!currentMethod) return [];
+    const currentMethod = VOTING_METHODS[config.tabulationMethod || ''];
+    if (!currentMethod || !config.tabulationMethod) return [];
 
-    // Get all methods available in current configuration
-    const availableMethods = getAvailableMethods(config);
-    const availableIds = availableMethods.map((m) => m.id);
+    const availableIds = getAvailableMethods(config);
+    const currentMethodId = config.tabulationMethod;
 
-    const suggestions = [];
+    // Helper to get methods matching a predicate
+    const getMethodsWhere = (predicate: (method: VotingMethod) => boolean): string[] =>
+      availableIds.filter(id => predicate(VOTING_METHODS[id]));
 
-    // Helper to filter suggested methods to only those available
-    const filterAvailable = (methodIds: string[]) =>
-      methodIds.filter((id) => availableIds.includes(id));
+    // Helper to get methods with specific tags
+    const getMethodsWithTag = (tag: string): string[] =>
+      availableIds.filter(id => VOTING_METHODS[id].tags?.includes(tag) || false);
 
-    // Proportional score methods
-    const proportionalScoreMethods = filterAvailable([
-      'equal-shares',
-      'star-pr',
-      'allocated-score',
-      'pav',
-    ]);
-    if (
-      proportionalScoreMethods.includes(config.tabulationMethod || '') &&
-      proportionalScoreMethods.length > 1
-    ) {
-      suggestions.push({
+    // Helper to get methods with any of the specified tags
+    const getMethodsWithAnyTag = (tags: string[]): string[] =>
+      availableIds.filter(id => 
+        tags.some(tag => VOTING_METHODS[id].tags?.includes(tag) || false)
+      );
+
+    // Define groups based on method properties and tags
+    const possibleGroups = [
+      {
+        methods: getMethodsWhere(m => m.ballotType === 'score' && m.isProportional),
         title: 'Proportional Score Methods',
-        methods: proportionalScoreMethods,
-        description:
-          'All provide proportional representation with score/approval ballots but use different algorithms',
-      });
-    }
-
-    // Multi-winner score methods (all types)
-    const multiWinnerScoreMethods = filterAvailable([
-      'block-score',
-      'equal-shares',
-      'star-pr',
-      'allocated-score',
-    ]);
-    if (
-      multiWinnerScoreMethods.includes(config.tabulationMethod || '') &&
-      multiWinnerScoreMethods.length > 1
-    ) {
-      suggestions.push({
+        description: 'All provide proportional representation with score/approval ballots but use different algorithms',
+      },
+      {
+        methods: getMethodsWhere(m => m.ballotType === 'score' && m.maxSeats !== 1),
         title: 'Multi-Winner Score Methods',
-        methods: multiWinnerScoreMethods,
-        description:
-          'Different approaches to multi-winner elections with score ballots - from simple block voting to complex proportional systems',
-      });
-    }
-
-    // Single-winner score methods
-    const singleWinnerScoreMethods = filterAvailable([
-      'highest-total',
-      'star',
-      'range-voting',
-      '3-2-1-voting',
-      'majority-judgment',
-    ]);
-    if (
-      singleWinnerScoreMethods.includes(config.tabulationMethod || '') &&
-      singleWinnerScoreMethods.length > 1
-    ) {
-      suggestions.push({
+        description: 'Different approaches to multi-winner elections with score ballots - from simple block voting to complex proportional systems',
+      },
+      {
+        methods: getMethodsWhere(m => m.ballotType === 'score' && m.maxSeats === 1),
         title: 'Single-Winner Score Methods',
-        methods: singleWinnerScoreMethods,
-        description:
-          'Different ways to count score ballots - from simple totals to complex runoffs',
-      });
-    }
-
-    // Single-winner choose-x methods
-    const singleWinnerChooseXMethods = filterAvailable([
-      'fptp',
-      'approval',
-      'limited-voting-single',
-      'top-two-runoff',
-    ]);
-    if (
-      singleWinnerChooseXMethods.includes(config.tabulationMethod || '') &&
-      singleWinnerChooseXMethods.length > 1
-    ) {
-      suggestions.push({
+        description: 'Different ways to count score ballots - from simple totals to complex runoffs',
+      },
+      {
+        methods: getMethodsWhere(m => m.ballotType === 'choose-x' && m.maxSeats === 1),
         title: 'Single-Winner Choose-X Methods',
-        methods: singleWinnerChooseXMethods,
         description: 'Different approaches to single-winner elections with choose-X ballots',
-      });
-    }
-
-    // Approval-based proportional methods
-    const approvalProportionalMethods = filterAvailable(['spav', 'pav', 'satisfaction-approval']);
-    if (
-      approvalProportionalMethods.includes(config.tabulationMethod || '') &&
-      approvalProportionalMethods.length > 1
-    ) {
-      suggestions.push({
+      },
+      {
+        methods: getMethodsWhere(m => m.ballotType === 'choose-x' && m.isProportional),
         title: 'Approval-Based Proportional Methods',
-        methods: approvalProportionalMethods,
         description: 'Ways to achieve proportional representation using approval ballots',
-      });
-    }
-
-    // Choose-X methods (all types - includes block voting, approval, etc.)
-    const chooseXMethods = filterAvailable([
-      'fptp',
-      'approval',
-      'limited-voting-single',
-      'top-two-runoff',
-      'block-voting',
-      'block-approval',
-      'limited-voting',
-      'cumulative-voting',
-      'sntv',
-      'satisfaction-approval',
-      'spav',
-      'pav',
-    ]);
-    if (chooseXMethods.includes(config.tabulationMethod || '') && chooseXMethods.length > 1) {
-      suggestions.push({
+      },
+      {
+        methods: getMethodsWhere(m => m.ballotType === 'choose-x'),
         title: 'Choose-X Methods',
-        methods: chooseXMethods,
-        description:
-          'Different ways to count choose-X ballots - from simple plurality to complex proportional systems',
-      });
-    }
-
-    // Multi-winner choose-X methods
-    const multiWinnerChooseXMethods = filterAvailable([
-      'block-voting',
-      'block-approval',
-      'limited-voting',
-      'cumulative-voting',
-      'sntv',
-      'satisfaction-approval',
-      'spav',
-      'pav',
-    ]);
-    if (
-      multiWinnerChooseXMethods.includes(config.tabulationMethod || '') &&
-      multiWinnerChooseXMethods.length > 1
-    ) {
-      suggestions.push({
+        description: 'Different ways to count choose-X ballots - from simple plurality to complex proportional systems',
+      },
+      {
+        methods: getMethodsWhere(m => m.ballotType === 'choose-x' && m.maxSeats !== 1),
         title: 'Multi-Winner Choose-X Methods',
-        methods: multiWinnerChooseXMethods,
-        description:
-          'Different approaches to multi-winner elections with choose-X ballots - from simple block voting to proportional systems',
-      });
-    }
-
-    // Ranked methods
-    const rankedMethods = filterAvailable(['irv', 'borda', 'condorcet', 'stv']);
-    if (rankedMethods.includes(config.tabulationMethod || '') && rankedMethods.length > 1) {
-      suggestions.push({
+        description: 'Different approaches to multi-winner elections with choose-X ballots - from simple block voting to proportional systems',
+      },
+      {
+        methods: getMethodsWhere(m => m.ballotType === 'ranking'),
         title: 'Ranked Choice Methods',
-        methods: rankedMethods,
         description: 'Different algorithms for counting ranked ballots',
-      });
-    }
+      },
+      {
+        methods: getMethodsWhere(m => m.isProportional),
+        title: 'Proportional Methods',
+        description: 'All methods that achieve proportional representation',
+      },
+      {
+        methods: getMethodsWhere(m => m.isSemiProportional),
+        title: 'Semi-Proportional Methods',
+        description: 'Methods that provide some minority representation but not full proportionality',
+      },
+      // Tag-based groups
+      {
+        methods: getMethodsWithTag('simple'),
+        title: 'Simple Methods',
+        description: 'Easy to understand and implement voting methods',
+      },
+      {
+        methods: getMethodsWithTag('runoff'),
+        title: 'Runoff-Based Methods',
+        description: 'Methods that use some form of runoff or elimination process',
+      },
+      {
+        methods: getMethodsWithTag('consensus'),
+        title: 'Consensus-Building Methods',
+        description: 'Methods that tend to elect broadly acceptable candidates',
+      },
+      {
+        methods: getMethodsWithTag('proportional'),
+        title: 'Proportional Methods (Tagged)',
+        description: 'All methods tagged as proportional',
+      },
+      {
+        methods: getMethodsWithAnyTag(['computationally-complex', 'optimization']),
+        title: 'Computationally Complex Methods',
+        description: 'Methods that require significant computation or optimization',
+      },
+    ];
 
-    return suggestions;
+    // Return groups that include the current method and have multiple options
+    return possibleGroups
+      .filter(group => 
+        group.methods.includes(currentMethodId) && 
+        group.methods.length > 1
+      );
+  }
+
+  // Mermaid initialization and flowchart rendering
+  let mermaidInitialized = false;
+
+  onMount(() => {
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+    });
+    mermaidInitialized = true;
+  });
+
+  async function renderFlowchart(element: HTMLElement, flowchartCode: string) {
+    if (!mermaidInitialized) return;
+    try {
+      const { svg } = await mermaid.render(`flowchart-${Date.now()}`, flowchartCode);
+      element.innerHTML = svg;
+    } catch (error) {
+      console.error('Error rendering flowchart:', error);
+      element.innerHTML = '<p>Error rendering flowchart</p>';
+    }
+  }
+
+  // Get current method's flowchart
+  $: currentMethod = VOTING_METHODS[config.tabulationMethod || ''];
+  $: currentFlowchart = currentMethod?.flowchart;
+
+  // Flowchart element and reactive rendering
+  let flowchartElement: HTMLElement;
+
+  $: if (flowchartElement && currentFlowchart && mermaidInitialized) {
+    renderFlowchart(flowchartElement, currentFlowchart);
   }
 </script>
 
@@ -1800,7 +1813,11 @@
 
 <div class="container wide-builder">
   <div class="description">
-    <h1>Voting Method Builder</h1>
+    <h1 style="color: black;">
+      <a href="{resolve('/')}">approval.vote</a>
+      //
+      <strong>Voting Method Builder</strong>
+    </h1>
     <p class="subtitle">Mix and match components to design your ideal voting system</p>
   </div>
 
@@ -2013,9 +2030,18 @@
                   <div class="score-label-container">
                     <span
                       class="score-label clickable"
+                      role="button"
+                      tabindex="0"
                       on:click={(e) => {
                         e.stopPropagation();
                         toggleTooltip('proportionality');
+                      }}
+                      on:keydown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleTooltip('proportionality');
+                        }
                       }}>Proportionality</span
                     >
                   </div>
@@ -2041,9 +2067,18 @@
                   <div class="score-label-container">
                     <span
                       class="score-label clickable"
+                      role="button"
+                      tabindex="0"
                       on:click={(e) => {
                         e.stopPropagation();
                         toggleTooltip('simplicity');
+                      }}
+                      on:keydown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleTooltip('simplicity');
+                        }
                       }}>Voter Simplicity</span
                     >
                   </div>
@@ -2068,9 +2103,18 @@
                   <div class="score-label-container">
                     <span
                       class="score-label clickable"
+                      role="button"
+                      tabindex="0"
                       on:click={(e) => {
                         e.stopPropagation();
                         toggleTooltip('honest-resistance');
+                      }}
+                      on:keydown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleTooltip('honest-resistance');
+                        }
                       }}>Honest Strategy Resistance</span
                     >
                   </div>
@@ -2096,9 +2140,18 @@
                   <div class="score-label-container">
                     <span
                       class="score-label clickable"
+                      role="button"
+                      tabindex="0"
                       on:click={(e) => {
                         e.stopPropagation();
                         toggleTooltip('quality');
+                      }}
+                      on:keydown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleTooltip('quality');
+                        }
                       }}>Representation Quality</span
                     >
                   </div>
@@ -2124,9 +2177,18 @@
                   <div class="score-label-container">
                     <span
                       class="score-label clickable"
+                      role="button"
+                      tabindex="0"
                       on:click={(e) => {
                         e.stopPropagation();
                         toggleTooltip('straightforwardness');
+                      }}
+                      on:keydown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleTooltip('straightforwardness');
+                        }
                       }}>Strategic Straightforwardness</span
                     >
                   </div>
@@ -2167,6 +2229,16 @@
             {@html votingMethodCritique
               .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
               .replace(/\n\n/g, '<br><br>')}
+          </div>
+        {/if}
+
+        {#if currentFlowchart}
+          <div class="method-flowchart">
+            <h3>Tabulation Process</h3>
+            <div
+              class="flowchart-container"
+              bind:this={flowchartElement}
+            ></div>
           </div>
         {/if}
 
@@ -2229,17 +2301,17 @@
 
       <div class="comparison-content">
         <div class="comparison-grid">
-          {#each comparisonMethods as method}
-            <div class="comparison-card" class:current={method.id === config.tabulationMethod}>
+          {#each comparisonMethodIds as methodId}
+            <div class="comparison-card" class:current={methodId === config.tabulationMethod}>
               <div class="card-header">
-                <h3>{method.name}</h3>
-                {#if method.id === config.tabulationMethod}
+                <h3>{VOTING_METHODS[methodId].name}</h3>
+                {#if methodId === config.tabulationMethod}
                   <span class="current-badge">Current</span>
                 {/if}
               </div>
 
               <div class="method-summary-compact">
-                <p><strong>What it does:</strong> {method.shortDescription}</p>
+                <p><strong>What it does:</strong> {VOTING_METHODS[methodId].shortDescription}</p>
               </div>
 
               <div class="score-comparison">
@@ -2248,77 +2320,77 @@
                   <div class="score-bar-small">
                     <div
                       class="score-fill-small"
-                      style="width: {(method.scores.proportionality / 5) * 100}%"
+                      style="width: {(VOTING_METHODS[methodId].scores.proportionality / 5) * 100}%"
                     ></div>
                   </div>
-                  <span class="score-num">{method.scores.proportionality}/5</span>
+                  <span class="score-num">{VOTING_METHODS[methodId].scores.proportionality}/5</span>
                 </div>
                 <div class="score-row">
                   <span class="score-name">Simplicity</span>
                   <div class="score-bar-small">
                     <div
                       class="score-fill-small"
-                      style="width: {(method.scores.simplicity / 5) * 100}%"
+                      style="width: {(VOTING_METHODS[methodId].scores.simplicity / 5) * 100}%"
                     ></div>
                   </div>
-                  <span class="score-num">{method.scores.simplicity}/5</span>
+                  <span class="score-num">{VOTING_METHODS[methodId].scores.simplicity}/5</span>
                 </div>
                 <div class="score-row">
                   <span class="score-name">Honest Strategy</span>
                   <div class="score-bar-small">
                     <div
                       class="score-fill-small"
-                      style="width: {(method.scores.honestStrategyResistance / 5) * 100}%"
+                      style="width: {(VOTING_METHODS[methodId].scores.honestStrategyResistance / 5) * 100}%"
                     ></div>
                   </div>
-                  <span class="score-num">{method.scores.honestStrategyResistance}/5</span>
+                  <span class="score-num">{VOTING_METHODS[methodId].scores.honestStrategyResistance}/5</span>
                 </div>
                 <div class="score-row">
                   <span class="score-name">Straightforward</span>
                   <div class="score-bar-small">
                     <div
                       class="score-fill-small"
-                      style="width: {(method.scores.strategicStraightforwardness / 5) * 100}%"
+                      style="width: {(VOTING_METHODS[methodId].scores.strategicStraightforwardness / 5) * 100}%"
                     ></div>
                   </div>
-                  <span class="score-num">{method.scores.strategicStraightforwardness}/5</span>
+                  <span class="score-num">{VOTING_METHODS[methodId].scores.strategicStraightforwardness}/5</span>
                 </div>
                 <div class="score-row">
                   <span class="score-name">Representation</span>
                   <div class="score-bar-small">
                     <div
                       class="score-fill-small"
-                      style="width: {(method.scores.representation / 5) * 100}%"
+                      style="width: {(VOTING_METHODS[methodId].scores.representation / 5) * 100}%"
                     ></div>
                   </div>
-                  <span class="score-num">{method.scores.representation}/5</span>
+                  <span class="score-num">{VOTING_METHODS[methodId].scores.representation}/5</span>
                 </div>
               </div>
 
               <div class="method-details">
-                <p><strong>Key Trade-offs:</strong> {method.detailedCritique.split('.')[0]}.</p>
+                <p><strong>Key Trade-offs:</strong> {VOTING_METHODS[methodId].detailedCritique.split('.')[0]}.</p>
               </div>
 
-              {#if method.votingMachineCompatibility}
+              {#if VOTING_METHODS[methodId].votingMachineCompatibility}
                 <div class="compatibility-compact">
                   <span class="compatibility-label">Voting Machines:</span>
                   <span
                     class="compatibility-value"
-                    class:compatible={method.votingMachineCompatibility.existingMachines}
-                    class:incompatible={!method.votingMachineCompatibility.existingMachines}
+                    class:compatible={VOTING_METHODS[methodId].votingMachineCompatibility.existingMachines}
+                    class:incompatible={!VOTING_METHODS[methodId].votingMachineCompatibility.existingMachines}
                   >
-                    {method.votingMachineCompatibility.existingMachines
+                    {VOTING_METHODS[methodId].votingMachineCompatibility.existingMachines
                       ? 'Compatible'
                       : 'Requires New Machines'}
                   </span>
                 </div>
               {/if}
 
-              {#if method.id !== config.tabulationMethod}
+              {#if methodId !== config.tabulationMethod}
                 <button
                   class="switch-method-button"
                   on:click={() => {
-                    selectOption('tabulationMethod', method.id);
+                    selectOption('tabulationMethod', methodId);
                     closeComparison();
                   }}
                 >
@@ -2585,30 +2657,7 @@
     border-bottom: 1px dashed #475569;
   }
 
-  .info-button {
-    background: none;
-    border: none;
-    color: #0ea5e9;
-    cursor: pointer;
-    font-size: 0.875rem;
-    padding: 2px;
-    margin: 0;
-    width: 18px;
-    height: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
-  }
 
-  .info-button:hover,
-  .info-button:focus {
-    background: #e0f2fe;
-    outline: 2px solid #0ea5e9;
-    outline-offset: 1px;
-  }
 
   .info-panel {
     background: #f8fafc;
@@ -2691,6 +2740,32 @@
     margin-bottom: 1rem;
     color: #333;
     font-size: 1.3rem;
+  }
+
+  .method-flowchart {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid #2563eb;
+  }
+
+  .method-flowchart h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #333;
+    font-size: 1.3rem;
+  }
+
+  .flowchart-container {
+    text-align: center;
+    overflow-x: auto;
+    padding: 1rem 0;
+  }
+
+  .flowchart-container :global(svg) {
+    max-width: 100%;
+    height: auto;
   }
 
   .method-actions {

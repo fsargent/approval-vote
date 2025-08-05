@@ -32,7 +32,11 @@
 
 <div class="container">
   <div class="description">
-    <h1>About Approval Voting</h1>
+    <h1 style="color: black;">
+    <a href="{resolve('/')}">approval.vote</a>
+    //
+    <strong>About Approval Voting</strong>
+  </h1>
   </div>
 
   <p>

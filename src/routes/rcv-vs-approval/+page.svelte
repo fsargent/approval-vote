@@ -175,7 +175,11 @@
 
 <div class="container">
   <div class="description">
-    <h1>RCV vs Approval Voting</h1>
+    <h1 style="color: black;">
+  <a href="{resolve('/')}">approval.vote</a>
+  //
+  <strong>RCV vs Approval Voting</strong>
+</h1>
   </div>
 
   <p>
@@ -842,7 +846,7 @@
 
     /* Set specific width for candidate column */
     .candidate-header {
-      width: 140px !important; /* Reduced from 180px to minimize white space */
+      width: 50px !important; /* Reduced from 180px to minimize white space */
     }
 
     /* Ensure candidate info stays left aligned */

@@ -98,8 +98,7 @@
       <p>
         For more information, see
         <a href="{resolve('/about')}">the about page</a>, learn about
-        <a href="{resolve('/about-approval-voting')}">approval voting</a>, explore
-        <a href="{resolve('/fair-share-voting')}">fair share voting</a>, compare
+        <a href="{resolve('/about-approval-voting')}">approval voting</a>, compare
         <a href="{resolve('/rcv-vs-approval')}">RCV vs approval voting</a>, or design your own system with
         the <a href="{resolve('/voting-method-builder')}">voting method builder</a>.
       </p>

@@ -28,7 +28,11 @@
 
 <div class="container">
   <div class="description">
-    <h1>Fair Share Voting</h1>
+    <h1 style="color: black;">
+    <a href="{resolve('/')}">approval.vote</a>
+    //
+    <strong>Fair Share Voting</strong>
+  </h1>
     <p class="subtitle">
       A proportional form of approval voting that still keeps local representation
     </p>
