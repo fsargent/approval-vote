@@ -33,6 +33,7 @@ Approval.Vote provides detailed reports and visualizations for Approval Voting e
    ```
 
 3. Start development server:
+
    ```bash
    npm run dev
    ```
