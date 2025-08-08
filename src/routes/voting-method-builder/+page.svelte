@@ -72,20 +72,22 @@
     };
     flowchart?: string; // Mermaid flowchart diagram
     tags?: string[]; // Tags for grouping and categorization
+    requiresParties?: boolean; // Party-based method requirement
+    usedBy?: { code: string; name: string; flag: string }[]; // Optional usage list
   }
 
   // Voting method configuration state
   let config: VotingConfig = {
-    ballotType: 'choose-x',
+    ballotType: null,
     limitedChoices: '1',
     customLimit: 3,
-    tabulationMethod: 'fptp',
+    tabulationMethod: null,
     numberOfSeats: 1,
     hasParties: true, // Always assume parties exist
     canVoteForParties: true,
     canVoteForCandidates: true,
     hasPrimaries: false,
-    listType: 'closed', // Default to closed list
+    listType: null,
     mixedMember: false,
     singleWinnerProportion: 50,
     allowNegativeVotes: false,
@@ -113,8 +115,17 @@
     },
   ];
 
-  // Current election type filter
+  // Current election type filter (legacy, used only in summary calculations)
   let electionTypeFilter = 'all';
+
+  // Facet filters (independent of config until a method is selected)
+  let electionFacet: string[] = ['single', 'multi']; // default: show all
+  let ballotFacetSelections: string[] = ['choose-x', 'ranking', 'score']; // default: show all
+  let choiceFacetSelections: string[] = ['1', 'custom', 'unlimited']; // default: show all
+
+  function toggleSelection(list: string[], value: string): string[] {
+    return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
+  }
 
   // Helper to get election type from numberOfSeats
   function getElectionType(numberOfSeats: number): string {
@@ -182,6 +193,11 @@
       shortDescription: 'Approve any number of candidates',
       detailedCritique:
         'Approval Voting represents a minimal yet powerful reform to plurality voting, allowing voters to select as many candidates as they approve of, with the candidate receiving the most approvals winning. This elegantly simple change eliminates the spoiler effect entirely - voters can support both their favorite candidate and a more viable alternative without harming either. The system encourages honest voting since supporting additional candidates never hurts those you\'ve already selected. Studies and real-world implementations show Approval Voting tends to elect broadly acceptable consensus candidates rather than polarizing figures. It requires no new voting equipment, as it uses the same ballots as plurality voting. The main limitation is the lack of preference expression - you cannot indicate that you prefer one approved candidate over another. However, this simplicity is also a strength, making the system transparent and easy to understand. Approval Voting has been successfully used by the UN, various professional societies, and the cities of Fargo and St. Louis.',
+      usedBy: [
+        { code: 'US-ND', name: 'Fargo (USA)', flag: '🇺🇸' },
+        { code: 'US-MO', name: 'St. Louis (USA)', flag: '🇺🇸' },
+        { code: 'UN', name: 'United Nations (various committees)', flag: '🇺🇳' },
+      ],
       ballotType: 'choose-x',
       choiceLimitation: 'unlimited',
       minSeats: 1,
@@ -243,10 +259,15 @@
         '**Non-Proportional Multi-Winner:** May lead to sweep victories and poor minority representation.',
     },
     'irv': {
-      name: 'IRV (Instant Runoff)',
+      name: 'IRV / RCV (Instant Runoff)',
       shortDescription: 'Eliminate lowest, transfer votes',
       detailedCritique:
-        'Instant Runoff Voting (IRV), also called Ranked Choice Voting in single-winner contexts, allows voters to rank candidates in order of preference. If no candidate receives a majority of first-choice votes, the candidate with the fewest votes is eliminated and their voters\' ballots are transferred to their next choice. This process continues until someone has a majority. While IRV does eliminate the most basic spoiler effects between similar candidates, it suffers from several paradoxes that can produce counterintuitive results. The system can eliminate centrist candidates who would beat any other candidate head-to-head (the "center squeeze" problem), and in some cases, getting more first-choice votes can actually cause a candidate to lose (non-monotonicity). IRV is also vulnerable to strategic voting - "bullet voting" (only ranking one candidate) can sometimes help your favorite candidate. The sequential elimination process makes results difficult to predict and can take days to tabulate in close races. Despite these flaws, IRV does ensure majority support (among remaining candidates) and allows voters to express preferences.',
+        'Instant Runoff Voting (IRV), also called Ranked Choice Voting (RCV) or Alternate Vote (AV, in the UK). Allows voters to rank candidates in order of preference. If no candidate receives a majority of first-choice votes, the candidate with the fewest votes is eliminated and their voters\' ballots are transferred to their next choice. This process continues until someone has a majority. While IRV does eliminate the most basic spoiler effects between similar candidates, it suffers from several paradoxes that can produce counterintuitive results. The system can eliminate centrist candidates who would beat any other candidate head-to-head (the "center squeeze" problem), and in some cases, getting more first-choice votes can actually cause a candidate to lose (non-monotonicity). IRV is also vulnerable to strategic voting - "bullet voting" (only ranking one candidate) can sometimes help your favorite candidate. The sequential elimination process makes results difficult to predict and can take days to tabulate in close races. Despite these flaws, IRV does ensure majority support (among remaining candidates) and allows voters to express preferences.',
+      usedBy: [
+        { code: 'AU', name: 'Australia (House of Representatives)', flag: '🇦🇺' },
+        { code: 'IE', name: 'Ireland (Presidential elections)', flag: '🇮🇪' },
+        { code: 'US', name: 'Multiple US cities', flag: '🇺🇸' },
+      ],
       ballotType: 'ranking',
       choiceLimitation: 'any',
       minSeats: 1,
@@ -361,7 +382,7 @@
 
     // Score voting single-winner
     'highest-total': {
-      name: 'Highest Total Score',
+      name: 'Score Voting',
       shortDescription: 'Sum all scores, highest wins',
       detailedCritique:
         'Adds up all scores for each candidate - the candidate with the highest sum wins. Simple. Works best with many candidates and relatively few voters where expressivity helps prevent ties.',
@@ -656,6 +677,11 @@
       shortDescription: 'Proportional ranked choice voting',
       detailedCritique:
         'Provides proportional representation with ranked ballots, maintaining local representation while ensuring diversity.',
+      usedBy: [
+        { code: 'IE', name: 'Ireland (Dáil Éireann)', flag: '🇮🇪' },
+        { code: 'MT', name: 'Malta', flag: '🇲🇹' },
+        { code: 'AU', name: 'Australia (Senate)', flag: '🇦🇺' },
+      ],
       ballotType: 'ranking',
       choiceLimitation: 'any',
       minSeats: 2,
@@ -842,9 +868,15 @@
     },
     'party-list-pr': {
       name: 'Party List PR',
-      shortDescription: 'Proportional seats by party vote share',
+      shortDescription: 'Proportional seats by party vote share. Can use Open Lists (voters pick candidates within a party) or Closed Lists (party sets candidate order).',
       detailedCritique:
-        "Pure proportional representation where voters choose parties, and seats are allocated based on each party's share of the vote. Ensures fair representation but can reduce individual candidate accountability. Used in many European countries like Netherlands, Israel, and Finland.",
+        "Pure proportional representation where voters choose parties, and seats are allocated based on each party's share of the vote. Can be Open List (voters choose specific candidates within a party, increasing voter choice but potentially creating intra‑party competition), Closed List (party decides candidate order, strengthening cohesion but reducing voter choice), or Flexible/Hybrid List (voters may either accept party order or elevate specific candidates). Ensures fair representation but can reduce individual candidate accountability. Used in many European countries like the Netherlands, Israel, and Finland.",
+      requiresParties: true,
+      usedBy: [
+        { code: 'NL', name: 'Netherlands', flag: '🇳🇱' },
+        { code: 'IL', name: 'Israel', flag: '🇮🇱' },
+        { code: 'SE', name: 'Sweden', flag: '🇸🇪' },
+      ],
       ballotType: 'choose-x',
       choiceLimitation: 'any',
       minSeats: 2,
@@ -887,9 +919,10 @@
     },
     'mmp': {
       name: 'MMP (Mixed Member Proportional)',
-      shortDescription: 'Combines districts with party lists',
+      shortDescription: 'Combines districts with party lists. Party lists may be Open or Closed depending on implementation.',
       detailedCritique:
-        'Hybrid system combining local districts with party lists. Voters cast two ballots: one for a local representative and one for a party. Additional "top-up" seats ensure overall proportionality while preserving local representation. Successfully used in Germany, New Zealand, and Scotland.',
+        'Hybrid system combining local districts with party lists. Voters cast two ballots: one for a local representative and one for a party. Party lists can be Open (voters can select candidates within the party) or Closed (party sets the order). Additional "top-up" seats ensure overall proportionality while preserving local representation. Successfully used in Germany, New Zealand, and Scotland.',
+      requiresParties: true,
       ballotType: 'choose-x',
       choiceLimitation: 'any',
       minSeats: 2,
@@ -1262,14 +1295,96 @@
     }));
   }
 
+  // Methods gallery filtering using facets
+  type MethodListItem = { id: string; name: string; shortDescription: string; category: string; isProportional: boolean; isSemiProportional: boolean; ballotType: string; choiceLimitation: string; minSeats: number; maxSeats: number | 'unlimited', recommended?: boolean, redFlag?: boolean };
+  let filteredMethods: MethodListItem[] = [];
+
+  function matchesElectionFacet(method: VotingMethod): boolean {
+    if (!electionFacet.length) return false; // none selected = show none
+    const methodType = method.maxSeats === 1 ? 'single' : 'multi';
+    return electionFacet.includes(methodType);
+  }
+
+  function matchesBallotFacet(method: VotingMethod): boolean {
+    return ballotFacetSelections.length === 0 ? true : ballotFacetSelections.includes(method.ballotType);
+  }
+
+  function matchesChoiceFacet(method: VotingMethod): boolean {
+    // Only applies to choose-x ballots; other ballots unaffected
+    if (method.ballotType !== 'choose-x') return true;
+    if (choiceFacetSelections.length === 0) return true;
+    // Methods that accept any choice limit should always pass
+    if (method.choiceLimitation === 'any') return true;
+    return choiceFacetSelections.includes(method.choiceLimitation);
+  }
+
+  // Party requirement facet
+  let partyFacetSelections: string[] = ['party-required', 'no-party-required'];
+  function matchesPartyFacet(method: VotingMethod): boolean {
+    const requires = !!method.requiresParties;
+    if (partyFacetSelections.length === 0) return true;
+    if (requires && partyFacetSelections.includes('party-required')) return true;
+    if (!requires && partyFacetSelections.includes('no-party-required')) return true;
+    return false;
+  }
+
+$: {
+  // Explicit reactive dependencies so this recomputes when any facet changes
+  electionFacet; ballotFacetSelections; choiceFacetSelections; partyFacetSelections;
+  filteredMethods = Object.entries(VOTING_METHODS)
+    .filter(([id, method]) => !!method && !!method.name)
+    .filter(([_, method]) => matchesElectionFacet(method))
+    .filter(([_, method]) => matchesBallotFacet(method))
+    .filter(([_, method]) => matchesChoiceFacet(method))
+    .filter(([_, method]) => matchesPartyFacet(method))
+    .map(([id, method]) => ({
+      id,
+      name: method.name,
+      shortDescription: method.shortDescription,
+      category: method.category,
+      isProportional: method.isProportional,
+      isSemiProportional: method.isSemiProportional,
+      ballotType: method.ballotType,
+      choiceLimitation: method.choiceLimitation,
+      minSeats: method.minSeats,
+      maxSeats: method.maxSeats,
+      recommended: ['star','approval','pav','spav','star-pr','equal-shares'].includes(id),
+      redFlag: ['fptp','block-voting','borda','pr-borda','cpo-stv','schulze-stv','meek-stv'].includes(id),
+    })) as MethodListItem[];
+}
+
+  function selectMethod(methodId: string) {
+    const method = VOTING_METHODS[methodId];
+    if (!method) return;
+    // Set core selections to match method
+    config.tabulationMethod = methodId;
+    config.ballotType = method.ballotType;
+    if (method.ballotType === 'choose-x') {
+      config.limitedChoices = method.choiceLimitation === 'any' ? 'unlimited' : method.choiceLimitation;
+    } else {
+      // ranking/score don't use limitedChoices
+      config.limitedChoices = 'unlimited';
+    }
+    // Seats based on the method capability and current config
+    if (method.maxSeats === 1) {
+      config.numberOfSeats = 1;
+    } else {
+      const minSeats = typeof method.minSeats === 'number' ? method.minSeats : 2;
+      config.numberOfSeats = config.numberOfSeats > 1 ? config.numberOfSeats : Math.max(2, minSeats);
+    }
+  }
+
   $: votingMethodName = generateVotingMethodName(config);
   $: votingMethodSummary = generateVotingMethodSummary(config);
   $: votingMethodCritique = generateVotingMethodCritiqueFromData(config);
   $: votingMethodScores = generateVotingMethodScores(config);
 
   function generateVotingMethodName(config: VotingConfig) {
-    // Fallback when no ballot type selected
-    if (!config.ballotType) return 'Select a ballot type to begin';
+    // If no method selected yet
+    if (!config.tabulationMethod) return 'Choose a voting method';
+
+    // Ensure ballot type is set from method
+    if (!config.ballotType) return 'Choose a voting method';
 
     // Fallback when no tabulation method selected
     if (!config.tabulationMethod) {
@@ -1278,7 +1393,7 @@
         if (config.limitedChoices === 'unlimited') return 'Approval Voting';
         if (config.limitedChoices === 'custom') return `Limited Voting (${config.customLimit})`;
       }
-      return 'Select a tabulation method';
+      return 'Choose a voting method';
     }
 
     // Get the base method name from VOTING_METHODS
@@ -1345,11 +1460,11 @@
       }
     }
 
-    // Tabulation method
+    // Voting method
     if (config.tabulationMethod) {
       const method = availableTabulationMethods.find((m) => m.id === config.tabulationMethod);
       if (method) {
-        summary += `**Tabulation:** ${method.description}\n\n`;
+        summary += `**Voting Method:** ${method.description}\n\n`;
       }
 
       // Voting machine compatibility
@@ -1541,11 +1656,7 @@
     return method?.isProportional || false;
   }
 
-  function isSemiProportionalMethod(config: VotingConfig): boolean {
-    if (config.numberOfSeats <= 1) return false;
-    const method = VOTING_METHODS[config.tabulationMethod || ''];
-    return method?.isSemiProportional || false;
-  }
+  // Removed semi-proportional badge
 
   function selectElectionType(selectedType: string) {
     if (selectedType === 'single') {
@@ -1725,11 +1836,7 @@
         title: 'Proportional Methods',
         description: 'All methods that achieve proportional representation',
       },
-      {
-        methods: getMethodsWhere(m => m.isSemiProportional),
-        title: 'Semi-Proportional Methods',
-        description: 'Methods that provide some minority representation but not full proportionality',
-      },
+      // Semi-proportional grouping removed
       // Tag-based groups
       {
         methods: getMethodsWithTag('simple'),
@@ -1792,6 +1899,7 @@
   // Get current method's flowchart
   $: currentMethod = VOTING_METHODS[config.tabulationMethod || ''];
   $: currentFlowchart = currentMethod?.flowchart;
+  $: currentUsedBy = currentMethod?.usedBy || [];
 
   // Flowchart element and reactive rendering
   let flowchartElement: HTMLElement;
@@ -1805,7 +1913,7 @@
   <title>Voting Method Builder - Create Your Custom Voting System - approval.vote</title>
   <meta
     name="description"
-    content="Interactive tool to design and analyze custom voting methods. Mix and match ballot types, tabulation methods, and multi-winner options to create your ideal voting system."
+    content="Interactive tool to design and analyze custom voting methods. Mix and match ballot types, voting methods, and multi-winner options to create your ideal voting system."
   />
 </svelte:head>
 
@@ -1824,185 +1932,121 @@
   <div class="builder-layout">
     <!-- Configuration Panel -->
     <div class="config-panel">
-      <!-- Ballot Type Section -->
+      <!-- Facet Filters -->
       <section class="config-section">
-        <h2>📝 Ballot Type</h2>
-        <p class="section-description">How do voters express their preferences?</p>
-        <div class="option-grid">
-          {#each ballotTypes as option}
-            <button
-              class="option-button"
-              class:selected={config.ballotType === option.id}
-              on:click={() => selectOption('ballotType', option.id)}
-            >
-              <div class="option-name">{option.name}</div>
-              <div class="option-description">{option.description}</div>
-            </button>
-          {/each}
+        <h2>🔎 Filters</h2>
+        <p class="section-description">Use these facets to narrow down voting methods. They don't lock in a choice — pick a method on the right when ready.</p>
+
+        <!-- Election Type Facet -->
+        <div class="facet-group">
+          <h3 class="facet-title">
+            Election Type
+            <span class="facet-tip" title="Single-winner methods elect one seat; multi-winner methods elect multiple seats (for councils/assemblies). This choice affects which methods are compatible and whether proportional representation is possible.">ⓘ</span>
+          </h3>
+          <div class="facet-grid">
+            <label class="facet-check">
+              <input type="checkbox" checked={electionFacet.includes('single')} on:change={() => (electionFacet = toggleSelection(electionFacet, 'single'))} />
+              <span>Single Winner</span>
+            </label>
+            <label class="facet-check">
+              <input type="checkbox" checked={electionFacet.includes('multi')} on:change={() => (electionFacet = toggleSelection(electionFacet, 'multi'))} />
+              <span>Multi Winner</span>
+            </label>
+          </div>
         </div>
 
-        {#if config.ballotType === 'score'}
-          <div class="sub-options">
-            <label>
-              Score Range:
-              <input
-                type="number"
-                bind:value={config.scoreMin}
-                min="-10"
-                max="0"
-                style="width: 60px;"
-              />
-              to
-              <input
-                type="number"
-                bind:value={config.scoreMax}
-                min="1"
-                max="10"
-                style="width: 60px;"
-              />
-            </label>
-            <label>
-              <input type="checkbox" bind:checked={config.allowNegativeVotes} />
-              Allow negative scores
-            </label>
-          </div>
-        {/if}
-      </section>
-
-      <!-- Limited Choices Section -->
-      {#if config.ballotType === 'choose-x'}
-        <section class="config-section">
-          <h2>🔢 Choice Limitations</h2>
-          <p class="section-description">How many candidates can voters select?</p>
-          <div class="option-grid">
-            {#each limitedChoicesOptions as option}
-              <button
-                class="option-button small"
-                class:selected={config.limitedChoices === option.id}
-                on:click={() => selectOption('limitedChoices', option.id)}
-              >
-                <div class="option-name">{option.name}</div>
-                <div class="option-description">{option.description}</div>
-              </button>
-            {/each}
-          </div>
-
-          {#if config.limitedChoices === 'custom'}
-            <div class="sub-options">
-              <label>
-                Custom maximum:
-                <input
-                  type="number"
-                  bind:value={config.customLimit}
-                  min="1"
-                  max="20"
-                  style="width: 80px;"
-                />
-                candidate{config.customLimit === 1 ? '' : 's'}
+        <!-- Ballot Type Facet -->
+        <div class="facet-group">
+          <h3 class="facet-title">
+            Ballot Type
+            <span class="facet-tip" title="How voters express preferences: Choose‑X (select candidates), Ranked (order candidates), Score (rate candidates). Different methods require different ballot types.">ⓘ</span>
+          </h3>
+          <div class="facet-grid">
+            {#each ballotTypes as option}
+              <label class="facet-check">
+                <input type="checkbox" checked={ballotFacetSelections.includes(option.id)} on:change={() => (ballotFacetSelections = toggleSelection(ballotFacetSelections, option.id))} />
+                <span>{option.name}</span>
               </label>
-            </div>
-          {/if}
-        </section>
-      {/if}
-
-      <!-- Election Type Section -->
-      <section class="config-section">
-        <h2>🏛️ Election Type</h2>
-        <p class="section-description">Are you electing one person or multiple people?</p>
-        <div class="option-grid">
-          {#each electionTypes as option}
-            <button
-              class="option-button small"
-              class:selected={electionTypeFilter === option.id}
-              on:click={() => selectElectionTypeFilter(option.id)}
-            >
-              <div class="option-name">{option.name}</div>
-              <div class="option-description">{option.description}</div>
-            </button>
-          {/each}
-        </div>
-      </section>
-
-      <!-- Tabulation Method Section -->
-      {#if config.ballotType}
-        <section class="config-section">
-          <h2>🔢 Tabulation Method</h2>
-          <p class="section-description">How are votes counted to determine winners?</p>
-          <div class="option-grid">
-            {#each availableTabulationMethods as option}
-              <button
-                class="option-button"
-                class:selected={config.tabulationMethod === option.id}
-                on:click={() => selectOption('tabulationMethod', option.id)}
-              >
-                <div class="option-name">{option.name}</div>
-                <div class="option-description">{option.description}</div>
-              </button>
             {/each}
           </div>
-        </section>
-      {/if}
+        </div>
 
-      <!-- Party-Based Method Options -->
-      {#if config.tabulationMethod && ['party-list-pr', 'mmp'].includes(config.tabulationMethod)}
-        <section class="config-section">
-          <h2>🗳️ Party-Based Method Options</h2>
-
-          <!-- List Type Options -->
-          <div class="sub-options">
-            <p><strong>List Type:</strong></p>
-            <div class="option-grid">
-              {#each listTypes as option}
-                <button
-                  class="option-button small"
-                  class:selected={config.listType === option.id}
-                  on:click={() => selectOption('listType', option.id)}
-                >
-                  <div class="option-name">{option.name}</div>
-                  <div class="option-description">{option.description}</div>
-                </button>
+        <!-- Choice Limit Facet (only visible when Choose X is selected) -->
+        {#if ballotFacetSelections.includes('choose-x')}
+          <div class="facet-group">
+            <h3 class="facet-title">
+              Choose‑X Limits
+              <span class="facet-tip" title="For Choose‑X ballots: Pick 1 (FPTP) versus Pick up to X or Approve any. This changes which methods fit and the strategic properties.">ⓘ</span>
+            </h3>
+            <div class="facet-grid">
+              {#each limitedChoicesOptions as option}
+                <label class="facet-check">
+                  <input type="checkbox" checked={choiceFacetSelections.includes(option.id)} on:change={() => (choiceFacetSelections = toggleSelection(choiceFacetSelections, option.id))} />
+                  <span>{option.name}</span>
+                </label>
               {/each}
             </div>
+            <p class="facet-help">These options apply to choose‑X ballots.</p>
           </div>
+        {/if}
 
-          <!-- Mixed Member Proportional Options -->
-          {#if config.tabulationMethod === 'mmp'}
-            <div class="sub-options">
-              <div class="toggle-section">
-                <label class="toggle-label">
-                  <input type="checkbox" bind:checked={config.mixedMember} />
-                  <span class="toggle-text">Enable mixed member system</span>
-                </label>
-              </div>
+        <!-- Party-Based Facet -->
+        <div class="facet-group">
+          <h3 class="facet-title">
+            Party Structure
+            <span class="facet-tip" title="Some methods require parties and allocate seats by party vote (e.g., Party List, MMP). Others are candidate‑based and work without parties.">ⓘ</span>
+          </h3>
+          <div class="facet-grid">
+            <label class="facet-check">
+              <input type="checkbox" checked={partyFacetSelections.includes('party-required')} on:change={() => (partyFacetSelections = toggleSelection(partyFacetSelections, 'party-required'))} />
+              <span>Requires parties (e.g., Party List, MMP)</span>
+            </label>
+            <label class="facet-check">
+              <input type="checkbox" checked={partyFacetSelections.includes('no-party-required')} on:change={() => (partyFacetSelections = toggleSelection(partyFacetSelections, 'no-party-required'))} />
+              <span>Candidate-based (no parties required)</span>
+            </label>
+          </div>
+        </div>
+      </section>
 
-              {#if config.mixedMember}
-                <div class="slider-section">
-                  <label>
-                    Single-winner seats: <strong>{config.singleWinnerProportion}%</strong>
-                    <input
-                      type="range"
-                      bind:value={config.singleWinnerProportion}
-                      min="0"
-                      max="100"
-                      step="5"
-                      class="proportion-slider"
-                    />
-                    <div class="slider-labels">
-                      <span>All List (0%)</span>
-                      <span>Mixed (50%)</span>
-                      <span>All Districts (100%)</span>
-                    </div>
-                  </label>
-                </div>
-              {/if}
-            </div>
-          {/if}
-        </section>
-      {/if}
+      <!-- Party-Based Method Options removed; include explanation in descriptions instead -->
     </div>
 
-    <!-- Results Panel -->
-    <div class="results-panel">
+    <!-- Methods Gallery Panel (middle column on desktop) -->
+    <div class="gallery-panel">
+      <!-- Methods Gallery -->
+      <div class="methods-gallery">
+        <div class="gallery-header">
+          <h2>📚 Voting Methods</h2>
+          <p class="section-description">Showing {filteredMethods.length} method{filteredMethods.length===1?'':'s'}</p>
+        </div>
+        <div class="methods-grid">
+          {#each filteredMethods as method}
+            <button class="method-card" class:selected={config.tabulationMethod===method.id} on:click={() => selectMethod(method.id)}>
+              <div class="method-card-header">
+                <h3 class="method-title">{method.name}</h3>
+                <div class="badge-group">
+                  {#if method.isProportional}
+                    <span class="badge proportional" title="Proportional representation">⚖️</span>
+                  {/if}
+                  {#if method.recommended}
+                    <span class="badge recommended" title="Recommended">⭐</span>
+                  {/if}
+                  {#if method.redFlag}
+                    <span class="badge redflag" title="Complex or known major weaknesses">🛑</span>
+                  {/if}
+                </div>
+              </div>
+              <!-- Meta removed per request to simplify cards -->
+              <p class="method-desc">{method.shortDescription}</p>
+            </button>
+          {/each}
+        </div>
+        </div>
+    </div>
+
+    <!-- Details Panel (right column on desktop) -->
+    <div class="details-panel">
       <div class="result-card">
         <h2 class="method-name">
           {votingMethodName}
@@ -2011,12 +2055,6 @@
               class="proportional-badge"
               title="This is a proportional representation method that ensures fair party/group representation"
               >⚖️</span
-            >
-          {:else if isSemiProportionalMethod(config)}
-            <span
-              class="proportional-badge"
-              title="This is a semi-proportional method that provides some fairness but not full proportional representation"
-              >⚖️✨</span
             >
           {/if}
         </h2>
@@ -2232,9 +2270,20 @@
           </div>
         {/if}
 
+        {#if currentUsedBy.length}
+          <div class="method-usedby">
+            <h3>Used By</h3>
+            <div class="flag-list">
+              {#each currentUsedBy as place}
+                <span class="flag" title={place.name}>{place.flag}</span>
+              {/each}
+            </div>
+          </div>
+        {/if}
+
         {#if currentFlowchart}
           <div class="method-flowchart">
-            <h3>Tabulation Process</h3>
+            <h3>Counting Process</h3>
             <div
               class="flowchart-container"
               bind:this={flowchartElement}
@@ -2390,7 +2439,7 @@
                 <button
                   class="switch-method-button"
                   on:click={() => {
-                    selectOption('tabulationMethod', methodId);
+                    selectMethod(methodId);
                     closeComparison();
                   }}
                 >
@@ -2414,15 +2463,13 @@
 
   /* Wide container for desktop use */
   :global(.container.wide-builder) {
-    max-width: 1400px;
+    max-width: 100vw;
+    width: 100%;
     margin: 1.25rem auto;
-    padding: 0 2rem;
-  }
-
-  @media (min-width: 1600px) {
-    :global(.container.wide-builder) {
-      max-width: 1600px;
-    }
+    padding-left: clamp(1rem, 3vw, 2rem);
+    padding-right: clamp(1rem, 3vw, 2rem);
+    overflow-x: hidden; /* prevent horizontal overflow */
+    box-sizing: border-box;
   }
 
   .builder-layout {
@@ -2434,15 +2481,12 @@
 
   @media (min-width: 1000px) {
     .builder-layout {
-      grid-template-columns: 1fr 450px;
-      gap: 3rem;
-    }
-  }
-
-  @media (min-width: 1400px) {
-    .builder-layout {
-      grid-template-columns: 1fr 500px;
-      gap: 4rem;
+      grid-template-columns:
+        clamp(260px, 22vw, 320px)
+        minmax(360px, 1fr)
+        clamp(300px, 26vw, 420px); /* responsive columns to avoid overflow */
+      gap: clamp(0.75rem, 1.5vw, 1rem);
+      align-items: start;
     }
   }
 
@@ -2466,120 +2510,49 @@
     font-style: italic;
   }
 
-  .option-grid {
+  .facet-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .facet-group { margin-bottom: 1.25rem; }
+  .facet-title { margin: 0 0 0.5rem 0; font-size: 1rem; color: #333; }
+  .facet-help { color: #777; font-size: 0.9rem; margin: 0.25rem 0 0; }
+  .facet-check { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; }
+  .facet-check input { transform: scale(1.1); }
+  .facet-tip { font-size: 0.9rem; color: #64748b; margin-left: 0.35rem; cursor: help; user-select: none; }
+
+  /* removed unused styles for previous option UI and legacy panels */
+
+  .gallery-panel { min-height: 0; }
+  .details-panel { position: sticky; top: 2rem; height: fit-content; min-width: 0; }
+  .gallery-panel { min-width: 0; }
+
+  .methods-gallery { margin-bottom: 1.5rem; min-width: 0; }
+  .gallery-header { display: flex; align-items: baseline; gap: 1rem; justify-content: space-between; }
+  .methods-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 0.75rem;
   }
-
-  .option-grid .option-button.small {
-    min-height: auto;
-  }
-
-  .option-button {
-    background: white;
-    border: 2px solid #ddd;
-    border-radius: 6px;
-    padding: 1rem;
+  .method-card {
     text-align: left;
+    padding: 0.9rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    background: #fff;
     cursor: pointer;
-    transition: all 0.2s ease;
-    min-height: 80px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
   }
-
-  .option-button:hover {
-    border-color: #437527;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .option-button.selected {
-    border-color: #437527;
-    background: #f0f8ec;
-    box-shadow: 0 2px 8px rgba(67, 117, 39, 0.2);
-  }
-
-  .option-name {
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 0.25rem;
-  }
-
-  .option-description {
-    font-size: 0.9rem;
-    color: #666;
-    line-height: 1.3;
-  }
-
-  .sub-options {
-    margin-top: 1rem;
-    padding: 1rem;
-    background: white;
-    border-radius: 4px;
-    border: 1px solid #ddd;
-  }
-
-  .sub-options label {
-    display: block;
-    margin-bottom: 0.75rem;
-    color: #555;
-  }
-
-  .sub-options input[type='number'] {
-    margin: 0 0.5rem;
-    padding: 0.25rem;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-  }
-
-  .toggle-section {
-    margin: 1rem 0;
-  }
-
-  .toggle-label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    font-weight: 500;
-  }
-
-  .toggle-label input[type='checkbox'] {
-    margin-right: 0.5rem;
-    transform: scale(1.2);
-  }
-
-  .toggle-text {
-    color: #333;
-  }
-
-  .slider-section {
-    margin-top: 1rem;
-    padding: 1rem;
-    background: #f5f5f5;
-    border-radius: 4px;
-  }
-
-  .proportion-slider {
-    width: 100%;
-    margin: 0.5rem 0;
-    accent-color: #437527;
-  }
-
-  .slider-labels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.8rem;
-    color: #666;
-    margin-top: 0.25rem;
-  }
-
-  .results-panel {
-    position: sticky;
-    top: 2rem;
-    height: fit-content;
-  }
+  .method-card.selected, .method-card:focus { outline: 2px solid #437527; outline-offset: 0; }
+  .method-card-header { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+  .badge-group { display: inline-flex; align-items: center; gap: 6px; line-height: 1; }
+  .method-title { margin: 0; font-size: 1rem; color: #222; }
+  /* removed unused meta pill styles */
+  .badge { font-size: 1rem; display: inline-block; transform: translateY(1px); }
+  .badge.recommended { margin-left: 4px; }
+  .badge.redflag { margin-left: 4px; }
 
   .result-card {
     background: white;
@@ -2734,6 +2707,11 @@
     border-radius: 6px;
     border-left: 4px solid #437527;
   }
+
+  .method-usedby { margin-bottom: 2rem; }
+  .method-usedby h3 { margin: 0 0 0.5rem 0; color: #333; font-size: 1.1rem; }
+  .flag-list { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .flag { font-size: 1.5rem; cursor: help; }
 
   .method-critique h3 {
     margin-top: 0;
