@@ -82,4 +82,5 @@ export interface IVotingPatterns {
   averageApprovalsPerBallot: number;
   mostCommonCombination: string[];
   approvalDistribution: { [key: number]: number };
+  candidateApprovalDistributions?: { [candidateName: string]: { [approvals: number]: number } };
 }

@@ -3,7 +3,8 @@
 
   import type { IContestReport, Allocatee, ICandidate } from '$lib/server/report_types';
   import VoteCounts from './report_components/VoteCounts.svelte';
-  import CoApprovalMatrix from './report_components/CoApprovalMatrix.svelte';
+  import ApprovalDistribution from './report_components/ApprovalDistribution.svelte';
+  import CoApprovalMatrixSimple from './report_components/CoApprovalMatrixSimple.svelte';
 
   import { setContext } from 'svelte';
 
@@ -114,17 +115,17 @@
   <div class="leftCol">
     <h2>Approval Distribution</h2>
     <p>
-      This chart shows how many candidates each voter approved. In approval voting,
-      voters can select as many candidates as they wish.
+      This shows how many candidates voters approved, both overall and broken down by
+      each candidate's supporters. This reveals whether some candidates attracted voters
+      who approved multiple candidates versus those who approved fewer candidates.
+      In approval voting, voters can select as many candidates as they wish.
     </p>
   </div>
 
   <div class="rightCol">
-    <CoApprovalMatrix
-      coApprovals={report.coApprovals}
+    <ApprovalDistribution
       candidates={report.candidates.map(c => c.name)}
       votingPatterns={report.votingPatterns}
-      type="chart"
     />
   </div>
 </div>
@@ -134,17 +135,16 @@
     <h2>Co-Approval Matrix</h2>
     <p>
       For every pair of candidates, this table shows the fraction of voters who
-      approved one candidate that also approved the other. This reveals strategic
-      voting patterns and candidate coalitions.
+      approved one candidate that also approved the other. This reveals voting
+      patterns and candidate coalitions.
     </p>
   </div>
 
   <div class="rightCol">
-    <CoApprovalMatrix
+    <CoApprovalMatrixSimple
       coApprovals={report.coApprovals}
       candidates={report.candidates.map(c => c.name)}
       votingPatterns={report.votingPatterns}
-      type="matrix"
     />
   </div>
 </div>

@@ -187,6 +187,7 @@ export function getReport(path: string): IContestReport {
         average_approvals_per_ballot: number;
         most_common_combination: string;
         approval_distribution: string;
+        candidate_approval_distributions?: string;
       }
     | undefined;
   let votingPatterns = null;
@@ -200,6 +201,9 @@ export function getReport(path: string): IContestReport {
       averageApprovalsPerBallot: votingPatternsRow.average_approvals_per_ballot,
       mostCommonCombination: JSON.parse(votingPatternsRow.most_common_combination || '[]'),
       approvalDistribution: JSON.parse(votingPatternsRow.approval_distribution || '{}'),
+      candidateApprovalDistributions: votingPatternsRow.candidate_approval_distributions
+        ? JSON.parse(votingPatternsRow.candidate_approval_distributions)
+        : undefined,
     };
   }
 
