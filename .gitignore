@@ -18,3 +18,4 @@ node_modules
 /static/images
 st-louis-cvr/cvr-data.sqlite3-*
 website/
+st-louis-cvr/data/CVRExport-8-27-2025/*
