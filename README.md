@@ -4,7 +4,14 @@ A website that visualizes and analyzes Approval Voting election results. View it
 
 ## About
 
-Approval.Vote provides detailed reports and visualizations for Approval Voting elections, where voters can select multiple candidates and the candidate with the most votes wins. The site is built with SvelteKit and hosted on GitHub Pages.
+Approval.Vote provides detailed reports and visualizations for Approval Voting elections, where voters can select multiple candidates and the candidate with the most votes wins. The site features:
+
+- **Vote Count Visualizations**: Bar charts showing candidate support
+- **Co-Approval Analysis**: Matrix showing how often voters approved candidate pairs together
+- **Voting Pattern Analysis**: Distribution of how many candidates voters approved
+- **Cast Vote Record Processing**: Tools to parse and analyze raw ballot data
+
+The site is built with SvelteKit and hosted on GitHub Pages.
 
 ## Development
 
@@ -58,12 +65,25 @@ npm run preview  # Preview the production build
 
 ## Contributing Election Data
 
-The election data is stored in `data.sqlite3`. To add a new election:
+The election data is stored in `data.sqlite3`. There are two ways to add election data:
+
+### Manual Data Entry
 
 1. Fork this repository
 2. Add your election data to `load-report.js`
 3. Run the script to update `data.sqlite3`
 4. Submit a pull request
+
+### Cast Vote Record Processing
+
+For elections with detailed ballot data:
+
+1. Use the `st-louis-cvr/` tools to parse CVR files into SQLite
+2. Generate co-approval matrices and voting pattern analysis
+3. Export the processed data to the main `data.sqlite3` database
+4. The website automatically displays the rich analysis features
+
+See the `st-louis-cvr/README.md` for detailed instructions.
 
 ## Deployment
 

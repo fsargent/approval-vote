@@ -38,6 +38,8 @@ export interface IContestReport {
   winners: CandidateId[];
   condorcet?: CandidateId;
   numCandidates: number;
+  coApprovals?: ICoApprovalData[];
+  votingPatterns?: IVotingPatterns;
 }
 
 export interface IElectionInfo {
@@ -62,4 +64,22 @@ export interface ICandidate {
   writeIn?: boolean;
   votes: number;
   winner?: boolean;
+}
+
+export interface ICoApprovalData {
+  candidateA: string;
+  candidateB: string;
+  coApprovalCount: number;
+  coApprovalRate: number;
+}
+
+export interface IVotingPatterns {
+  totalBallots: number;
+  bulletVotingCount: number;
+  bulletVotingRate: number;
+  fullApprovalCount: number;
+  fullApprovalRate: number;
+  averageApprovalsPerBallot: number;
+  mostCommonCombination: string[];
+  approvalDistribution: { [key: number]: number };
 }

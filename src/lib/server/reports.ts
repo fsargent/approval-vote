@@ -157,6 +157,52 @@ export function getReport(path: string): IContestReport {
 
   const winnerNames = winners.map((candidate: ICandidate) => candidate.name);
 
+  // Load co-approval data
+  const coApprovalRows = db
+    .prepare('SELECT * FROM co_approvals WHERE report_id = ?')
+    .all(reportRow.id) as Array<{
+    candidate_a: string;
+    candidate_b: string;
+    co_approval_count: number;
+    co_approval_rate: number;
+  }>;
+
+  const coApprovals = coApprovalRows.map((row) => ({
+    candidateA: row.candidate_a,
+    candidateB: row.candidate_b,
+    coApprovalCount: row.co_approval_count,
+    coApprovalRate: row.co_approval_rate,
+  }));
+
+  // Load voting patterns
+  const votingPatternsRow = db
+    .prepare('SELECT * FROM voting_patterns WHERE report_id = ?')
+    .get(reportRow.id) as
+    | {
+        total_ballots: number;
+        bullet_voting_count: number;
+        bullet_voting_rate: number;
+        full_approval_count: number;
+        full_approval_rate: number;
+        average_approvals_per_ballot: number;
+        most_common_combination: string;
+        approval_distribution: string;
+      }
+    | undefined;
+  let votingPatterns = null;
+  if (votingPatternsRow) {
+    votingPatterns = {
+      totalBallots: votingPatternsRow.total_ballots,
+      bulletVotingCount: votingPatternsRow.bullet_voting_count,
+      bulletVotingRate: votingPatternsRow.bullet_voting_rate,
+      fullApprovalCount: votingPatternsRow.full_approval_count,
+      fullApprovalRate: votingPatternsRow.full_approval_rate,
+      averageApprovalsPerBallot: votingPatternsRow.average_approvals_per_ballot,
+      mostCommonCombination: JSON.parse(votingPatternsRow.most_common_combination || '[]'),
+      approvalDistribution: JSON.parse(votingPatternsRow.approval_distribution || '{}'),
+    };
+  }
+
   const report: IContestReport = {
     info: {
       name: reportRow.name,
@@ -183,6 +229,8 @@ export function getReport(path: string): IContestReport {
     winners: winnerNames,
     condorcet: reportRow.condorcet,
     numCandidates: candidateRows.length,
+    coApprovals: coApprovals.length > 0 ? coApprovals : undefined,
+    votingPatterns: votingPatterns || undefined,
   };
 
   return report;
