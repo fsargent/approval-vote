@@ -1,0 +1,41 @@
+# Cache static assets for 1 year
+/fonts/*
+  cache-control: max-age=31536000, immutable
+
+/*.css
+  cache-control: max-age=31536000, immutable
+
+/*.js
+  cache-control: max-age=31536000, immutable
+
+/icons/*
+  cache-control: max-age=31536000, immutable
+
+/images/*
+  cache-control: max-age=31536000, immutable
+
+/*.png
+  cache-control: max-age=31536000, immutable
+
+/*.jpg
+  cache-control: max-age=31536000, immutable
+
+/*.jpeg
+  cache-control: max-age=31536000, immutable
+
+/*.svg
+  cache-control: max-age=31536000, immutable
+
+/*.woff2
+  cache-control: max-age=31536000, immutable
+
+/*.woff
+  cache-control: max-age=31536000, immutable
+
+# Cache HTML files for 24 hours
+/*.html
+  cache-control: max-age=86400
+
+# Don't cache service worker
+/service-worker.js
+  cache-control: no-cache
