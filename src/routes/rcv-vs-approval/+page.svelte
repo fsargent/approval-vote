@@ -1,15 +1,27 @@
-<script>
+<script lang="ts">
   import { resolve } from '$app/paths';
 
   // Interactive voting example state
-  let approvalVotes = $state([]);
+  let approvalVotes: string[] = $state([]);
 
   // Simple RCV state - track selected cells as "candidateId-rank"
-  let selectedCells = $state(new Set());
+  let selectedCells: Set<string> = $state(new Set());
 
   // Ballot validation state
-  let ballotError = $state(null);
-  let ballotInterpretation = $state(null);
+  let ballotError: string | null = $state(null);
+  let ballotInterpretation: BallotInterpretation | null = $state(null);
+
+  interface BallotInterpretation {
+    valid: boolean;
+    message: string;
+    validRanks?: number[];
+    exhaustedAt?: number;
+    duplicateCandidate?: {
+      id: string;
+      name: string | undefined;
+      ranks: number[];
+    };
+  }
 
   const candidates = [
     { id: 'alice', name: 'Alice Johnson', party: 'Progressive' },
@@ -18,7 +30,7 @@
     { id: 'diana', name: 'Diana Wilson', party: 'Moderate' },
   ];
 
-  function handleApprovalVote(candidateId) {
+  function handleApprovalVote(candidateId: string) {
     const index = approvalVotes.indexOf(candidateId);
     if (index > -1) {
       approvalVotes = approvalVotes.filter((id) => id !== candidateId);
@@ -27,7 +39,7 @@
     }
   }
 
-  function handleRankClick(candidateId, rank) {
+  function handleRankClick(candidateId: string, rank: number) {
     const cellKey = `${candidateId}-${rank}`;
 
     // Toggle: if this cell is selected, unselect it; otherwise select it
@@ -48,12 +60,12 @@
     ballotInterpretation = null;
   }
 
-  function isCellSelected(candidateId, rank) {
+  function isCellSelected(candidateId: string, rank: number) {
     return selectedCells.has(`${candidateId}-${rank}`);
   }
 
-  function getCandidatesAtRank(rank) {
-    const candidates = [];
+  function getCandidatesAtRank(rank: number) {
+    const candidates: string[] = [];
     for (const cellKey of selectedCells) {
       const [candidateId, cellRank] = cellKey.split('-');
       if (parseInt(cellRank) === rank) {
@@ -63,8 +75,8 @@
     return candidates;
   }
 
-  function getRanksForCandidate(candidateId) {
-    const ranks = [];
+  function getRanksForCandidate(candidateId: string) {
+    const ranks: number[] = [];
     for (const cellKey of selectedCells) {
       const [cellCandidateId, rank] = cellKey.split('-');
       if (cellCandidateId === candidateId) {
@@ -92,7 +104,7 @@
     });
 
     // Check for candidates ranked multiple times
-    const candidateRanks = {};
+    const candidateRanks: { [key: string]: number[] } = {};
     selections.forEach(({ candidateId, rank }) => {
       if (!candidateRanks[candidateId]) candidateRanks[candidateId] = [];
       candidateRanks[candidateId].push(rank);
@@ -103,7 +115,7 @@
       .map(([candidateId, ranks]) => ({
         id: candidateId,
         name: candidates.find((c) => c.id === candidateId)?.name,
-        ranks: ranks.sort((a, b) => a - b),
+        ranks: ranks.sort((a: number, b: number) => a - b),
       }));
 
     if (candidatesWithMultipleRanks.length > 0) {
@@ -118,7 +130,7 @@
     }
 
     // Check for multiple candidates at same rank
-    const rankCounts = {};
+    const rankCounts: { [key: number]: number } = {};
     selections.forEach(({ rank }) => {
       rankCounts[rank] = (rankCounts[rank] || 0) + 1;
     });
@@ -176,7 +188,7 @@
 <div class="container">
   <div class="description">
     <h1 style="color: black;">
-  <a href="{resolve('/')}">approval.vote</a>
+  <a href="/">approval.vote</a>
   //
   <strong>RCV vs Approval Voting</strong>
 </h1>
@@ -298,7 +310,7 @@
               <div class="valid-content">
                 <h5>Valid Ballot</h5>
                 <p>{ballotInterpretation.message}</p>
-                <p>Your rankings: {ballotInterpretation.validRanks.join(', ')}</p>
+                <p>Your rankings: {ballotInterpretation.validRanks?.join(', ')}</p>
               </div>
             </div>
           {/if}
@@ -392,7 +404,7 @@
   </p>
   <p>
     In approval voting, voters can express their true preferences without fear of "wasting" their
-    vote. If you only like one candiate, you don't have to worry about your vote 'splitting' the
+    vote. If you only like one candidate, you don't have to worry about your vote 'splitting' the
     election and helping your least favorite candidate win.
   </p>
 
@@ -440,7 +452,7 @@
       See how approval voting performs in actual elections with detailed analysis and data from
       real-world races.
     </p>
-    <a href="{resolve('/')}" class="cta-button">View Election Results</a>
+    <a href="/" class="cta-button">View Election Results</a>
   </div>
 </div>
 

@@ -24,7 +24,9 @@
       return [report.candidates[0]];
     }
 
-    return candidates.filter((candidate) => candidate.winner === true);
+    return candidates
+      .filter((candidate) => candidate.winner === true)
+      .sort((a, b) => b.votes - a.votes); // Sort by vote count descending (highest first)
   }
 
   setContext('candidates', {
