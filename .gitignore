@@ -16,6 +16,6 @@ node_modules
 !.env.example
 .vscode/settings.json
 /static/images
-st-louis-cvr/cvr-data.sqlite3-*
-website/
+st-louis-cvr/*.sqlite3
 st-louis-cvr/data/CVRExport-8-27-2025/*
+website/

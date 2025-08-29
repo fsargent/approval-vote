@@ -5,6 +5,7 @@
   import VoteCounts from './report_components/VoteCounts.svelte';
   import ApprovalDistribution from './report_components/ApprovalDistribution.svelte';
   import CoApprovalMatrixSimple from './report_components/CoApprovalMatrixSimple.svelte';
+  import AnyoneButAnalysis from './report_components/AnyoneButAnalysis.svelte';
 
   import { setContext } from 'svelte';
 
@@ -148,4 +149,31 @@
     />
   </div>
 </div>
+
+{#if report.votingPatterns?.anyoneButAnalysis}
+<div class="row">
+  <div class="leftCol">
+    <h2>"Anyone But" Analysis</h2>
+    <p>
+      This shows which candidates were excluded when voters approved all candidates except one.
+      These ballots reveal strong opposition patterns, where voters are saying
+      "I'll support anyone except this candidate."
+    </p>
+    {#if report.votingPatterns?.anyoneButAnalysis}
+      {@const totalExclusions = Object.values(report.votingPatterns.anyoneButAnalysis).reduce((sum, count) => sum + count, 0)}
+      <p>
+        <strong>{totalExclusions.toLocaleString()}</strong> ballots approved all but one candidate
+        ({((totalExclusions / report.ballotCount) * 100).toFixed(1)}% of all ballots).
+      </p>
+    {/if}
+  </div>
+
+  <div class="rightCol">
+    <AnyoneButAnalysis
+      candidates={report.candidates.map(c => c.name)}
+      votingPatterns={report.votingPatterns}
+    />
+  </div>
+</div>
+{/if}
 {/if}

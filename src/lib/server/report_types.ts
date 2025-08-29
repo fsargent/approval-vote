@@ -83,4 +83,5 @@ export interface IVotingPatterns {
   mostCommonCombination: string[];
   approvalDistribution: { [key: number]: number };
   candidateApprovalDistributions?: { [candidateName: string]: { [approvals: number]: number } };
+  anyoneButAnalysis?: { [candidateName: string]: number };
 }

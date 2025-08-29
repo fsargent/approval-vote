@@ -13,7 +13,6 @@ Usage:
     uv run process-all
 """
 
-import glob
 import json
 import logging
 import os
@@ -61,7 +60,7 @@ def find_xml_directories():
     data_dir = Path("./data")
     xml_dirs = []
 
-    for root, dirs, files in os.walk(data_dir):
+    for root, _dirs, files in os.walk(data_dir):
         if any(f.endswith(".xml") for f in files):
             xml_dirs.append(Path(root))
 
@@ -229,6 +228,22 @@ def generate_co_approval_analysis(contest_name, cvr_conn):
 
         candidate_approval_distributions[candidate] = dict(candidate_distribution)
 
+    # Calculate "Anyone But X" analysis - ballots with exactly N-1 approvals
+    anyone_but_analysis = {}
+    num_candidates = len(candidates)
+    anyone_but_ballots = 0
+
+    for _ballot_id, approved_candidates in ballot_approvals.items():
+        if len(approved_candidates) == num_candidates - 1:  # N-1 approvals
+            anyone_but_ballots += 1
+            # Find the one candidate that was NOT approved
+            excluded_candidates = set(candidates) - approved_candidates
+            if len(excluded_candidates) == 1:
+                excluded_candidate = list(excluded_candidates)[0]
+                anyone_but_analysis[excluded_candidate] = (
+                    anyone_but_analysis.get(excluded_candidate, 0) + 1
+                )
+
     voting_patterns = {
         "totalBallots": total_ballots,
         "bulletVotingCount": bullet_voting_count,
@@ -239,6 +254,7 @@ def generate_co_approval_analysis(contest_name, cvr_conn):
         "mostCommonCombination": most_common_combination,
         "approvalDistribution": dict(approval_distribution),
         "candidateApprovalDistributions": candidate_approval_distributions,
+        "anyoneButAnalysis": anyone_but_analysis,
     }
 
     return co_approvals, voting_patterns
@@ -315,10 +331,26 @@ def export_to_main_database():
             most_common_combination TEXT,
             approval_distribution TEXT,
             candidate_approval_distributions TEXT,
+            anyone_but_analysis TEXT,
             FOREIGN KEY(report_id) REFERENCES reports(id)
         );
     """
     )
+
+    # Add anyone_but_analysis column if it doesn't exist (migration for existing databases)
+    try:
+        main_conn.execute(
+            "ALTER TABLE voting_patterns ADD COLUMN anyone_but_analysis TEXT"
+        )
+        logger.info(
+            "✓ Added anyone_but_analysis column to existing voting_patterns table"
+        )
+    except sqlite3.OperationalError as e:
+        if "duplicate column name" in str(e):
+            logger.info("✓ anyone_but_analysis column already exists")
+        else:
+            logger.warning(f"Could not add anyone_but_analysis column: {e}")
+            # Continue anyway - might not be a critical error
 
     # Get all contests from CVR
     contests = cvr_conn.execute(
@@ -383,6 +415,15 @@ def export_to_main_database():
 
             voting_patterns["candidateApprovalDistributions"] = mapped_distributions
 
+        # Convert anyoneButAnalysis to use proper database names
+        if voting_patterns and "anyoneButAnalysis" in voting_patterns:
+            mapped_anyone_but = {}
+            for cvr_name, count in voting_patterns["anyoneButAnalysis"].items():
+                proper_name = name_mapping.get(cvr_name, cvr_name)
+                mapped_anyone_but[proper_name] = count
+
+            voting_patterns["anyoneButAnalysis"] = mapped_anyone_but
+
         if not co_approvals:
             logger.warning(f"  No co-approval data generated for {contest_name}")
             continue
@@ -415,8 +456,9 @@ def export_to_main_database():
             INSERT INTO voting_patterns (
                 report_id, total_ballots, bullet_voting_count, bullet_voting_rate,
                 full_approval_count, full_approval_rate, average_approvals_per_ballot,
-                most_common_combination, approval_distribution, candidate_approval_distributions
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                most_common_combination, approval_distribution, candidate_approval_distributions,
+                anyone_but_analysis
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
             (
                 report_id,
@@ -429,6 +471,7 @@ def export_to_main_database():
                 json.dumps(voting_patterns["mostCommonCombination"]),
                 json.dumps(voting_patterns["approvalDistribution"]),
                 json.dumps(voting_patterns["candidateApprovalDistributions"]),
+                json.dumps(voting_patterns["anyoneButAnalysis"]),
             ),
         )
 
