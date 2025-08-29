@@ -1,22 +1,35 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import mermaid from 'mermaid';
 
   export let code: string | undefined;
 
   let container: HTMLElement;
+  let mermaidLoaded = false;
+  let mermaid: any;
 
-  let initialized = false;
-  function initMermaid() {
-    if (initialized) return;
-    mermaid.initialize({ startOnLoad: false, theme: 'default', securityLevel: 'loose' });
-    initialized = true;
+  async function loadMermaid() {
+    if (mermaidLoaded) return mermaid;
+    try {
+      const mermaidModule = await import('mermaid');
+      mermaid = mermaidModule.default;
+      mermaid.initialize({ startOnLoad: false, theme: 'default', securityLevel: 'loose' });
+      mermaidLoaded = true;
+      return mermaid;
+    } catch (err) {
+      console.error('Failed to load Mermaid:', err);
+      return null;
+    }
   }
 
   async function render() {
     if (!code || !container) return;
     try {
-      const { svg } = await mermaid.render(`flowchart-${Date.now()}`, code);
+      const mermaidInstance = await loadMermaid();
+      if (!mermaidInstance) {
+        container.innerHTML = '<p style="margin:0;color:#6b7280">Error loading flowchart renderer</p>';
+        return;
+      }
+      const { svg } = await mermaidInstance.render(`flowchart-${Date.now()}`, code);
       container.innerHTML = svg;
     } catch (err) {
       container.innerHTML = '<p style="margin:0;color:#6b7280">Error rendering flowchart</p>';
@@ -24,12 +37,10 @@
   }
 
   onMount(() => {
-    initMermaid();
     render();
   });
 
   $: if (code) {
-    initMermaid();
     render();
   }
 </script>

@@ -12,15 +12,6 @@
   <link rel="preload" href="{resolve('/fonts.css')}" as="style" />
   <link rel="stylesheet" href="{resolve('/fonts.css')}" />
 
-  <!-- Then preload the most critical font file -->
-  <link
-    rel="preload"
-    href="https://fonts.gstatic.com/s/sourcesanspro/v22/6xK3dSBYKcSV-LCoeQqfX1RYOo3qOK7l.woff2"
-    as="font"
-    type="font/woff2"
-    crossorigin
-  />
-
   <!-- Regular CSS after fonts are handled -->
   <link rel="stylesheet" href="{resolve('/style.css')}" />
   <link rel="icon" type="image/png" href="{resolve('/icons/icon.png')}" />

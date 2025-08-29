@@ -3,8 +3,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK3dSBYKcSV-LCoeQqfX1RYOo3qOK7l.woff2)
-    format('woff2');
+  src: url(/fonts/source-sans-pro-regular.woff2) format('woff2');
 }
 
 @font-face {
@@ -12,8 +11,7 @@
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwlxdu.woff2)
-    format('woff2');
+  src: url(/fonts/source-sans-pro-semibold.woff2) format('woff2');
 }
 
 @font-face {
@@ -21,6 +19,5 @@
   font-style: italic;
   font-weight: 400;
   font-display: swap;
-  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK1dSBYKcSV-LCoeQqfX1RYOo3qPZ7nsDI.woff2)
-    format('woff2');
+  src: url(/fonts/source-sans-pro-italic.woff2) format('woff2');
 }

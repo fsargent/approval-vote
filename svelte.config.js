@@ -39,7 +39,7 @@ const config = {
       appTemplate: 'src/app.html',
       errorTemplate: 'src/error.html',
     },
-    inlineStyleThreshold: 0,
+    inlineStyleThreshold: 1024, // Inline CSS under 1KB
     moduleExtensions: ['.js', '.ts'],
     outDir: '.svelte-kit',
     paths: {
