@@ -8,16 +8,24 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
+    <!-- Preload critical fonts -->
+    <link
+      rel="preload"
+      href="https://fonts.gstatic.com/s/sourcesanspro/v22/6xK3dSBYKcSV-LCoeQqfX1RYOo3qOK7l.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <!-- Preload critical CSS -->
+    <link rel="preload" href="/style.css" as="style" />
+    <link rel="preload" href="/fonts.css" as="style" />
+
     <!-- Load main CSS -->
     <link rel="stylesheet" href="/style.css" />
 
-    <!-- Defer font loading -->
-    <link rel="stylesheet" href="/fonts.css" media="print" onload="this.media='all'" />
-
-    <!-- Fallback for no-JS -->
-    <noscript>
-      <link rel="stylesheet" href="/fonts.css" />
-    </noscript>
+    <!-- Load fonts immediately instead of deferring -->
+    <link rel="stylesheet" href="/fonts.css" />
 
     <link rel="icon" type="image/png" href="/icons/icon.png" />
     <meta

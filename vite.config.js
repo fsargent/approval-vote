@@ -20,6 +20,29 @@ const config = {
       ],
     },
   },
+  build: {
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          // Split Mermaid into its own chunk since it's only used on one page
+          if (id.includes('mermaid')) {
+            return 'mermaid';
+          }
+          // Split vendor deps into separate chunk
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
+        },
+      },
+    },
+  },
 };
 
 export default config;
