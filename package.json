@@ -19,7 +19,7 @@
   "dependencies": {
     "@sveltejs/adapter-static": "^3.0.8",
     "better-sqlite3": "12.2.0",
-    "mermaid": "^11.9.0",
+    "mermaid": "^11.10.1",
     "puppeteer": "^24.15.0",
     "qrcode": "^1.5.4",
     "tippy.js": "^6.3.7",
