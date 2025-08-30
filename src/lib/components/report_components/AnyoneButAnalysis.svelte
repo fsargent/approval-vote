@@ -128,4 +128,18 @@
     padding: 20px;
     font-size: 10pt;
   }
+
+  @media (prefers-color-scheme: dark) {
+    .chart-title {
+      color: #b0b0b0;
+    }
+
+    .no-data {
+      color: #999;
+    }
+
+    text {
+      fill: #e0e0e0;
+    }
+  }
 </style>

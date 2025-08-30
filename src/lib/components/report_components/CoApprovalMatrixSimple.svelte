@@ -107,7 +107,7 @@
           <td
             class="entry"
             use:tooltip={entry ? generateTooltip(candidateA, candidateB, entry) : null}
-            style={entry ? `background: ${fracToColor(entry.frac)}` : ''}>
+            style={entry ? `--frac: ${entry.frac}; --max-frac: ${maxFrac()}` : ''}>
             {#if entry}
               {Math.round(entry.frac * 1000) / 10}%
             {:else}
@@ -149,6 +149,30 @@
     vertical-align: middle;
     text-align: center;
     color: black;
+    /* Light mode: 0% = light background (95%), 100% = theme green (40%) */
+    background: hsl(99, 41%, calc(95% - (var(--frac, 0) / var(--max-frac, 1)) * 55%));
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .entry {
+      color: white;
+      /* Dark mode: 0% = dark background (15%), 100% = theme green (50%) */
+      background: hsl(99, 41%, calc(15% + (var(--frac, 0) / var(--max-frac, 1)) * 35%));
+    }
+
+    .colsLabel,
+    .rowsLabel {
+      color: #e0e0e0;
+    }
+
+    table {
+      color: #e0e0e0;
+    }
+
+    .colLabel,
+    .rowLabel {
+      color: #e0e0e0;
+    }
   }
 
   .colsLabel {

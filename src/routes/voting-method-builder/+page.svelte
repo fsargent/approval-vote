@@ -816,7 +816,7 @@
 
 <div class="container wide-builder">
   <div class="description">
-    <h1 style="color: black;">
+    <h1>
       <a href="{resolve('/')}">approval.vote</a>
       //
       <strong>Voting Method Builder</strong>

@@ -104,6 +104,8 @@
     
     return `${row.candidateName}: ${data.count.toLocaleString()} voters (${data.percentage.toFixed(1)}%) approved exactly ${numApprovals} candidate${numApprovals !== 1 ? 's' : ''}`;
   }
+
+
 </script>
 
 {#if approvalMatrix().length > 0}
@@ -135,7 +137,7 @@
             class="entry"
             use:tooltip={row.distributions[numApprovals] ? generateMatrixCellTooltip(row, numApprovals) : null}
             style={row.distributions[numApprovals]
-              ? `background: hsl(99, 41%, ${97 - (row.distributions[numApprovals].percentage * 0.8)}%)`
+              ? `--percentage: ${row.distributions[numApprovals].percentage}`
               : ''}>
             {#if row.distributions[numApprovals]}
               {row.distributions[numApprovals].percentage.toFixed(1)}%
@@ -184,6 +186,8 @@
     vertical-align: middle;
     text-align: center;
     color: black;
+    /* Light mode: 0% = light background (95%), 100% = theme green (40%) */
+    background: hsl(99, 41%, calc(95% - var(--percentage, 0) * 0.55%));
   }
 
   .colsLabel {
@@ -206,11 +210,11 @@
 
   /* Add spacing after "All Candidates" row */
   .overall-separator {
-    border-bottom: 4px solid #fff;
+    border-bottom: 4px solid white;
   }
 
   .overall-separator td {
-    border-bottom: 4px solid #fff;
+    border-bottom: 4px solid white;
   }
 
   /* Keep column headers horizontal for approval distribution */
@@ -219,5 +223,39 @@
     writing-mode: initial;
     text-align: center;
     margin: auto;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .entry {
+      color: white;
+      /* Dark mode: 0% = dark background (15%), 100% = theme green (50%) */
+      background: hsl(99, 41%, calc(15% + var(--percentage, 0) * 0.35%));
+    }
+
+    .voter-count {
+      color: #999;
+    }
+
+    .colsLabel,
+    .rowsLabel {
+      color: #e0e0e0;
+    }
+
+    table {
+      color: #e0e0e0;
+    }
+
+    .colLabel,
+    .rowLabel {
+      color: #e0e0e0;
+    }
+
+    .overall-separator {
+      border-bottom-color: #1a1a1a;
+    }
+
+    .overall-separator td {
+      border-bottom-color: #1a1a1a;
+    }
   }
 </style>

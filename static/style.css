@@ -297,3 +297,71 @@ hr {
     display: block;
   }
 }
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+    border-top-color: #5a8a37;
+  }
+
+  .description {
+    color: #e0e0e0;
+  }
+
+  .description h1 {
+    color: #e0e0e0;
+  }
+
+  h2 {
+    color: #b0b0b0;
+  }
+
+  h3 {
+    color: #b0b0b0;
+  }
+
+  h3 a {
+    color: #e0e0e0;
+  }
+
+  h3 strong {
+    color: #5a8a37;
+  }
+
+  .meta {
+    color: #b0b0b0;
+  }
+
+  .race a {
+    color: #b0b0b0;
+  }
+
+  .race a:hover {
+    background: #333;
+  }
+
+  .race a .title strong {
+    color: #e0e0e0;
+  }
+
+  a {
+    color: #5a8a37;
+  }
+
+  hr {
+    border-bottom-color: #555;
+  }
+
+  .tippy-box[data-theme~='light-border'] {
+    background-color: #333;
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+    box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.3);
+  }
+
+  .tippy-box[data-theme~='light-border'] > .tippy-arrow:before {
+    border-top-color: #333;
+  }
+}

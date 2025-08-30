@@ -32,7 +32,7 @@
 
 <div class="container">
   <div class="description">
-    <h1 style="color: black;">
+    <h1>
     <a href="{resolve('/')}">approval.vote</a>
     //
     <strong>About Approval Voting</strong>
@@ -502,6 +502,75 @@
     gap: 1rem;
     flex-wrap: wrap;
     margin-top: 1rem;
+  }
+
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .description h1 {
+      color: #e0e0e0;
+    }
+
+    .voting-system {
+      background: #2a2a2a;
+      border-color: #555;
+    }
+
+    .voting-system h3 {
+      color: #5a8a37;
+    }
+
+    .radio-option:hover,
+    .checkbox-option:hover {
+      background: #555;
+    }
+
+    .party {
+      color: #999;
+    }
+
+    .comparison-table th {
+      background: #5a8a37;
+      color: white;
+    }
+
+    .comparison-table tr:nth-child(even) {
+      background: #2a2a2a;
+    }
+
+    .comparison-table td {
+      border-color: #555;
+    }
+
+    .paper-list li {
+      background: #2a2a2a;
+      border-left-color: #5a8a37;
+    }
+
+    .paper-title a {
+      color: #5a8a37;
+    }
+
+    .paper-description {
+      color: #999;
+    }
+
+    .cta-section {
+      background: #2a2a2a;
+      border-color: #555;
+    }
+
+    .cta-button {
+      background: #5a8a37;
+      color: white;
+    }
+
+    .cta-button:hover {
+      background: #4a7327;
+    }
+
+    h2 {
+      border-bottom-color: #555;
+    }
   }
 
   @media (max-width: 768px) {

@@ -6,7 +6,7 @@
 
 <div class="container">
   <div class="description">
-    <h1 style="color: black;">
+    <h1>
     <a href="{resolve('/')}">approval.vote</a>
     //
     <strong>About</strong>

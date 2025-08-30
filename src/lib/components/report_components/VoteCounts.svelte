@@ -80,4 +80,10 @@
   .eliminated {
     opacity: 30%;
   }
+
+  @media (prefers-color-scheme: dark) {
+    text {
+      fill: #e0e0e0;
+    }
+  }
 </style>

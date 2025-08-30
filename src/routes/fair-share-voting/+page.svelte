@@ -28,7 +28,7 @@
 
 <div class="container">
   <div class="description">
-    <h1 style="color: black;">
+    <h1>
     <a href="{resolve('/')}">approval.vote</a>
     //
     <strong>Fair Share Voting</strong>
@@ -1287,6 +1287,12 @@
 
     .basic-section {
       margin: 1.5rem 0;
+    }
+  }
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .description h1 {
+      color: #e0e0e0;
     }
   }
 </style>

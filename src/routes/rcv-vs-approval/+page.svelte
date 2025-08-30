@@ -187,7 +187,7 @@
 
 <div class="container">
   <div class="description">
-    <h1 style="color: black;">
+    <h1>
   <a href="/">approval.vote</a>
   //
   <strong>RCV vs Approval Voting</strong>
@@ -793,6 +793,120 @@
   .cta-button:hover {
     background: #365a1f;
     text-decoration: none;
+  }
+
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .description h1 {
+      color: #e0e0e0;
+    }
+
+    .voting-system {
+      background: #2a2a2a;
+      border-color: #555;
+    }
+
+    .voting-system h3 {
+      color: #5a8a37;
+    }
+
+    .checkbox-option:hover {
+      background: #555;
+    }
+
+    .party {
+      color: #999;
+    }
+
+    .rcv-ballot {
+      background: #2a2a2a;
+      border-color: #555;
+    }
+
+    .rcv-ballot th {
+      background: #5a8a37;
+      color: white;
+      border-color: #4a7327;
+    }
+
+    .rcv-ballot td {
+      border-color: #555;
+    }
+
+    .candidate-info strong {
+      color: #e0e0e0;
+    }
+
+    .rank-button {
+      border-color: #555;
+      background: #333;
+      color: #e0e0e0;
+    }
+
+    .rank-button:hover {
+      border-color: #5a8a37;
+      background: #f8fff8;
+      color: #333;
+    }
+
+    .rank-button.selected {
+      background: #5a8a37;
+      color: white;
+      border-color: #4a7327;
+    }
+
+    .ballot-instructions {
+      background: #2a2a2a;
+      border-color: #555;
+    }
+
+    .clear-ranking-btn {
+      background: #666;
+      color: white;
+    }
+
+    .clear-ranking-btn:hover {
+      background: #777;
+    }
+
+    .ballot-error {
+      background: #4a2a2a;
+      border-color: #6a3a3a;
+      color: #ff9999;
+    }
+
+    .ballot-valid {
+      background: #2a4a2a;
+      border-color: #3a6a3a;
+      color: #99ff99;
+    }
+
+    .comparison-table th {
+      background: #5a8a37;
+      color: white;
+    }
+
+    .comparison-table tr:nth-child(even) {
+      background: #2a2a2a;
+    }
+
+    .comparison-table td {
+      border-color: #555;
+    }
+
+    .cta-section {
+      background: #2a2a2a;
+      border-color: #555;
+    }
+
+    .cta-button {
+      background: #5a8a37;
+      color: white;
+    }
+
+    .cta-button:hover {
+      background: #4a7327;
+    }
   }
 
   @media (max-width: 768px) {
