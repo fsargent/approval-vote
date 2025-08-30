@@ -29,6 +29,13 @@
   <meta property="og:site_name" content="approval.vote" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Analytics -->
+  <script
+    src="https://app.rybbit.io/api/script.js"
+    data-site-id="2295"
+    defer
+  ></script>
 </svelte:head>
 <main>
   {@render children?.()}
