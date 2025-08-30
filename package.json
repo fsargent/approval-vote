@@ -17,7 +17,7 @@
     "postbuild": "npx svelte-sitemap --domain https://approval.vote"
   },
   "dependencies": {
-    "@sveltejs/adapter-static": "^3.0.8",
+    "@sveltejs/adapter-static": "^3.0.9",
     "better-sqlite3": "12.2.0",
     "mermaid": "^11.9.0",
     "puppeteer": "^24.15.0",
