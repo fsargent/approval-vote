@@ -2,78 +2,15 @@
   import { resolve } from '$app/paths';
   import Mermaid from '$lib/components/common/Mermaid.svelte';
   import { METHOD_FLOWCHARTS } from '$lib/flowcharts/index';
+  import MethodsGallery from './components/MethodsGallery.svelte';
+  import MethodScores from './components/MethodScores.svelte';
+  import ComparisonModal from './components/ComparisonModal.svelte';
+  import FiltersPanel from './components/FiltersPanel.svelte';
+  import type { VotingMethod, VotingConfig } from '$lib/types/voting';
   const { data } = $props<{ data: { votingMethods: Record<string, VotingMethod> } }>();
   let VOTING_METHODS: Record<string, VotingMethod> = $derived(data.votingMethods);
 
-  // Type definition for our config
-  interface VotingConfig {
-    ballotType: string | null;
-    limitedChoices: string | null;
-    customLimit: number;
-    tabulationMethod: string | null;
-    numberOfSeats: number;
-    hasParties: boolean;
-    canVoteForParties: boolean;
-    canVoteForCandidates: boolean;
-    hasPrimaries: boolean;
-
-    listType: string | null;
-    mixedMember: boolean;
-    singleWinnerProportion: number;
-    allowNegativeVotes: boolean;
-    scoreMin: number;
-    scoreMax: number;
-  }
-
-  interface VotingMethod {
-    name: string;
-    shortDescription: string;
-    detailedCritique: string;
-    // Requirements/Constraints
-    ballotType: 'choose-x' | 'ranking' | 'score';
-    choiceLimitation: '1' | 'custom' | 'unlimited' | 'any';
-    minSeats: number;
-    maxSeats: number | 'unlimited';
-    // Voting Machine Compatibility
-    votingMachineCompatibility?: {
-      existingMachines: boolean;
-      description: string;
-    };
-    // Scoring
-    scores: {
-      proportionality: number;
-      simplicity: number;
-      honestStrategyResistance: number;
-      strategicStraightforwardness: number;
-      representation: number;
-    };
-    // Classification
-    isProportional: boolean;
-    isSemiProportional: boolean;
-    category: 'plurality' | 'approval' | 'ranked' | 'score' | 'mixed';
-    // Variants/Options
-    hasVariants?: boolean;
-    variants?: {
-      listType?: boolean;
-      mixedMember?: boolean;
-    };
-    // Critique fields (ballot-specific critique removed to avoid duplication)
-    tabulationCritique?: string;
-    proportionalityDetails?: string; // Only shown for multi-winner
-    listTypeCritique?: {
-      closed?: string;
-      open?: string;
-      flexible?: string;
-    };
-    primaryCritique?: {
-      withPrimaries?: string;
-      withoutPrimaries?: string;
-    };
-    flowchart?: string; // Mermaid flowchart diagram
-    tags?: string[]; // Tags for grouping and categorization
-    requiresParties?: boolean; // Party-based method requirement
-    usedBy?: { code: string; name: string; flag: string }[]; // Optional usage list
-  }
+  // Types come from $lib/types/voting
 
   // Voting method configuration state
   let config = $state<VotingConfig>({
@@ -96,22 +33,9 @@
 
   // Election type options
   const electionTypes = [
-    {
-      id: 'all',
-      name: 'Show All',
-      description: 'Show both single winner and multi winner elections',
-    },
-    {
-      id: 'single',
-      name: 'Single Winner',
-      description: 'Choose one person for a role (President, Mayor, etc.)',
-    },
-    {
-      id: 'multi',
-      name: 'Multi Winner',
-      description:
-        'Choose multiple people for a body (Council, Parliament, etc.) or for Top X Primaries',
-    },
+    { id: 'all', name: 'Show All', description: 'Show both single winner and multi winner elections' },
+    { id: 'single', name: 'Single Winner', description: 'Choose one person for a role (President, Mayor, etc.)' },
+    { id: 'multi', name: 'Multi Winner', description: 'Choose multiple people for a body (Council, Parliament, etc.) or for Top X Primaries' },
   ];
 
   // Current election type filter (legacy, used only in summary calculations)
@@ -130,50 +54,11 @@
   // In-use facet (show only methods with real-world adoption)
   let inUseOnly = $state(false);
 
-  // Helper to get election type from numberOfSeats
-  function getElectionType(numberOfSeats: number): string {
-    return numberOfSeats === 1 ? 'single' : 'multi';
-  }
-
   // Helper to get the selected election type
+  import { ballotTypes, limitedChoicesOptions, listTypes, getElectionType, getAvailableMethods, generateVotingMethodName as genName, generateVotingMethodSummary as genSummary, generateVotingMethodCritiqueFromData as genCritique, generateVotingMethodScores as genScores, isProportionalMethod as isProp, getSuggestedComparisons as getCompares } from '$lib/voting/builder-utils';
   let selectedElectionType = $derived(getElectionType(config.numberOfSeats));
 
-  // Option definitions
-  const ballotTypes = [
-    { id: 'choose-x', name: 'Choose X', description: 'Pick candidates' },
-    { id: 'ranking', name: 'Ranked', description: 'Rank candidates in order of preference' },
-    { id: 'score', name: 'Score', description: 'Give each candidate a numerical score' },
-  ];
-
-  const limitedChoicesOptions = [
-    { id: '1', name: 'Pick 1', description: 'Must select exactly 1 (FPTP)' },
-    { id: 'custom', name: 'Custom limit', description: 'Set your own maximum' },
-    {
-      id: 'unlimited',
-      name: 'As many as you like',
-      description: 'No limit on selections (approval voting)',
-    },
-  ];
-
-
-
-  const listTypes = [
-    {
-      id: 'closed',
-      name: 'Closed List',
-      description: 'Voters vote for parties, party decides candidate order',
-    },
-    {
-      id: 'open',
-      name: 'Open List',
-      description: 'Voters vote for individual candidates within parties',
-    },
-    {
-      id: 'flexible',
-      name: 'Flexible List',
-      description: 'Voters can vote for party or individual candidates',
-    },
-  ];
+  // Option definitions now imported from utils
 
   // Computed properties
   let isRankedBallot = $derived(config.ballotType === 'ranking');
@@ -183,45 +68,11 @@
 
   // Available tabulation methods derived from current config and filter
   let availableTabulationMethods: { id: string; name: string; description: string }[] = $derived.by(() => {
-    const methodIds = getAvailableMethods(config);
-    return methodIds.map((id) => ({
-      id,
-      name: VOTING_METHODS[id]?.name,
-      description: VOTING_METHODS[id]?.shortDescription,
-    }));
+    const methodIds = getAvailableMethods(VOTING_METHODS, config, electionTypeFilter);
+    return methodIds.map((id) => ({ id, name: VOTING_METHODS[id]?.name, description: VOTING_METHODS[id]?.shortDescription }));
   });
 
-  // Get available methods based on current configuration
-  function getAvailableMethods(config: VotingConfig): string[] {
-    const isCompatibleWithBallotType = ([id, method]: [string, VotingMethod]) => 
-      method.ballotType === config.ballotType;
-
-    const isCompatibleWithChoiceLimit = ([id, method]: [string, VotingMethod]) =>
-      method.choiceLimitation === 'any' || method.choiceLimitation === config.limitedChoices;
-
-    const isCompatibleWithElectionType = ([id, method]: [string, VotingMethod]) => {
-      if (electionTypeFilter === 'all') return true;
-      
-      const currentElectionType = getElectionType(config.numberOfSeats);
-      return electionTypeFilter === 'single' 
-        ? method.minSeats <= 1 
-        : method.maxSeats !== 1;
-    };
-
-    const isCompatibleWithSeatCount = ([id, method]: [string, VotingMethod]) => {
-      if (electionTypeFilter === 'all') return true;
-      
-      return config.numberOfSeats >= method.minSeats &&
-        (method.maxSeats === 'unlimited' || config.numberOfSeats <= method.maxSeats);
-    };
-
-    return Object.entries(VOTING_METHODS)
-      .filter(isCompatibleWithBallotType)
-      .filter(isCompatibleWithChoiceLimit)
-      .filter(isCompatibleWithElectionType)
-      .filter(isCompatibleWithSeatCount)
-      .map(([id]) => id);
-  }
+  // Filtering helpers now in utils
 
   // (legacy block removed; handled by $derived above)
 
@@ -308,10 +159,10 @@
     }
   }
 
-  let votingMethodName = $derived(generateVotingMethodName(config));
-  let votingMethodSummary = $derived(generateVotingMethodSummary(config));
-  let votingMethodCritique = $derived(generateVotingMethodCritiqueFromData(config));
-  let votingMethodScores = $derived(generateVotingMethodScores(config));
+  let votingMethodName = $derived(genName(VOTING_METHODS, config));
+  let votingMethodSummary = $derived(genSummary(VOTING_METHODS, config, availableTabulationMethods));
+  let votingMethodCritique = $derived(genCritique(VOTING_METHODS, config));
+  let votingMethodScores = $derived(genScores(VOTING_METHODS, config));
 
   function generateVotingMethodName(config: VotingConfig) {
     // If no method selected yet
@@ -573,11 +424,7 @@
     return scores;
   }
 
-  function isProportionalMethod(config: VotingConfig): boolean {
-    if (config.numberOfSeats <= 1) return false;
-    const method = VOTING_METHODS[config.tabulationMethod || ''];
-    return method?.isProportional || false;
-  }
+  const isProportionalMethod = (c: VotingConfig) => isProp(VOTING_METHODS, c);
 
   // Removed semi-proportional badge
 
@@ -689,111 +536,9 @@
   }
 
   // Get suggested comparisons based on current method
-  function getSuggestedComparisons(
-    config: VotingConfig
-  ): { title: string; methods: string[]; description: string }[] {
-    const currentMethod = VOTING_METHODS[config.tabulationMethod || ''];
-    if (!currentMethod || !config.tabulationMethod) return [];
-
-    const availableIds = getAvailableMethods(config);
-    const currentMethodId = config.tabulationMethod;
-
-    // Helper to get methods matching a predicate
-    const getMethodsWhere = (predicate: (method: VotingMethod) => boolean): string[] =>
-      availableIds.filter(id => predicate(VOTING_METHODS[id] as VotingMethod));
-
-    // Helper to get methods with specific tags
-    const getMethodsWithTag = (tag: string): string[] =>
-      availableIds.filter(id => (VOTING_METHODS[id] as VotingMethod).tags?.includes(tag) || false);
-
-    // Helper to get methods with any of the specified tags
-    const getMethodsWithAnyTag = (tags: string[]): string[] =>
-      availableIds.filter(id => 
-        tags.some(tag => (VOTING_METHODS[id] as VotingMethod).tags?.includes(tag) || false)
-      );
-
-    // Define groups based on method properties and tags
-    const possibleGroups = [
-      {
-        methods: getMethodsWhere(m => m.ballotType === 'score' && m.isProportional),
-        title: 'Proportional Score Methods',
-        description: 'All provide proportional representation with score/approval ballots but use different algorithms',
-      },
-      {
-        methods: getMethodsWhere(m => m.ballotType === 'score' && m.maxSeats !== 1),
-        title: 'Multi-Winner Score Methods',
-        description: 'Different approaches to multi-winner elections with score ballots - from simple block voting to complex proportional systems',
-      },
-      {
-        methods: getMethodsWhere(m => m.ballotType === 'score' && m.maxSeats === 1),
-        title: 'Single-Winner Score Methods',
-        description: 'Different ways to count score ballots - from simple totals to complex runoffs',
-      },
-      {
-        methods: getMethodsWhere(m => m.ballotType === 'choose-x' && m.maxSeats === 1),
-        title: 'Single-Winner Choose-X Methods',
-        description: 'Different approaches to single-winner elections with choose-X ballots',
-      },
-      {
-        methods: getMethodsWhere(m => m.ballotType === 'choose-x' && m.isProportional),
-        title: 'Approval-Based Proportional Methods',
-        description: 'Ways to achieve proportional representation using approval ballots',
-      },
-      {
-        methods: getMethodsWhere(m => m.ballotType === 'choose-x'),
-        title: 'Choose-X Methods',
-        description: 'Different ways to count choose-X ballots - from simple plurality to complex proportional systems',
-      },
-      {
-        methods: getMethodsWhere(m => m.ballotType === 'choose-x' && m.maxSeats !== 1),
-        title: 'Multi-Winner Choose-X Methods',
-        description: 'Different approaches to multi-winner elections with choose-X ballots - from simple block voting to proportional systems',
-      },
-      {
-        methods: getMethodsWhere(m => m.ballotType === 'ranking'),
-        title: 'Ranked Choice Methods',
-        description: 'Different algorithms for counting ranked ballots',
-      },
-      {
-        methods: getMethodsWhere(m => m.isProportional),
-        title: 'Proportional Methods',
-        description: 'All methods that achieve proportional representation',
-      },
-      // Semi-proportional grouping removed
-      // Tag-based groups
-      {
-        methods: getMethodsWithTag('simple'),
-        title: 'Simple Methods',
-        description: 'Easy to understand and implement voting methods',
-      },
-      {
-        methods: getMethodsWithTag('runoff'),
-        title: 'Runoff-Based Methods',
-        description: 'Methods that use some form of runoff or elimination process',
-      },
-      {
-        methods: getMethodsWithTag('consensus'),
-        title: 'Consensus-Building Methods',
-        description: 'Methods that tend to elect broadly acceptable candidates',
-      },
-      {
-        methods: getMethodsWithTag('proportional'),
-        title: 'Proportional Methods (Tagged)',
-        description: 'All methods tagged as proportional',
-      },
-      {
-        methods: getMethodsWithAnyTag(['computationally-complex', 'optimization']),
-        title: 'Computationally Complex Methods',
-        description: 'Methods that require significant computation or optimization',
-      },
-    ];
-
-    // Return groups that include the current method and have multiple options
-    return possibleGroups
-      .filter(group => 
-        group.methods.includes(currentMethodId) && 
-        group.methods.length > 1
-      );
+  function getSuggestedComparisons(config: VotingConfig) {
+    const availableIds = getAvailableMethods(VOTING_METHODS, config, electionTypeFilter);
+    return getCompares(VOTING_METHODS, config, availableIds);
   }
 
 
@@ -827,176 +572,31 @@
   <div class="builder-layout">
     <!-- Configuration Panel -->
     <div class="config-panel">
-      <!-- Facet Filters -->
-      <section class="config-section">
-        <h2>🔎 Filters</h2>
-        <p class="section-description">Use these facets to narrow down voting methods. They don't lock in a choice — pick a method on the right when ready.</p>
-
-        <!-- Election Type Facet -->
-        <div class="facet-group">
-          <h3 class="facet-title">
-            Election Type
-            <span
-              class="facet-tip"
-              role="button"
-              tabindex="0"
-              onclick={(e) => { e.stopPropagation(); toggleTooltip('facet-election'); }}
-              onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); toggleTooltip('facet-election'); } }}
-            >ⓘ</span>
-          </h3>
-          {#if activeTooltip === 'facet-election'}
-            <div class="info-panel">Single-winner methods elect one seat; multi-winner methods elect multiple seats (for councils/assemblies). This choice affects which methods are compatible and whether proportional representation is possible.</div>
-          {/if}
-          <div class="facet-grid">
-            <label class="facet-check">
-              <input type="checkbox" checked={electionFacet.includes('single')} onchange={() => (electionFacet = toggleSelection(electionFacet, 'single'))} />
-              <span>Single Winner</span>
-            </label>
-            <label class="facet-check">
-              <input type="checkbox" checked={electionFacet.includes('multi')} onchange={() => (electionFacet = toggleSelection(electionFacet, 'multi'))} />
-              <span>Multi Winner</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- Ballot Type Facet -->
-        <div class="facet-group">
-          <h3 class="facet-title">
-            Ballot Type
-            <span
-              class="facet-tip"
-              role="button"
-              tabindex="0"
-              onclick={(e) => { e.stopPropagation(); toggleTooltip('facet-ballot'); }}
-              onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); toggleTooltip('facet-ballot'); } }}
-            >ⓘ</span>
-          </h3>
-          {#if activeTooltip === 'facet-ballot'}
-            <div class="info-panel">How voters express preferences: Choose‑X (select candidates), Ranked (order candidates), Score (rate candidates). Different methods require different ballot types.</div>
-          {/if}
-          <div class="facet-grid">
-            {#each ballotTypes as option}
-              <label class="facet-check">
-                <input type="checkbox" checked={ballotFacetSelections.includes(option.id)} onchange={() => (ballotFacetSelections = toggleSelection(ballotFacetSelections, option.id))} />
-                <span>{option.name}</span>
-              </label>
-            {/each}
-          </div>
-        </div>
-
-        <!-- Choice Limit Facet (only visible when Choose X is selected) -->
-        {#if ballotFacetSelections.includes('choose-x')}
-          <div class="facet-group">
-            <h3 class="facet-title">
-              Choose‑X Limits
-              <span
-                class="facet-tip"
-                role="button"
-                tabindex="0"
-                onclick={(e) => { e.stopPropagation(); toggleTooltip('facet-choosex'); }}
-                onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); toggleTooltip('facet-choosex'); } }}
-              >ⓘ</span>
-            </h3>
-            {#if activeTooltip === 'facet-choosex'}
-              <div class="info-panel">For Choose‑X ballots: Pick 1 (FPTP) versus Pick up to X or Approve any. This changes which methods fit and the strategic properties.</div>
-            {/if}
-            <div class="facet-grid">
-              {#each limitedChoicesOptions as option}
-                <label class="facet-check">
-                  <input type="checkbox" checked={choiceFacetSelections.includes(option.id)} onchange={() => (choiceFacetSelections = toggleSelection(choiceFacetSelections, option.id))} />
-                  <span>{option.name}</span>
-                </label>
-              {/each}
-            </div>
-            <p class="facet-help">These options apply to choose‑X ballots.</p>
-          </div>
-        {/if}
-
-        <!-- Party-Based Facet -->
-        <div class="facet-group">
-          <h3 class="facet-title">
-            Party Structure
-            <span
-              class="facet-tip"
-              role="button"
-              tabindex="0"
-              onclick={(e) => { e.stopPropagation(); toggleTooltip('facet-party'); }}
-              onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); toggleTooltip('facet-party'); } }}
-            >ⓘ</span>
-          </h3>
-          {#if activeTooltip === 'facet-party'}
-            <div class="info-panel">Some methods require parties and allocate seats by party vote (e.g., Party List, MMP). Others are candidate‑based and work without parties.</div>
-          {/if}
-          <div class="facet-grid">
-            <label class="facet-check">
-              <input type="checkbox" checked={partyFacetSelections.includes('party-required')} onchange={() => (partyFacetSelections = toggleSelection(partyFacetSelections, 'party-required'))} />
-              <span>Requires parties (e.g., Party List, MMP)</span>
-            </label>
-            <label class="facet-check">
-              <input type="checkbox" checked={partyFacetSelections.includes('no-party-required')} onchange={() => (partyFacetSelections = toggleSelection(partyFacetSelections, 'no-party-required'))} />
-              <span>Candidate-based (no parties required)</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- In-use Facet -->
-        <div class="facet-group">
-          <h3 class="facet-title">
-            Real‑World Use
-            <span
-              class="facet-tip"
-              role="button"
-              tabindex="0"
-              onclick={(e) => { e.stopPropagation(); toggleTooltip('facet-inuse'); }}
-              onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); toggleTooltip('facet-inuse'); } }}
-            >ⓘ</span>
-          </h3>
-          {#if activeTooltip === 'facet-inuse'}
-            <div class="info-panel">Show only methods that are currently used in at least one country or jurisdiction.</div>
-          {/if}
-          <div class="facet-grid">
-            <label class="facet-check">
-              <input type="checkbox" bind:checked={inUseOnly} />
-              <span>Currently in use</span>
-            </label>
-          </div>
-        </div>
-      </section>
+      <FiltersPanel
+        {activeTooltip}
+        {toggleTooltip}
+        electionFacet={electionFacet}
+        ballotFacetSelections={ballotFacetSelections}
+        choiceFacetSelections={choiceFacetSelections}
+        partyFacetSelections={partyFacetSelections}
+        inUseOnly={inUseOnly}
+        updateElectionFacet={(v) => (electionFacet = v)}
+        updateBallotFacetSelections={(v) => (ballotFacetSelections = v)}
+        updateChoiceFacetSelections={(v) => (choiceFacetSelections = v)}
+        updatePartyFacetSelections={(v) => (partyFacetSelections = v)}
+        setInUseOnly={(v) => (inUseOnly = v)}
+      />
 
       <!-- Party-Based Method Options removed; include explanation in descriptions instead -->
     </div>
 
     <!-- Methods Gallery Panel (middle column on desktop) -->
     <div class="gallery-panel">
-      <!-- Methods Gallery -->
-      <div class="methods-gallery">
-        <div class="gallery-header">
-          <h2>📚 Voting Methods</h2>
-          <p class="section-description">Showing {filteredMethods.length} method{filteredMethods.length===1?'':'s'}</p>
-        </div>
-        <div class="methods-grid">
-          {#each filteredMethods as method}
-            <button class="method-card" class:selected={config.tabulationMethod===method.id} onclick={() => selectMethod(method.id)}>
-              <div class="method-card-header">
-                <h3 class="method-title">{method.name}</h3>
-                <div class="badge-group">
-                  {#if method.isProportional}
-                    <span class="badge proportional" title="Proportional representation">⚖️</span>
-                  {/if}
-                  {#if method.recommended}
-                    <span class="badge recommended" title="Recommended">⭐</span>
-                  {/if}
-                  {#if method.redFlag}
-                    <span class="badge redflag" title="Complex or known major weaknesses">🛑</span>
-                  {/if}
-                </div>
-              </div>
-              <!-- Meta removed per request to simplify cards -->
-              <p class="method-desc">{method.shortDescription}</p>
-            </button>
-          {/each}
-        </div>
-        </div>
+      <MethodsGallery
+        methods={filteredMethods.map(m => ({ id: m.id, name: m.name, shortDescription: m.shortDescription, isProportional: m.isProportional, recommended: m.recommended, redFlag: m.redFlag }))}
+        selectedId={config.tabulationMethod}
+        on:select={(e) => selectMethod(e.detail)}
+      />
     </div>
 
     <!-- Details Panel (right column on desktop) -->
@@ -1014,197 +614,11 @@
         </h2>
 
         {#if config.ballotType && config.tabulationMethod}
-          <div class="method-scores">
-            <h3>System Analysis</h3>
-            <div class="score-grid">
-              <div class="score-item">
-                <div class="score-bar-container">
-                  <div class="score-label-container">
-                    <span
-                      class="score-label clickable"
-                      role="button"
-                      tabindex="0"
-                      onclick={(e) => {
-                        e.stopPropagation();
-                        toggleTooltip('proportionality');
-                      }}
-                      onkeydown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          toggleTooltip('proportionality');
-                        }
-                      }}>Proportionality</span
-                    >
-                  </div>
-                  <div class="score-bar">
-                    <div
-                      class="score-fill"
-                      data-score={votingMethodScores.proportionality}
-                      style="width: {(votingMethodScores.proportionality / 5) * 100}%"
-                    ></div>
-                    <span class="score-value">{votingMethodScores.proportionality}/5</span>
-                  </div>
-                </div>
-                {#if activeTooltip === 'proportionality'}
-                  <div class="info-panel">
-                    How well the election results reflect the proportion of support for different
-                    groups or parties - higher scores mean seats are allocated more fairly based on
-                    vote share
-                  </div>
-                {/if}
-              </div>
-              <div class="score-item">
-                <div class="score-bar-container">
-                  <div class="score-label-container">
-                    <span
-                      class="score-label clickable"
-                      role="button"
-                      tabindex="0"
-                      onclick={(e) => {
-                        e.stopPropagation();
-                        toggleTooltip('simplicity');
-                      }}
-                      onkeydown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          toggleTooltip('simplicity');
-                        }
-                      }}>Voter Simplicity</span
-                    >
-                  </div>
-                  <div class="score-bar">
-                    <div
-                      class="score-fill"
-                      data-score={votingMethodScores.simplicity}
-                      style="width: {(votingMethodScores.simplicity / 5) * 100}%"
-                    ></div>
-                    <span class="score-value">{votingMethodScores.simplicity}/5</span>
-                  </div>
-                </div>
-                {#if activeTooltip === 'simplicity'}
-                  <div class="info-panel">
-                    How easy it is for voters to understand and use the voting method - considers
-                    ballot complexity, cognitive load, and learning curve
-                  </div>
-                {/if}
-              </div>
-              <div class="score-item">
-                <div class="score-bar-container">
-                  <div class="score-label-container">
-                    <span
-                      class="score-label clickable"
-                      role="button"
-                      tabindex="0"
-                      onclick={(e) => {
-                        e.stopPropagation();
-                        toggleTooltip('honest-resistance');
-                      }}
-                      onkeydown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          toggleTooltip('honest-resistance');
-                        }
-                      }}>Honest Strategy Resistance</span
-                    >
-                  </div>
-                  <div class="score-bar">
-                    <div
-                      class="score-fill"
-                      data-score={votingMethodScores.honestStrategyResistance}
-                      style="width: {(votingMethodScores.honestStrategyResistance / 5) * 100}%"
-                    ></div>
-                    <span class="score-value">{votingMethodScores.honestStrategyResistance}/5</span>
-                  </div>
-                </div>
-                {#if activeTooltip === 'honest-resistance'}
-                  <div class="info-panel">
-                    How well the method resists dishonest strategies where you support a
-                    less-preferred candidate more than a preferred one - higher scores mean less
-                    incentive for tactical voting
-                  </div>
-                {/if}
-              </div>
-              <div class="score-item">
-                <div class="score-bar-container">
-                  <div class="score-label-container">
-                    <span
-                      class="score-label clickable"
-                      role="button"
-                      tabindex="0"
-                      onclick={(e) => {
-                        e.stopPropagation();
-                        toggleTooltip('quality');
-                      }}
-                      onkeydown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          toggleTooltip('quality');
-                        }
-                      }}>Representation Quality</span
-                    >
-                  </div>
-                  <div class="score-bar">
-                    <div
-                      class="score-fill"
-                      data-score={votingMethodScores.representation}
-                      style="width: {(votingMethodScores.representation / 5) * 100}%"
-                    ></div>
-                    <span class="score-value">{votingMethodScores.representation}/5</span>
-                  </div>
-                </div>
-                {#if activeTooltip === 'quality'}
-                  <div class="info-panel">
-                    How well the elected candidates actually represent the preferences and will of
-                    the electorate - considers broad support, minority representation, and whether
-                    outcomes reflect voter intent
-                  </div>
-                {/if}
-              </div>
-              <div class="score-item">
-                <div class="score-bar-container">
-                  <div class="score-label-container">
-                    <span
-                      class="score-label clickable"
-                      role="button"
-                      tabindex="0"
-                      onclick={(e) => {
-                        e.stopPropagation();
-                        toggleTooltip('straightforwardness');
-                      }}
-                      onkeydown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          toggleTooltip('straightforwardness');
-                        }
-                      }}>Strategic Straightforwardness</span
-                    >
-                  </div>
-                  <div class="score-bar">
-                    <div
-                      class="score-fill"
-                      data-score={votingMethodScores.strategicStraightforwardness}
-                      style="width: {(votingMethodScores.strategicStraightforwardness / 5) * 100}%"
-                    ></div>
-                    <span class="score-value"
-                      >{votingMethodScores.strategicStraightforwardness}/5</span
-                    >
-                  </div>
-                </div>
-                {#if activeTooltip === 'straightforwardness'}
-                  <div class="info-panel">
-                    How easy it is to vote your true preferences without needing to consider
-                    strategy or candidate viability - higher scores mean less mental burden on
-                    voters
-                  </div>
-                {/if}
-              </div>
-            </div>
-          </div>
+          <MethodScores
+            scores={votingMethodScores}
+            {activeTooltip}
+            onToggle={(id) => toggleTooltip(id)}
+          />
         {/if}
 
         {#if votingMethodSummary}
@@ -1277,133 +691,14 @@
   </div>
 </div>
 
-<!-- Method Comparison Modal -->
-{#if showComparison}
-  <div
-    class="comparison-overlay"
-    role="button"
-    tabindex="0"
-    onclick={closeComparison}
-    onkeydown={(e) => e.key === 'Escape' && closeComparison()}
-  >
-    <div
-      class="comparison-modal"
-      role="dialog"
-      tabindex="-1"
-      aria-labelledby="comparison-title"
-      onclick={(e) => e.stopPropagation()}
-      onkeydown={(e) => e.stopPropagation()}
-    >
-      <div class="comparison-header">
-        <h2 id="comparison-title">Method Comparison</h2>
-        <button class="close-button" onclick={closeComparison}>×</button>
-      </div>
-
-      <div class="comparison-content">
-        <div class="comparison-grid">
-          {#each comparisonMethodIds as methodId}
-            <div class="comparison-card" class:current={methodId === config.tabulationMethod}>
-              <div class="card-header">
-                <h3>{VOTING_METHODS[methodId].name}</h3>
-                {#if methodId === config.tabulationMethod}
-                  <span class="current-badge">Current</span>
-                {/if}
-              </div>
-
-              <div class="method-summary-compact">
-                <p><strong>What it does:</strong> {VOTING_METHODS[methodId].shortDescription}</p>
-              </div>
-
-              <div class="score-comparison">
-                <div class="score-row">
-                  <span class="score-name">Proportionality</span>
-                  <div class="score-bar-small">
-                    <div
-                      class="score-fill-small"
-                      style="width: {(VOTING_METHODS[methodId].scores.proportionality / 5) * 100}%"
-                    ></div>
-                  </div>
-                  <span class="score-num">{VOTING_METHODS[methodId].scores.proportionality}/5</span>
-                </div>
-                <div class="score-row">
-                  <span class="score-name">Simplicity</span>
-                  <div class="score-bar-small">
-                    <div
-                      class="score-fill-small"
-                      style="width: {(VOTING_METHODS[methodId].scores.simplicity / 5) * 100}%"
-                    ></div>
-                  </div>
-                  <span class="score-num">{VOTING_METHODS[methodId].scores.simplicity}/5</span>
-                </div>
-                <div class="score-row">
-                  <span class="score-name">Honest Strategy</span>
-                  <div class="score-bar-small">
-                    <div
-                      class="score-fill-small"
-                      style="width: {(VOTING_METHODS[methodId].scores.honestStrategyResistance / 5) * 100}%"
-                    ></div>
-                  </div>
-                  <span class="score-num">{VOTING_METHODS[methodId].scores.honestStrategyResistance}/5</span>
-                </div>
-                <div class="score-row">
-                  <span class="score-name">Straightforward</span>
-                  <div class="score-bar-small">
-                    <div
-                      class="score-fill-small"
-                      style="width: {(VOTING_METHODS[methodId].scores.strategicStraightforwardness / 5) * 100}%"
-                    ></div>
-                  </div>
-                  <span class="score-num">{VOTING_METHODS[methodId].scores.strategicStraightforwardness}/5</span>
-                </div>
-                <div class="score-row">
-                  <span class="score-name">Representation</span>
-                  <div class="score-bar-small">
-                    <div
-                      class="score-fill-small"
-                      style="width: {(VOTING_METHODS[methodId].scores.representation / 5) * 100}%"
-                    ></div>
-                  </div>
-                  <span class="score-num">{VOTING_METHODS[methodId].scores.representation}/5</span>
-                </div>
-              </div>
-
-              <div class="method-details">
-                <p><strong>Key Trade-offs:</strong> {VOTING_METHODS[methodId].detailedCritique.split('.')[0]}.</p>
-              </div>
-
-              {#if VOTING_METHODS[methodId].votingMachineCompatibility}
-                <div class="compatibility-compact">
-                  <span class="compatibility-label">Voting Machines:</span>
-                  <span
-                    class="compatibility-value"
-                    class:compatible={VOTING_METHODS[methodId].votingMachineCompatibility.existingMachines}
-                    class:incompatible={!VOTING_METHODS[methodId].votingMachineCompatibility.existingMachines}
-                  >
-                    {VOTING_METHODS[methodId].votingMachineCompatibility.existingMachines
-                      ? 'Compatible'
-                      : 'Requires New Machines'}
-                  </span>
-                </div>
-              {/if}
-
-              {#if methodId !== config.tabulationMethod}
-                <button
-                  class="switch-method-button"
-                  onclick={() => {
-                    selectMethod(methodId);
-                    closeComparison();
-                  }}
-                >
-                  Switch to this method
-                </button>
-              {/if}
-            </div>
-          {/each}
-        </div>
-      </div>
-    </div>
-  </div>
-{/if}
+<ComparisonModal
+  visible={showComparison}
+  methods={comparisonMethodIds}
+  methodData={VOTING_METHODS}
+  currentId={config.tabulationMethod}
+  onClose={closeComparison}
+  onSwitch={(id) => { selectMethod(id); closeComparison(); }}
+/>
 
 <style>
   .subtitle {
@@ -1441,39 +736,7 @@
     }
   }
 
-  .config-section {
-    margin-bottom: 2.5rem;
-    padding: 1.5rem;
-    background: #f9f9f9;
-    border-radius: 8px;
-    border-left: 4px solid #437527;
-  }
-
-  .config-section h2 {
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-    color: #333;
-  }
-
-  .section-description {
-    margin-bottom: 1rem;
-    color: #666;
-    font-style: italic;
-  }
-
-  .facet-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .facet-group { margin-bottom: 1.25rem; }
-  .facet-title { margin: 0 0 0.5rem 0; font-size: 1rem; color: #333; }
-  .facet-help { color: #777; font-size: 0.9rem; margin: 0.25rem 0 0; }
-  .facet-check { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; }
-  .facet-check input { transform: scale(1.1); }
-  .facet-tip { font-size: 0.9rem; color: #64748b; margin-left: 0.35rem; cursor: help; user-select: none; }
+  /* filters styles moved to FiltersPanel */
 
   /* removed unused styles for previous option UI and legacy panels */
 
@@ -1481,29 +744,7 @@
   .details-panel { position: sticky; top: 2rem; height: fit-content; min-width: 0; }
   .gallery-panel { min-width: 0; }
 
-  .methods-gallery { margin-bottom: 1.5rem; min-width: 0; }
-  .gallery-header { display: flex; align-items: baseline; gap: 1rem; justify-content: space-between; }
-  .methods-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 0.75rem;
-  }
-  .method-card {
-    text-align: left;
-    padding: 0.9rem 1rem;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-    background: #fff;
-    cursor: pointer;
-  }
-  .method-card.selected, .method-card:focus { outline: 2px solid #437527; outline-offset: 0; }
-  .method-card-header { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
-  .badge-group { display: inline-flex; align-items: center; gap: 6px; line-height: 1; }
-  .method-title { margin: 0; font-size: 1rem; color: #222; }
-  /* removed unused meta pill styles */
-  .badge { font-size: 1rem; display: inline-block; transform: translateY(1px); }
-  .badge.recommended { margin-left: 4px; }
-  .badge.redflag { margin-left: 4px; }
+  /* gallery styles moved to MethodsGallery */
 
   .result-card {
     background: white;
@@ -1529,121 +770,9 @@
     cursor: help;
   }
 
-  .method-scores {
-    background: #f1f5f9;
-    padding: 1.5rem;
-    border-radius: 8px;
-    border-left: 4px solid #0ea5e9;
-    margin-bottom: 1.5rem;
-  }
+  /* score styles moved to MethodScores */
 
-  .method-scores h3 {
-    margin-top: 0;
-    color: #0ea5e9;
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
-  }
-
-  .score-grid {
-    display: grid;
-    gap: 1rem;
-  }
-
-  .score-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .score-label-container {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    width: 200px;
-    flex-shrink: 0;
-  }
-
-  .score-label {
-    font-weight: 500;
-    color: #475569;
-    font-size: 0.95rem;
-  }
-
-  .score-label.clickable {
-    cursor: help;
-    transition: border-bottom 0.2s ease;
-    user-select: none;
-    border-bottom: 1px dashed #94a3b8;
-    padding-bottom: 1px;
-  }
-
-  .score-label.clickable:hover {
-    border-bottom: 1px dashed #475569;
-  }
-
-
-
-  .info-panel {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    padding: 0.75rem;
-    font-size: 0.875rem;
-    line-height: 1.4;
-    color: #475569;
-    margin-top: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-
-  .score-bar-container {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .score-bar {
-    flex: 1;
-    height: 24px;
-    background: #e2e8f0;
-    border-radius: 12px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .score-fill {
-    height: 100%;
-    border-radius: 12px;
-    transition: all 0.3s ease;
-  }
-
-  :global(.score-fill[data-score='0']) {
-    background: #ef4444;
-  } /* Red */
-  :global(.score-fill[data-score='1']) {
-    background: #f97316;
-  } /* Orange-red */
-  :global(.score-fill[data-score='2']) {
-    background: #f59e0b;
-  } /* Orange */
-  :global(.score-fill[data-score='3']) {
-    background: #eab308;
-  } /* Yellow */
-  :global(.score-fill[data-score='4']) {
-    background: #84cc16;
-  } /* Light green */
-  :global(.score-fill[data-score='5']) {
-    background: #10b981;
-  } /* Green */
-
-  .score-value {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #1e293b;
-  }
+  
 
   .method-summary {
     margin-bottom: 2rem;
@@ -1717,279 +846,5 @@
     color: #374151;
   }
 
-  /* Comparison features */
-  .comparison-suggestions {
-    background: #f0f9ff;
-    border: 1px solid #bae6fd;
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .comparison-suggestions h3 {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    color: #0369a1;
-    font-size: 1.1rem;
-  }
-
-  .comparison-suggestion {
-    margin-bottom: 1rem;
-  }
-
-  .compare-button {
-    background: #0ea5e9;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 0.5rem 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    margin-bottom: 0.5rem;
-  }
-
-  .compare-button:hover {
-    background: #0284c7;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .suggestion-description {
-    margin: 0;
-    font-size: 0.9rem;
-    color: #374151;
-    font-style: italic;
-  }
-
-  .comparison-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    padding: 1rem;
-  }
-
-  .comparison-modal {
-    background: white;
-    border-radius: 12px;
-    max-width: 1200px;
-    width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow:
-      0 20px 25px -5px rgba(0, 0, 0, 0.1),
-      0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  }
-
-  .comparison-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 2rem;
-    border-bottom: 1px solid #e2e8f0;
-    background: #f8fafc;
-    border-radius: 12px 12px 0 0;
-  }
-
-  .comparison-header h2 {
-    margin: 0;
-    color: #1e293b;
-  }
-
-  .close-button {
-    background: none;
-    border: none;
-    font-size: 2rem;
-    color: #64748b;
-    cursor: pointer;
-    padding: 0;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: all 0.2s ease;
-  }
-
-  .close-button:hover {
-    background: #e2e8f0;
-    color: #334155;
-  }
-
-  .comparison-content {
-    padding: 2rem;
-  }
-
-  .comparison-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .comparison-card {
-    background: #f8fafc;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 1.5rem;
-    transition: all 0.3s ease;
-  }
-
-  .comparison-card.current {
-    border-color: #10b981;
-    background: #f0fdf4;
-  }
-
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-
-  .card-header h3 {
-    margin: 0;
-    color: #1e293b;
-    font-size: 1.1rem;
-  }
-
-  .current-badge {
-    background: #10b981;
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-  }
-
-  .method-summary-compact {
-    margin-bottom: 1rem;
-  }
-
-  .method-summary-compact p {
-    margin: 0;
-    font-size: 0.9rem;
-    color: #475569;
-    line-height: 1.4;
-  }
-
-  .score-comparison {
-    margin-bottom: 1rem;
-  }
-
-  .score-row {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .score-name {
-    font-size: 0.8rem;
-    color: #64748b;
-    min-width: 110px;
-    font-weight: 500;
-  }
-
-  .score-bar-small {
-    flex: 1;
-    height: 16px;
-    background: #e2e8f0;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-
-  .score-fill-small {
-    height: 100%;
-    background: #0ea5e9;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-  }
-
-  .score-num {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #1e293b;
-    min-width: 30px;
-  }
-
-  .method-details {
-    margin-bottom: 1rem;
-  }
-
-  .method-details p {
-    margin: 0;
-    font-size: 0.9rem;
-    color: #475569;
-    line-height: 1.4;
-  }
-
-  .switch-method-button {
-    background: #6366f1;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 0.5rem 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    width: 100%;
-  }
-
-  .switch-method-button:hover {
-    background: #5048e5;
-    transform: translateY(-1px);
-  }
-
-  .compatibility-compact {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
-  }
-
-  .compatibility-label {
-    font-weight: 500;
-    color: #64748b;
-  }
-
-  .compatibility-value {
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: 600;
-  }
-
-  .compatibility-value.compatible {
-    background: #dcfce7;
-    color: #15803d;
-  }
-
-  .compatibility-value.incompatible {
-    background: #fef3c7;
-    color: #d97706;
-  }
-
-  @media (max-width: 768px) {
-    .comparison-modal {
-      margin: 0.5rem;
-      max-height: 95vh;
-    }
-
-    .comparison-content {
-      padding: 1rem;
-    }
-
-    .comparison-grid {
-      grid-template-columns: 1fr;
-    }
-  }
+  /* comparison styles moved to ComparisonModal */
 </style>
