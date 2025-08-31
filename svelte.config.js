@@ -21,24 +21,13 @@ const config = {
       },
     },
     csrf: {
-      checkOrigin: true,
+      trustedOrigins: ['https://approval.vote'],
     },
     env: {
       dir: process.cwd(),
       publicPrefix: 'PUBLIC_',
     },
-    files: {
-      assets: 'static',
-      hooks: {
-        client: 'src/hooks.client',
-        server: 'src/hooks.server',
-      },
-      lib: 'src/lib',
-      params: 'src/params',
-      routes: 'src/routes',
-      appTemplate: 'src/app.html',
-      errorTemplate: 'src/error.html',
-    },
+
     inlineStyleThreshold: 1024, // Inline CSS under 1KB
     moduleExtensions: ['.js', '.ts'],
     outDir: '.svelte-kit',
