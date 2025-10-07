@@ -48,7 +48,7 @@
         return entry ? {
           frac: entry.coApprovalRate / 100, // Convert percentage to fraction for color calculation
           numerator: entry.coApprovalCount,
-          denominator: Math.round(entry.coApprovalCount / (entry.coApprovalRate / 100))
+          denominator: entry.coApprovalRate > 0 ? Math.round(entry.coApprovalCount / (entry.coApprovalRate / 100)) : 0
         } : null;
       })
     )
@@ -80,6 +80,12 @@
 
   function generateTooltip(candA: string, candB: string, entry: MatrixEntry): string {
     const percentage = (entry.frac * 100).toFixed(1);
+    if (entry.numerator === 0) {
+      return `${percentage}% of ${candA} voters also approved ${candB} (no voters approved both candidates)`;
+    }
+    if (entry.denominator === 0) {
+      return `No voters approved ${candA}`;
+    }
     return `${percentage}% of ${candA} voters also approved ${candB} (${entry.numerator.toLocaleString()} of ${entry.denominator.toLocaleString()})`;
   }
 </script>

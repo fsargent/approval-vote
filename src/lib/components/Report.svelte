@@ -56,6 +56,12 @@
   const sumVotes = report.candidates.map((candidate) => candidate.votes).reduce((a, b) => a + b);
 
   const numCandidates = report.candidates.filter((candidate) => !candidate.writeIn).length;
+
+  // Detect if this is an election-wide report by checking if candidates have race info in parentheses
+  const isElectionWideReport = $derived(() => {
+    return report.info.office === 'election-wide' ||
+           report.candidates.some(c => c.name.includes('(') && c.name.includes(')'));
+  });
 </script>
 
 <div class="row">
@@ -107,13 +113,19 @@
       approvals. There was an average of
       <strong>{(sumVotes / report.ballotCount).toFixed(1)}</strong> approvals per ballot in this race.
     </p>
+
+    {#if isElectionWideReport() && report.votingPatterns?.multiApprovalVoters !== undefined}
+    <p>
+      <strong>{report.votingPatterns.singleApprovalOnlyRate?.toFixed(1)}%</strong> of voters ({report.votingPatterns.singleApprovalOnlyVoters?.toLocaleString()} voters) approved exactly one candidate in each race they participated in, while <strong>{report.votingPatterns.multiApprovalRate?.toFixed(1)}%</strong> ({report.votingPatterns.multiApprovalVoters?.toLocaleString()} voters) approved multiple candidates in at least one race.
+    </p>
+    {/if}
   </div>
   <div class="rightCol">
     <VoteCounts {report} />
   </div>
 </div>
 
-{#if report.coApprovals && report.coApprovals.length > 0 && report.votingPatterns}
+{#if report.coApprovals && report.coApprovals.length > 0 && report.votingPatterns && !isElectionWideReport()}
 <div class="row">
   <div class="leftCol">
     <h2>Approval Distribution</h2>
@@ -132,7 +144,9 @@
     />
   </div>
 </div>
+{/if}
 
+{#if report.coApprovals && report.coApprovals.length > 0 && report.votingPatterns}
 <div class="row">
   <div class="leftCol">
     <h2>Co-Approval Matrix</h2>
@@ -151,6 +165,7 @@
     />
   </div>
 </div>
+{/if}
 
 {#if report.votingPatterns?.anyoneButAnalysis}
 <div class="row">
@@ -177,5 +192,4 @@
     />
   </div>
 </div>
-{/if}
 {/if}

@@ -163,17 +163,19 @@ def generate_co_approval_analysis(contest_name, cvr_conn):
                 if cand_a in approved
             ]
 
-            if len(cand_a_ballots) == 0:
-                continue
+            # Always create entry, even if 0 ballots approved candidate A
+            # This ensures complete co-approval matrix without NaN values
+            both_count = 0
+            co_approval_rate = 0.0
 
-            # Count how many of those also approved cand_b
-            both_count = sum(
-                1
-                for ballot_id in cand_a_ballots
-                if cand_b in ballot_approvals[ballot_id]
-            )
-
-            co_approval_rate = (both_count / len(cand_a_ballots)) * 100
+            if len(cand_a_ballots) > 0:
+                # Count how many of those also approved cand_b
+                both_count = sum(
+                    1
+                    for ballot_id in cand_a_ballots
+                    if cand_b in ballot_approvals[ballot_id]
+                )
+                co_approval_rate = (both_count / len(cand_a_ballots)) * 100
 
             co_approvals.append(
                 {

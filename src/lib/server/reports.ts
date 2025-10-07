@@ -8,7 +8,7 @@ import type {
   ICandidate,
   IContestIndexEntry,
   IElectionIndexEntry,
-} from '$lib/report_types';
+} from './report_types';
 
 // Helper function to create a contest object
 function createContest(row: IContestIndexEntry & { sumVotes: number }, winners: string[]) {
@@ -189,6 +189,10 @@ export function getReport(path: string): IContestReport {
         approval_distribution: string;
         candidate_approval_distributions?: string;
         anyone_but_analysis?: string;
+        multi_approval_voters?: number;
+        multi_approval_rate?: number;
+        single_approval_only_voters?: number;
+        single_approval_only_rate?: number;
       }
     | undefined;
   let votingPatterns = null;
@@ -208,6 +212,11 @@ export function getReport(path: string): IContestReport {
       anyoneButAnalysis: votingPatternsRow.anyone_but_analysis
         ? JSON.parse(votingPatternsRow.anyone_but_analysis)
         : undefined,
+      // Add cross-race voting behavior fields
+      multiApprovalVoters: votingPatternsRow.multi_approval_voters || undefined,
+      multiApprovalRate: votingPatternsRow.multi_approval_rate || undefined,
+      singleApprovalOnlyVoters: votingPatternsRow.single_approval_only_voters || undefined,
+      singleApprovalOnlyRate: votingPatternsRow.single_approval_only_rate || undefined,
     };
   }
 

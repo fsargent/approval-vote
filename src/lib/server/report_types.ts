@@ -84,4 +84,19 @@ export interface IVotingPatterns {
   approvalDistribution: { [key: number]: number };
   candidateApprovalDistributions?: { [candidateName: string]: { [approvals: number]: number } };
   anyoneButAnalysis?: { [candidateName: string]: number };
+  // Cross-race voting behavior fields
+  multiApprovalVoters?: number;
+  multiApprovalRate?: number;
+  singleApprovalOnlyVoters?: number;
+  singleApprovalOnlyRate?: number;
+}
+
+// Cross-race co-approval data type (used internally for processing)
+export interface ICrossRaceCoApprovalData {
+  candidateA: string;
+  candidateB: string;
+  contestA: string;
+  contestB: string;
+  coApprovalCount: number;
+  coApprovalRate: number;
 }
