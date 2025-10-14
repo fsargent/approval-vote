@@ -595,7 +595,7 @@
       <MethodsGallery
         methods={filteredMethods.map(m => ({ id: m.id, name: m.name, shortDescription: m.shortDescription, isProportional: m.isProportional, recommended: m.recommended, redFlag: m.redFlag }))}
         selectedId={config.tabulationMethod}
-        on:select={(e) => selectMethod(e.detail)}
+        onSelect={(id) => selectMethod(id)}
       />
     </div>
 
@@ -844,6 +844,50 @@
 
   .github-link:hover {
     color: #374151;
+  }
+
+  /* Comparison suggestions */
+  .comparison-suggestions {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #fffbeb;
+    border-radius: 6px;
+    border-left: 4px solid #f59e0b;
+  }
+
+  .comparison-suggestions h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #333;
+    font-size: 1.2rem;
+  }
+
+  .comparison-suggestion {
+    margin-bottom: 1rem;
+  }
+
+  .compare-button {
+    background: #0ea5e9;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: inherit;
+  }
+
+  .compare-button:hover {
+    background: #0284c7;
+  }
+
+  .suggestion-description {
+    margin: 0.5rem 0 0 0;
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.4;
   }
 
   /* comparison styles moved to ComparisonModal */

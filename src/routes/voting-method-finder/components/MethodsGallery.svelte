@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
   type MethodListItem = {
     id: string;
     name: string;
@@ -10,14 +8,13 @@
     redFlag?: boolean;
   };
 
-  export let methods: MethodListItem[] = [];
-  export let selectedId: string | null = null;
-
-  const dispatch = createEventDispatcher<{ select: string }>();
-
-  function handleSelect(id: string) {
-    dispatch('select', id);
+  interface Props {
+    methods: MethodListItem[];
+    selectedId: string | null;
+    onSelect: (id: string) => void;
   }
+
+  let { methods, selectedId, onSelect }: Props = $props();
 </script>
 
 <div class="methods-gallery">
@@ -30,7 +27,7 @@
       <button
         class="method-card"
         class:selected={selectedId === method.id}
-        onclick={() => handleSelect(method.id)}
+        onclick={() => onSelect(method.id)}
       >
         <div class="method-card-header">
           <h3 class="method-title">{method.name}</h3>

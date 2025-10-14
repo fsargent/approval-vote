@@ -98,7 +98,7 @@
   .score-grid { display: grid; gap: 1rem; }
   .score-item { display: flex; flex-direction: column; gap: 0.5rem; }
   .score-label-container { display: flex; align-items: center; gap: 0.5rem; width: 200px; flex-shrink: 0; }
-  .score-label { font-weight: 500; color: #475569; font-size: 0.95rem; }
+  .score-label { font-weight: 500; color: #475569; font-size: 0.95rem; background: none; border: none; padding: 0; text-align: left; font-family: inherit; }
   .score-label.clickable { cursor: help; user-select: none; border-bottom: 1px dashed #94a3b8; padding-bottom: 1px; }
   .score-bar-container { display: flex; align-items: center; gap: 1rem; }
   .score-bar { flex: 1; height: 24px; background: #e2e8f0; border-radius: 12px; position: relative; overflow: hidden; }
