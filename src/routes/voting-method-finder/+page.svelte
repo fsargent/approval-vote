@@ -55,7 +55,7 @@
   let inUseOnly = $state(false);
 
   // Helper to get the selected election type
-  import { ballotTypes, limitedChoicesOptions, listTypes, getElectionType, getAvailableMethods, generateVotingMethodName as genName, generateVotingMethodSummary as genSummary, generateVotingMethodCritiqueFromData as genCritique, generateVotingMethodScores as genScores, isProportionalMethod as isProp, getSuggestedComparisons as getCompares } from '$lib/voting/builder-utils';
+  import { ballotTypes, limitedChoicesOptions, listTypes, getElectionType, getAvailableMethods, generateVotingMethodName as genName, generateVotingMethodSummary as genSummary, generateVotingMethodCritiqueFromData as genCritique, generateVotingMethodScores as genScores, isProportionalMethod as isProp, getSuggestedComparisons as getCompares } from '$lib/voting/finder-utils';
   let selectedElectionType = $derived(getElectionType(config.numberOfSeats));
 
   // Option definitions now imported from utils
@@ -97,7 +97,7 @@
         choiceLimitation: (method as VotingMethod).choiceLimitation,
         minSeats: (method as VotingMethod).minSeats,
         maxSeats: (method as VotingMethod).maxSeats,
-        recommended: ['star','approval','pav','spav','star-pr','equal-shares'].includes(id),
+        recommended: ['star','approval','pav','spav','star-pr','equal-shares','excess-method'].includes(id),
         redFlag: ['fptp','irv','block-voting','borda','pr-borda','cpo-stv','schulze-stv','meek-stv'].includes(id),
       })) as MethodListItem[];
     return items;
@@ -550,7 +550,7 @@
 </script>
 
 <svelte:head>
-  <title>Voting Method Builder - Create Your Custom Voting System - approval.vote</title>
+  <title>Voting Method finder - Create Your Custom Voting System - approval.vote</title>
   <meta
     name="description"
     content="Interactive tool to design and analyze custom voting methods. Mix and match ballot types, voting methods, and multi-winner options to create your ideal voting system."
@@ -559,17 +559,17 @@
 
 <svelte:window onkeydown={handleKeydown} onclick={closeTooltip} />
 
-<div class="container wide-builder">
+<div class="container wide-finder">
   <div class="description">
     <h1>
       <a href="{resolve('/')}">approval.vote</a>
       //
-      <strong>Voting Method Builder</strong>
+      <strong>Voting Method finder</strong>
     </h1>
     <p class="subtitle">Mix and match components to design your ideal voting system</p>
   </div>
 
-  <div class="builder-layout">
+  <div class="finder-layout">
     <!-- Configuration Panel -->
     <div class="config-panel">
       <FiltersPanel
@@ -708,7 +708,7 @@
   }
 
   /* Wide container for desktop use */
-  :global(.container.wide-builder) {
+  :global(.container.wide-finder) {
     max-width: 100vw;
     width: 100%;
     margin: 1.25rem auto;
@@ -718,7 +718,7 @@
     box-sizing: border-box;
   }
 
-  .builder-layout {
+  .finder-layout {
     display: grid;
     grid-template-columns: 1fr;
     gap: 2rem;
@@ -726,7 +726,7 @@
   }
 
   @media (min-width: 1000px) {
-    .builder-layout {
+    .finder-layout {
       grid-template-columns:
         clamp(260px, 22vw, 320px)
         minmax(360px, 1fr)

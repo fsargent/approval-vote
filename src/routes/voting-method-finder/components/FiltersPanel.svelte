@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ballotTypes, limitedChoicesOptions } from '$lib/voting/builder-utils';
+  import { ballotTypes, limitedChoicesOptions } from '$lib/voting/finder-utils';
 
   export let electionFacet: string[] = [];
   export let ballotFacetSelections: string[] = [];

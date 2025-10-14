@@ -100,7 +100,7 @@
         <a href="{resolve('/about')}">the about page</a>, learn about
         <a href="{resolve('/about-approval-voting')}">approval voting</a>, compare
         <a href="{resolve('/rcv-vs-approval')}">RCV vs approval voting</a>, or design your own system with
-        the <a href="{resolve('/voting-method-builder')}">voting method builder</a>.
+        the <a href="{resolve('/voting-method-finder')}">voting method finder</a>.
       </p>
 
       <p>

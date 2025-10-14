@@ -814,6 +814,62 @@ export const VOTING_METHODS: Record<string, VotingMethod> = {
       'np-hard',
     ],
   },
+  'excess-method': {
+    name: 'Excess Method',
+    shortDescription: 'Sequential proportional approval using Jefferson method',
+    detailedCritique:
+      "The Excess Method, developed by Steven Brams and Markus Brill, is a sequential multi-winner approval voting procedure that achieves proportional representation by redistributing excess votes. When a candidate wins a seat, their \"excess\" votes (approvals beyond what was needed to win) are proportionally transferred to other candidates approved by the same voters. This transfer uses the Jefferson method of apportionment, ensuring that popular candidates don't waste votes while maintaining voter sovereignty - voters who only approved the winner don't have their votes transferred. The method is monotonic (approving a candidate never hurts them), computationally simple compared to optimization-based methods like PAV, and reduces the incentive for strategic voting since voters know their excess support for popular candidates will help their other choices. When applied to party-list voting, it becomes equivalent to the standard Jefferson method. Unlike quota-based systems, it uses an endogenous threshold (the runner-up's score) rather than a fixed quota, avoiding certain paradoxes and not requiring advance knowledge of the number of seats.",
+    ballotType: 'choose-x',
+    choiceLimitation: 'unlimited',
+    minSeats: 2,
+    maxSeats: 'unlimited',
+    votingMachineCompatibility: {
+      existingMachines: true,
+      description: 'Compatible with existing voting machines',
+    },
+    scores: {
+      proportionality: 5,
+      simplicity: 4,
+      honestStrategyResistance: 4,
+      strategicStraightforwardness: 4,
+      representation: 5,
+    },
+    isProportional: true,
+    isSemiProportional: false,
+    category: 'approval',
+    tabulationCritique:
+      "**Excess Method:** Sequential election where each winner's excess votes (beyond what was needed to beat the runner-up) are redistributed proportionally to their supporters' other approved candidates using the Jefferson method. Simpler than PAV while achieving similar proportional outcomes.",
+    proportionalityDetails:
+      '**Proportional Representation:** Achieves proportional representation through sequential excess vote redistribution. Equivalent to Jefferson method when applied to party lists.',
+    flowchart: `flowchart TD
+    A["Start: Count approval votes<br/>for each candidate"] --> B["Round 1: Elect candidate<br/>with most approvals"]
+    B --> C["Calculate excess:<br/>Winner's votes - Runner-up's votes"]
+    C --> D["For each voter who approved winner:<br/>Calculate their share of excess"]
+    D --> E["Distribute excess proportionally<br/>to voter's other approved candidates"]
+    E --> F["Update voter profile with<br/>transferred vote weights"]
+    F --> G{"All seats<br/>filled?"}
+    G -->|No| H["Next round: Apply Jefferson method<br/>to updated profile to elect winner"]
+    H --> I["Calculate new excess for winner"]
+    I --> J["Redistribute excess to<br/>remaining approved candidates"]
+    J --> K["Update voter profile again"]
+    K --> G
+    G -->|Yes| L["Committee elected"]
+
+    style A fill:#e1f5fe
+    style L fill:#c8e6c9
+    style C fill:#fff3e0
+    style E fill:#f3e5f5
+    style H fill:#e8f5e9`,
+    tags: [
+      'proportional',
+      'approval',
+      'sequential',
+      'jefferson-method',
+      'monotonic',
+      'excess-transfer',
+      'computationally-simple',
+    ],
+  },
   'star-pr': {
     name: 'STAR-PR',
     shortDescription: 'Proportional STAR voting',
