@@ -32,28 +32,31 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@felixsargent" />
   <meta name="twitter:creator" content="@felixsargent" />
-  <meta name="twitter:title" content="{report.info.jurisdictionName} / {report.info.officeName}" />
+  <meta name="twitter:title" content="Approval Voting Results: {report.info.jurisdictionName} {report.info.officeName} ({report.info.date.slice(0, 4)})" />
   <meta
     name="twitter:description"
-    content="Detailed approval voting election results for {report.info.jurisdictionName} {report
-      .info.officeName} - {report.info.electionName} ({report.info.date.slice(0, 4)})"
+    content="Detailed approval voting election results and analysis for {report.info.jurisdictionName} {report.info.officeName} - {report.info.electionName} held in {report.info.date.slice(0, 4)}. View candidate vote counts, co-approval patterns, and voting distributions."
   />
   <meta name="twitter:image" content={imagePath} />
+  <meta name="twitter:image:width" content="1200" />
+  <meta name="twitter:image:height" content="630" />
   <meta
     name="twitter:image:alt"
-    content="Election results visualization showing approval voting outcomes"
+    content="Election results visualization showing approval voting outcomes for {report.info.jurisdictionName} {report.info.officeName}"
   />
 
   <!-- Open Graph Tags (also used by X) -->
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://approval.vote/report/{path}" />
-  <meta property="og:title" content="{report.info.jurisdictionName} / {report.info.officeName}" />
+  <meta property="og:title" content="Approval Voting Results: {report.info.jurisdictionName} {report.info.officeName} ({report.info.date.slice(0, 4)})" />
   <meta
     property="og:description"
-    content="Detailed approval voting election results for {report.info.jurisdictionName} {report
-      .info.officeName} - {report.info.electionName} ({report.info.date.slice(0, 4)})"
+    content="Detailed approval voting election results and analysis for {report.info.jurisdictionName} {report.info.officeName} - {report.info.electionName} held in {report.info.date.slice(0, 4)}. View candidate vote counts, co-approval patterns, and voting distributions."
   />
   <meta property="og:image" content={imagePath} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:type" content="image/png" />
   <meta property="og:logo" content="https://approval.vote/icons/icon-512x512.png" />
 </svelte:head>
 

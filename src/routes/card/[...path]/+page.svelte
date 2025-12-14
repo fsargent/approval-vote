@@ -37,8 +37,8 @@
     .sort((a, b) => b.votes - a.votes));
 
   // Calculate dynamic sizes based on number of candidates
-  const headerHeight = $derived(Math.min(180, Math.max(120, 600 / (candidates.length + 2))));
-  const rowHeight = $derived((600 - headerHeight) / candidates.length);
+  const headerHeight = $derived(Math.min(180, Math.max(120, 630 / (candidates.length + 2))));
+  const rowHeight = $derived((630 - headerHeight) / candidates.length);
   // Adjusted font size calculation to be more generous in the middle range
   const fontSize = $derived(Math.min(2.5, Math.max(1, 8 / candidates.length)));
 </script>
@@ -46,14 +46,18 @@
 <div class="card">
   {#if report?.info && candidates.length > 0}
     <div class="header" style="height: {headerHeight}px">
-      <div class="watermark">approval.vote/{data.path}</div>
       <canvas bind:this={qrCanvas} width="120" height="120" class="qr-code"></canvas>
-      <div class="jurisdiction">{report.info.jurisdictionName}</div>
-      {#if report.info.officeName !== report.info.jurisdictionName}
-        <div class="office">{report.info.officeName}</div>
-      {/if}
-      <div class="election">
-        {report.info.electionName} ({report.info.date.slice(0, 4)})
+      <div class="header-content">
+        <div class="brand">Approval.Vote</div>
+        <div class="election-info">
+          <div class="jurisdiction">{report.info.jurisdictionName}</div>
+          {#if report.info.officeName !== report.info.jurisdictionName}
+            <div class="office">{report.info.officeName}</div>
+          {/if}
+          <div class="election">
+            {report.info.electionName} ({report.info.date.slice(0, 4)})
+          </div>
+        </div>
       </div>
     </div>
     <div class="results">
@@ -84,7 +88,7 @@
 <style>
   .card {
     width: 1200px;
-    height: 600px;
+    height: 630px;
     background: white;
     position: relative;
     overflow: hidden;
@@ -95,12 +99,19 @@
 
   .header {
     padding: 1rem 2rem;
-    text-align: center;
     background: white;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    position: relative; /* Added to ensure proper watermark positioning */
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 2rem;
   }
 
   .results {
@@ -136,7 +147,7 @@
     display: flex;
     align-items: center;
     width: 100%;
-    padding: 0 2rem; /* Keep some padding for the text content */
+    padding: 0 2rem;
     color: #666;
   }
 
@@ -144,22 +155,53 @@
     color: #437527;
   }
 
+  .brand {
+    font-size: 3.5em;
+    font-weight: 800;
+    color: #437527;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
+    line-height: 1;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  .election-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    justify-content: center;
+    padding-left: 1rem;
+    border-left: 3px solid #437527;
+  }
+
   .jurisdiction {
-    font-size: 1.75em;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 0.25rem;
+    font-size: 1.9em;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 0.3rem;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
   }
 
   .office {
-    font-size: 1.25em;
-    color: #444;
-    margin-bottom: 0.25rem;
+    font-size: 1.35em;
+    font-weight: 500;
+    color: #2d2d2d;
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.01em;
+    line-height: 1.3;
   }
 
   .election {
-    font-size: 1.1em;
+    font-size: 1.15em;
+    font-weight: 400;
     color: #666;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    font-size: 0.95em;
+    opacity: 0.85;
   }
 
   .candidate-name {
@@ -185,16 +227,6 @@
     font-size: 0.7em;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-  }
-
-  .watermark {
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    font-size: 0.8rem;
-    color: #666;
-    opacity: 0.5;
-    font-style: italic;
   }
 
   .qr-code {

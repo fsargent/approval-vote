@@ -20,9 +20,8 @@
     content="approval voting, election results, voting systems, democracy, electoral reform"
   />
 
-  <!-- Open Graph defaults -->
+  <!-- Open Graph defaults (can be overridden by pages) -->
   <meta property="og:site_name" content="approval.vote" />
-  <meta property="og:type" content="website" />
   <meta property="og:logo" content="https://approval.vote/icons/icon-512x512.png" />
   <meta name="twitter:card" content="summary_large_image" />
 

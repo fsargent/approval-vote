@@ -30,6 +30,50 @@ async function generateCards() {
 
 	console.log(`Found ${reports.length} reports to process`);
 
+	// Generate index card first
+	console.log("\nGenerating index card...");
+	try {
+		const indexUrl = `http://localhost:5173/card/index`;
+		const indexOutputPath = `static/images/index.png`;
+		const indexOutputDir = path.dirname(indexOutputPath);
+
+		await fs.mkdir(indexOutputDir, { recursive: true });
+
+		const indexPage = await browser.newPage();
+		await indexPage.setDefaultTimeout(30000);
+		await indexPage.setViewport({
+			width: 1200,
+			height: 630,
+			deviceScaleFactor: 4,
+		});
+
+		console.log(`Loading index URL: ${indexUrl}`);
+		await indexPage.goto(indexUrl, {
+			waitUntil: "domcontentloaded",
+			timeout: 10000,
+		});
+
+		console.log("Waiting for .card element...");
+		await indexPage.waitForSelector(".card", { timeout: 5000 });
+
+		console.log("Taking screenshot...");
+		const indexElement = await indexPage.$(".card");
+		if (!indexElement) {
+			throw new Error("Card element not found");
+		}
+
+		await indexElement.screenshot({
+			path: indexOutputPath,
+			type: "png",
+			omitBackground: false,
+		});
+
+		console.log(`✓ Generated index card: ${indexOutputPath}`);
+		await indexPage.close();
+	} catch (error) {
+		console.error(`✗ Failed to generate index card:`, error.message);
+	}
+
 	let page = await browser.newPage();
 	await page.setDefaultTimeout(30000);
 	await page.setViewport({

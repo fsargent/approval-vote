@@ -40,25 +40,30 @@
   />
 
   <!-- Open Graph Tags -->
+  <meta property="og:type" content="website" />
   <meta
     property="og:title"
-    content="approval.vote: detailed reports on approval voting elections"
+    content="approval.vote: Detailed Reports and Analysis of Approval Voting Elections"
   />
   <meta
     property="og:description"
-    content="Explore detailed reports and analysis of approval voting elections. See how voters express their preferences when they can choose multiple candidates."
+    content="Explore comprehensive reports and analysis of approval voting elections from across the United States. See how voters express their preferences when they can choose multiple candidates, with detailed visualizations of vote counts, co-approval patterns, and voting distributions."
   />
   <meta property="og:url" content="https://approval.vote" />
-  <meta property="og:image" content="https://approval.vote/icons/icon-512x512.png" />
-  <meta property="og:logo" content="https://approval.vote/icons/icon-512x512.png" />
+  <meta property="og:image" content="https://approval.vote/images/index.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:type" content="image/png" />
 
   <!-- Twitter Tags -->
-  <meta name="twitter:title" content="approval.vote: Election Analysis" />
+  <meta name="twitter:title" content="approval.vote: Detailed Reports and Analysis of Approval Voting Elections" />
   <meta
     name="twitter:description"
-    content="Explore detailed reports and analysis of approval voting elections."
+    content="Explore comprehensive reports and analysis of approval voting elections from across the United States. See how voters express their preferences when they can choose multiple candidates."
   />
-  <meta name="twitter:image" content="https://approval.vote/icons/icon-512x512.png" />
+  <meta name="twitter:image" content="https://approval.vote/images/index.png" />
+  <meta name="twitter:image:width" content="1200" />
+  <meta name="twitter:image:height" content="630" />
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
