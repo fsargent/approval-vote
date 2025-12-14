@@ -7,6 +7,9 @@ This script:
 2. Creates CVR tables in main database (if needed)
 3. Exports CVR data with source='utah'
 4. Generates co-approval analysis and voting patterns
+
+After running this script, you can validate the results by running:
+    python3 test_utah_cvr.py
 """
 
 import json

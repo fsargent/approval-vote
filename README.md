@@ -11,47 +11,64 @@ Approval.Vote provides detailed reports and visualizations for Approval Voting e
 - **Voting Pattern Analysis**: Distribution of how many candidates voters approved
 - **Cast Vote Record Processing**: Tools to parse and analyze raw ballot data
 
-The site is built with SvelteKit and hosted on GitHub Pages.
+The site is built with SvelteKit, uses Bun as the JavaScript runtime, and is hosted on GitHub Pages.
 
 ## Development
 
 ### Prerequisites
 
 - [mise](https://mise.jdx.dev/) for environment management
+- [Bun](https://bun.sh/) JavaScript runtime
 - [trunk](https://trunk.io) for linting and formatting
 
 ### Setup
 
-1. Install mise and trunk:
+1. Install mise, Bun, and trunk:
 
    ```bash
    # macOS
    brew install mise trunk-io
+   curl -fsSL https://bun.sh/install | bash
 
-   # Other platforms: see mise.jdx.dev and trunk.io
+   # Other platforms: see mise.jdx.dev, bun.sh, and trunk.io
    ```
 
 2. Set up development environment:
 
    ```bash
-   mise install    # Installs Node.js 20
-   trunk install   # Installs linters and formatters
-   npm ci         # Installs dependencies
+   mise install    # Installs Node.js and Bun
+   trunk install   # Installs linters and formatters (Biome)
+   bun install     # Installs dependencies
    ```
 
 3. Start development server:
 
    ```bash
-   npm run dev
+   bun run dev
    ```
 
 ### Code Quality
 
-We use trunk.io for consistent code quality:
+We use trunk.io with Biome for consistent code quality:
 
 ```bash
-trunk check    # Run all linters
-trunk fmt      # Format all files
+trunk check    # Run Biome linter
+trunk fmt      # Format all files with Biome
+```
+
+Or use npm scripts:
+
+```bash
+bun run lint    # Run trunk check
+bun run format  # Format with Biome
+```
+
+### Testing
+
+Run the test suite:
+
+```bash
+bun test
 ```
 
 ## Building
@@ -59,8 +76,8 @@ trunk fmt      # Format all files
 Create a production build:
 
 ```bash
-npm run build    # Generate static site
-npm run preview  # Preview the production build
+bun run build    # Generate static site
+bun run preview  # Preview the production build
 ```
 
 ## Contributing Election Data
@@ -70,8 +87,13 @@ The election data is stored in `data.sqlite3`. There are two ways to add electio
 ### Manual Data Entry
 
 1. Fork this repository
-2. Add your election data to `load-report.js`
-3. Run the script to update `data.sqlite3`
+2. Add your election data to `scripts/load-report.js`
+3. Run the script to update `data.sqlite3`:
+
+   ```bash
+   bun scripts/load-report.js
+   ```
+
 4. Submit a pull request
 
 ### Cast Vote Record Processing

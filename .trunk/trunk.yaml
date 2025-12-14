@@ -4,7 +4,7 @@ cli:
 plugins:
   sources:
     - id: trunk
-      ref: v1.7.2
+      ref: v1.7.4
       uri: https://github.com/trunk-io/plugins
 lint:
   ignore:
@@ -13,23 +13,24 @@ lint:
         # Ignore data files
         - st-louis-cvr/data/**
   disabled:
+    - prettier
+    - eslint
     - trufflehog
     - checkov
     - gitleaks
   enabled:
-    - bandit@1.8.6
-    - black@25.1.0
-    - isort@6.0.1
-    - ruff@0.12.10
-    - eslint@9.34.0
+    - biome@2.3.8
+    - bandit@1.9.2
+    - black@25.12.0
+    - isort@7.0.0
+    - ruff@0.14.9
     - taplo@0.10.0
-    - osv-scanner@2.2.2
+    - osv-scanner@2.3.1
     - yamllint@1.37.1
-    - actionlint@1.7.7
+    - actionlint@1.7.9
     - git-diff-check
-    - markdownlint@0.45.0
+    - markdownlint@0.47.0
     - oxipng@9.1.5
-    - prettier@3.6.2
     - shellcheck@0.11.0
     - shfmt@3.6.0
 runtimes:

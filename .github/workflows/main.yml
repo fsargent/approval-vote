@@ -18,11 +18,10 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 🟢
-        uses: actions/setup-node@v4
+      - name: Setup Bun 🟡
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version-file: .nvmrc
-          cache: npm
+          bun-version: latest
 
       - name: Setup Chrome 🌐
         uses: browser-actions/setup-chrome@v1
@@ -31,9 +30,10 @@ jobs:
         id: setup-chrome
 
       - name: Install Dependencies 📦
-        run: |
-          npm ci
-          npm install -g wait-on
+        run: bun install
+
+      - name: Run Tests 🧪
+        run: bun test
 
       - name: Generate Cards and Build 🔧
         env:
@@ -42,15 +42,15 @@ jobs:
           # Copy database to static directory for Datasette Lite access
           cp data.sqlite3 static/data.sqlite3
           # Start the dev server in the background
-          npm run dev &
+          bun run dev &
           # Wait for dev server to be ready (timeout after 30 seconds)
-          wait-on -t 30000 http://localhost:5173
+          bunx wait-on -t 30000 http://localhost:5173
           # Generate card images
-          node scripts/generate-cards.js
+          bun scripts/generate-cards.js
           # Kill the dev server
           kill $(lsof -t -i:5173) || true
           # Build the site
-          npm run build
+          bun run build
 
       - name: Deploy 🚀
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

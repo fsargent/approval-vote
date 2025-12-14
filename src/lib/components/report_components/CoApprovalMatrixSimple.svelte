@@ -100,8 +100,16 @@
       {/each}
     </tr>
     {#each sortedCandidates() as candidateA, i}
+      {@const candidateVotes = votingPatterns?.candidateApprovalDistributions?.[candidateA] 
+        ? Object.values(votingPatterns.candidateApprovalDistributions[candidateA]).reduce((sum, count) => sum + Number(count), 0)
+        : null}
       <tr>
-        <td class="rowLabel">{candidateA}</td>
+        <td class="rowLabel">
+          <div>{candidateA}</div>
+          {#if candidateVotes !== null}
+            <div class="voter-count">({candidateVotes.toLocaleString()} voters)</div>
+          {/if}
+        </td>
         {#each sortedCandidates() as candidateB, j}
           {@const entry = matrixData().entries[i][j]}
           <td
@@ -142,6 +150,16 @@
     text-align: right;
   }
 
+  .rowLabel div {
+    margin: 0;
+  }
+
+  .voter-count {
+    font-size: 7pt;
+    color: #999;
+    margin-top: 2px;
+  }
+
   .entry {
     height: 40px;
     width: 40px;
@@ -158,6 +176,10 @@
       color: white;
       /* Dark mode: 0% = dark background (15%), 100% = theme green (50%) */
       background: hsl(99, 41%, calc(15% + (var(--frac, 0) / var(--max-frac, 1)) * 35%));
+    }
+
+    .voter-count {
+      color: #999;
     }
 
     .colsLabel,
