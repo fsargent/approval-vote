@@ -78,12 +78,12 @@ The election data is stored in `data.sqlite3`. There are two ways to add electio
 
 For elections with detailed ballot data:
 
-1. Use the `st-louis-cvr/` tools to parse CVR files into SQLite
+1. Use the `cvr/st-louis/` tools to parse CVR files into SQLite
 2. Generate co-approval matrices and voting pattern analysis
 3. Export the processed data to the main `data.sqlite3` database
 4. The website automatically displays the rich analysis features
 
-See the `st-louis-cvr/README.md` for detailed instructions.
+See the `cvr/st-louis/README.md` for detailed instructions.
 
 ## Deployment
 

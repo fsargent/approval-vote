@@ -14,7 +14,7 @@
 
 <svelte:head>
   <title
-    >approval.vote: {report.info.jurisdictionName} / {report.info.name} / {report.info.date.slice(
+    >approval.vote: {report.info.jurisdictionName} / {report.info.officeName} / {report.info.date.slice(
       0,
       4
     )}</title
@@ -24,11 +24,11 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@felixsargent" />
   <meta name="twitter:creator" content="@felixsargent" />
-  <meta name="twitter:title" content="{report.info.jurisdictionName} / {report.info.name}" />
+  <meta name="twitter:title" content="{report.info.jurisdictionName} / {report.info.officeName}" />
   <meta
     name="twitter:description"
     content="Detailed approval voting election results for {report.info.jurisdictionName} {report
-      .info.name} ({report.info.date.slice(0, 4)})"
+      .info.officeName} - {report.info.electionName} ({report.info.date.slice(0, 4)})"
   />
   <meta name="twitter:image" content="https://approval.vote/images/{path}.png" />
   <meta
@@ -39,11 +39,11 @@
   <!-- Open Graph Tags (also used by X) -->
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://approval.vote/report/{path}" />
-  <meta property="og:title" content="{report.info.jurisdictionName} / {report.info.name}" />
+  <meta property="og:title" content="{report.info.jurisdictionName} / {report.info.officeName}" />
   <meta
     property="og:description"
     content="Detailed approval voting election results for {report.info.jurisdictionName} {report
-      .info.name} ({report.info.date.slice(0, 4)})"
+      .info.officeName} - {report.info.electionName} ({report.info.date.slice(0, 4)})"
   />
   <meta property="og:image" content="https://approval.vote/images/{path}.png" />
 </svelte:head>

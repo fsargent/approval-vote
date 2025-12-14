@@ -39,6 +39,8 @@ jobs:
         env:
           CHROME_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
         run: |
+          # Copy database to static directory for Datasette Lite access
+          cp data.sqlite3 static/data.sqlite3
           # Start the dev server in the background
           npm run dev &
           # Wait for dev server to be ready (timeout after 30 seconds)

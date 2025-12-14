@@ -136,8 +136,9 @@ export function getIndex(): IReportIndex {
 }
 
 export function getReport(path: string): IContestReport {
-  let office = path.split('/').slice(-1);
-  path = path.split('/').slice(0, -1).join('/');
+  const pathParts = path.split('/');
+  const office = pathParts[pathParts.length - 1];
+  path = pathParts.slice(0, -1).join('/');
   const reportRow = db
     .prepare('SELECT * FROM reports WHERE path = ? AND office = ?')
     .get(path, office) as IContestReport;

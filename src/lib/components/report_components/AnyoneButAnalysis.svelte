@@ -39,27 +39,42 @@
   const chartData = $derived(() => {
     if (!votingPatterns?.anyoneButAnalysis) return null;
     
-    const totalExclusions = Object.values(votingPatterns.anyoneButAnalysis).reduce((sum, count) => sum + count, 0);
     const totalBallots = votingPatterns.totalBallots || 0;
+    
+    // Create data array and sort by exclusion count (descending)
+    const data = candidates.map(candidateName => {
+      const analysis = votingPatterns.anyoneButAnalysis![candidateName];
+      if (!analysis || typeof analysis === 'number') {
+        // Legacy format: just a number
+        const exclusionCount = typeof analysis === 'number' ? analysis : 0;
+        return {
+          name: candidateName,
+          exclusionCount,
+          exclusionRate: totalBallots > 0 ? (exclusionCount / totalBallots) * 100 : 0,
+          overallRate: totalBallots > 0 ? (exclusionCount / totalBallots) * 100 : 0
+        };
+      } else {
+        // New format: object with exclusionCount, exclusionRate, overallRate
+        return {
+          name: candidateName,
+          exclusionCount: analysis.exclusionCount || 0,
+          exclusionRate: (analysis.exclusionRate || 0) * 100, // Convert from decimal to percentage
+          overallRate: (analysis.overallRate || 0) * 100 // Convert from decimal to percentage
+        };
+      }
+    }).sort((a, b) => b.exclusionCount - a.exclusionCount);
+    
+    const totalExclusions = data.reduce((sum, item) => sum + item.exclusionCount, 0);
     
     if (totalExclusions === 0) return null;
     
-    // Create data array and sort by exclusion count (descending)
-    const data = candidates.map(candidateName => ({
-      name: candidateName,
-      exclusionCount: votingPatterns.anyoneButAnalysis![candidateName] || 0,
-      exclusionRate: totalExclusions > 0 ? ((votingPatterns.anyoneButAnalysis![candidateName] || 0) / totalExclusions) * 100 : 0,
-      overallRate: totalBallots > 0 ? ((votingPatterns.anyoneButAnalysis![candidateName] || 0) / totalBallots) * 100 : 0
-    })).sort((a, b) => b.exclusionCount - a.exclusionCount);
-    
-    const maxExclusions = Math.max(...data.map(d => d.exclusionCount));
-    const scale = (width - labelSpace - 50) / maxExclusions;
+    // Scale based on 100% of total ballots (same as VoteCounts)
+    const scale = (width - labelSpace - 50) / totalBallots;
     
     return {
       data,
       totalExclusions,
       totalBallots,
-      maxExclusions,
       scale
     };
   });
@@ -76,9 +91,28 @@
     <div class="chart-title">Anyone but...</div>
     <svg width="100%" viewBox={`0 0 ${width} ${height()}`}>
       <g transform={`translate(${labelSpace} 0)`}>
+        <!-- 100% reference line -->
+        <line
+          x1={data.scale * data.totalBallots}
+          y1={0}
+          x2={data.scale * data.totalBallots}
+          y2={height()}
+          stroke="#666"
+          stroke-width="1"
+          stroke-dasharray="2,2"
+          opacity="0.5"
+        />
         {#each data.data as candidate, i}
+          {@const tooltipContent = `<strong>${candidate.name}</strong><br/>
+              <strong>${candidate.exclusionCount.toLocaleString()}</strong> ballots excluded this candidate<br/>
+              ${candidate.overallRate.toFixed(1)}% of all ballots cast`}
           <g transform={`translate(0 ${outerHeight * (i + 0.5)})`}>
-            <text font-size="90%" text-anchor="end" dominant-baseline="middle">
+            <text
+              font-size="90%"
+              text-anchor="end"
+              dominant-baseline="middle"
+              use:tooltip={tooltipContent}
+            >
               {candidate.name}
             </text>
             <g transform={`translate(5 ${-innerHeight / 2 - 1})`}>
@@ -86,11 +120,11 @@
                 class="exclusions"
                 height={innerHeight}
                 width={data.scale * candidate.exclusionCount}
-                use:tooltip={`<strong>${candidate.name}</strong> was excluded by <strong>${candidate.exclusionCount.toLocaleString()}</strong> voters who approved all other candidates, ${candidate.overallRate.toFixed(1)}% of all ballots cast.`}
+                use:tooltip={tooltipContent}
               />
             </g>
             <text font-size="90%" dominant-baseline="middle" x={10 + data.scale * candidate.exclusionCount}>
-              {candidate.exclusionRate.toFixed(1)}%
+              {candidate.overallRate.toFixed(1)}%
             </text>
           </g>
         {/each}

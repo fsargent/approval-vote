@@ -57,4 +57,13 @@
       >comprehensive guide to approval voting</a
     >.
   </p>
+
+  <h2>Database Access</h2>
+
+  <p>
+    The election data is stored in a SQLite database. You can explore it using
+    <a href="{resolve('/data')}">Datasette Lite</a>, which runs entirely in your browser. The
+    database file is also available directly from
+    <a href="https://github.com/fsargent/approval-vote/blob/main/data.sqlite3">GitHub</a>.
+  </p>
 </div>
