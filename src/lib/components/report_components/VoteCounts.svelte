@@ -119,7 +119,14 @@
         class={candidate.winner === true ? '' : 'eliminated'}
         transform={`translate(0 ${outerHeight * (i + 0.5)})`}
       >
-        <text font-size="90%" text-anchor="end" dominant-baseline="middle">
+        <text 
+          font-size="90%" 
+          text-anchor="end" 
+          dominant-baseline="middle"
+          use:tooltip={`<strong>${candidate.name}</strong><br/>
+          <strong>${candidate.votes.toLocaleString()}</strong> total votes<br/>
+          ${((candidate.votes / ballotsCast) * 100).toFixed(1)}% of all ballots cast`}
+        >
           {candidate.name}
         </text>
         <g transform={`translate(5 ${-innerHeight / 2 - 1})`}>

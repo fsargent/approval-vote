@@ -12,8 +12,8 @@
   onMount(() => {
     const url = `https://approval.vote/report/${data.path}`;
     QRCode.toCanvas(qrCanvas, url, {
-      width: 48,
-      margin: 0,
+      width: 120,
+      margin: 1,
       color: {
         dark: '#666666',
         light: '#ffffff',
@@ -41,12 +41,12 @@
 <div class="card">
   {#if report?.info && candidates.length > 0}
     <div class="header" style="height: {headerHeight}px">
-      <div class="source-info">
-        <div class="watermark">approval.vote</div>
-        <canvas bind:this={qrCanvas} width="48" height="48"></canvas>
-      </div>
+      <div class="watermark">approval.vote/{data.path}</div>
+      <canvas bind:this={qrCanvas} width="120" height="120" class="qr-code"></canvas>
       <div class="jurisdiction">{report.info.jurisdictionName}</div>
-      <div class="office">{report.info.officeName}</div>
+      {#if report.info.officeName !== report.info.jurisdictionName}
+        <div class="office">{report.info.officeName}</div>
+      {/if}
       <div class="election">
         {report.info.electionName} ({report.info.date.slice(0, 4)})
       </div>
@@ -182,24 +182,20 @@
     letter-spacing: 0.05em;
   }
 
-  .source-info {
+  .watermark {
     position: absolute;
     top: 1rem;
-    right: 1rem;
-    display: flex;
-    flex-direction: column; /* Changed to column layout */
-    align-items: flex-end; /* Align items to the right */
-    gap: 0.25rem; /* Reduced gap for vertical layout */
-  }
-
-  .watermark {
+    left: 1rem;
     font-size: 0.8rem;
     color: #666;
     opacity: 0.5;
     font-style: italic;
   }
 
-  canvas {
+  .qr-code {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
     opacity: 0.5;
   }
 </style>
