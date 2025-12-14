@@ -4,12 +4,17 @@
   import QRCode from 'qrcode';
   import { onMount } from 'svelte';
 
-  export let data: PageData;
-  const report: IContestReport = data.report;
+  interface Props {
+    data: PageData;
+  }
 
-  let qrCanvas: HTMLCanvasElement;
+  let { data }: Props = $props();
+  const report = $derived(data.report);
+
+  let qrCanvas = $state<HTMLCanvasElement | undefined>(undefined);
 
   onMount(() => {
+    if (!qrCanvas) return;
     const url = `https://approval.vote/report/${data.path}`;
     QRCode.toCanvas(qrCanvas, url, {
       width: 120,
@@ -22,20 +27,20 @@
   });
 
   // Get all candidates and their approval percentages, sorted by votes
-  const candidates = report.candidates
+  const candidates = $derived(report.candidates
     .map((candidate) => ({
       name: candidate.name,
       percentage: ((candidate.votes / report.ballotCount) * 100).toFixed(1),
       votes: candidate.votes,
       winner: candidate.winner,
     }))
-    .sort((a, b) => b.votes - a.votes);
+    .sort((a, b) => b.votes - a.votes));
 
   // Calculate dynamic sizes based on number of candidates
-  $: headerHeight = Math.min(180, Math.max(120, 600 / (candidates.length + 2)));
-  $: rowHeight = (600 - headerHeight) / candidates.length;
+  const headerHeight = $derived(Math.min(180, Math.max(120, 600 / (candidates.length + 2))));
+  const rowHeight = $derived((600 - headerHeight) / candidates.length);
   // Adjusted font size calculation to be more generous in the middle range
-  $: fontSize = Math.min(2.5, Math.max(1, 8 / candidates.length));
+  const fontSize = $derived(Math.min(2.5, Math.max(1, 8 / candidates.length)));
 </script>
 
 <div class="card">

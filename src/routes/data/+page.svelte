@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
 
   let datasetteLoaded = $state(false);
-  let iframeRef: HTMLIFrameElement;
+  let iframeRef = $state<HTMLIFrameElement | undefined>(undefined);
 
   onMount(() => {
     // Datasette Lite loads asynchronously

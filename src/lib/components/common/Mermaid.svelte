@@ -1,10 +1,14 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  export let code: string | undefined;
+  interface Props {
+    code?: string;
+  }
 
-  let container: HTMLElement;
-  let mermaidLoaded = false;
+  let { code }: Props = $props();
+
+  let container = $state<HTMLElement | undefined>(undefined);
+  let mermaidLoaded = $state(false);
   let mermaid: any;
 
   async function loadMermaid() {
@@ -40,9 +44,11 @@
     render();
   });
 
-  $: if (code) {
-    render();
-  }
+  $effect(() => {
+    if (code) {
+      render();
+    }
+  });
 </script>
 
 {#if code}

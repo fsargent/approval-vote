@@ -1,9 +1,9 @@
-<script>
+<script lang="ts">
   import { resolve } from '$app/paths';
 
   // Interactive voting example state
   let fptpVote = $state('');
-  let approvalVotes = $state([]);
+  let approvalVotes = $state<string[]>([]);
 
   const candidates = [
     { id: 'alice', name: 'Alice Johnson', party: 'Progressive' },
@@ -12,7 +12,7 @@
     { id: 'diana', name: 'Diana Wilson', party: 'Moderate' },
   ];
 
-  function handleApprovalVote(candidateId) {
+  function handleApprovalVote(candidateId: string) {
     const index = approvalVotes.indexOf(candidateId);
     if (index > -1) {
       approvalVotes = approvalVotes.filter((id) => id !== candidateId);

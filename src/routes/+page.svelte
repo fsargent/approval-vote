@@ -7,10 +7,10 @@
   }
 
   let { data }: Props = $props();
-  let index = data.index;
+  const indexArray = $derived(Array.from(data.index));
 
   // Calculate total statistics (using reduce to avoid mutation warnings)
-  const stats = Array.from(index).reduce(
+  const stats = $derived(indexArray.reduce(
     (acc, [_, elections]) => {
       elections.forEach((election) => {
         election.contests.forEach((contest) => {
@@ -22,11 +22,14 @@
       return acc;
     },
     { totalRaces: 0, totalApprovals: 0, totalBallots: 0 }
-  );
+  ));
 
-  const { totalRaces, totalApprovals, totalBallots } = stats;
-  const avgApprovalsPerBallot =
-    totalBallots > 0 ? (totalApprovals / totalBallots).toFixed(1) : '0.0';
+  const totalRaces = $derived(stats.totalRaces);
+  const totalApprovals = $derived(stats.totalApprovals);
+  const totalBallots = $derived(stats.totalBallots);
+  const avgApprovalsPerBallot = $derived(
+    totalBallots > 0 ? (totalApprovals / totalBallots).toFixed(1) : '0.0'
+  );
 </script>
 
 <svelte:head>
@@ -47,6 +50,7 @@
   />
   <meta property="og:url" content="https://approval.vote" />
   <meta property="og:image" content="https://approval.vote/icons/icon-512x512.png" />
+  <meta property="og:logo" content="https://approval.vote/icons/icon-512x512.png" />
 
   <!-- Twitter Tags -->
   <meta name="twitter:title" content="approval.vote: Election Analysis" />
@@ -110,7 +114,7 @@
     </div>
 
     <div class="rightCol">
-      {#each [...index] as [year, elections]}
+      {#each indexArray as [year, elections]}
         <div class="yearSection">
           <h2>{year}</h2>
           <div class="electionSection">

@@ -8,8 +8,16 @@
   }
 
   let { data } = $props();
-  let report: IContestReport = data.report;
-  let path: string = data.path;
+  const report = $derived(data.report);
+  const path = $derived(data.path);
+  // Construct image path: images/{path}/{office}.png
+  // The path param includes both path and office, so we need to extract office
+  const imagePath = $derived.by(() => {
+    const pathParts = path.split('/');
+    const office = pathParts[pathParts.length - 1];
+    const basePath = pathParts.slice(0, -1).join('/');
+    return `https://approval.vote/images/${basePath}/${office}.png`;
+  });
 </script>
 
 <svelte:head>
@@ -30,7 +38,7 @@
     content="Detailed approval voting election results for {report.info.jurisdictionName} {report
       .info.officeName} - {report.info.electionName} ({report.info.date.slice(0, 4)})"
   />
-  <meta name="twitter:image" content="https://approval.vote/images/{path}.png" />
+  <meta name="twitter:image" content={imagePath} />
   <meta
     name="twitter:image:alt"
     content="Election results visualization showing approval voting outcomes"
@@ -45,7 +53,8 @@
     content="Detailed approval voting election results for {report.info.jurisdictionName} {report
       .info.officeName} - {report.info.electionName} ({report.info.date.slice(0, 4)})"
   />
-  <meta property="og:image" content="https://approval.vote/images/{path}.png" />
+  <meta property="og:image" content={imagePath} />
+  <meta property="og:logo" content="https://approval.vote/icons/icon-512x512.png" />
 </svelte:head>
 
 <div class="wide container">
@@ -58,7 +67,7 @@
       <a href="https://creativecommons.org/licenses/by/2.0/">CC-BY</a>. Learn more
       <a href="{resolve('/about')}">about approval.vote</a>.
       <span style="margin-left: 1em;">
-        <a href="{resolve(`/images/${path}.png`)}">View card image →</a>
+        <a href={imagePath.replace('https://approval.vote', '')}>View card image →</a>
       </span>
     </p>
   </div>

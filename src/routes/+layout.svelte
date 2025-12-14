@@ -1,10 +1,5 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
-  interface Props {
-    children?: import('svelte').Snippet;
-  }
-
-  let { children }: Props = $props();
 </script>
 
 <svelte:head>
@@ -28,6 +23,7 @@
   <!-- Open Graph defaults -->
   <meta property="og:site_name" content="approval.vote" />
   <meta property="og:type" content="website" />
+  <meta property="og:logo" content="https://approval.vote/icons/icon-512x512.png" />
   <meta name="twitter:card" content="summary_large_image" />
 
   <!-- Analytics -->
@@ -38,5 +34,5 @@
   ></script>
 </svelte:head>
 <main>
-  {@render children?.()}
+  <slot />
 </main>

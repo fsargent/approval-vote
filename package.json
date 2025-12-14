@@ -4,7 +4,8 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"dev": "bun vite dev",
+		"dev": "node node_modules/vite/bin/vite.js dev",
+		"dev:bun": "bun vite dev",
 		"build": "bun vite build",
 		"preview": "bun vite preview",
 		"start": "bun --bun __vite__/build",
@@ -14,6 +15,8 @@
 		"lint": "trunk check",
 		"format": "biome format --write .",
 		"svelte-check": "svelte-check",
+		"generate-images": "bun scripts/generate-cards.js",
+		"generate-images:with-server": "node scripts/generate-images-with-server.js",
 		"postbuild": "bunx svelte-sitemap --domain https://approval.vote"
 	},
 	"dependencies": {

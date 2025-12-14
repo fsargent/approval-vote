@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
   import { resolve } from '$app/paths';
 
   // Carousel state
-  let currentSlide = 0;
+  let currentSlide = $state(0);
   const totalSlides = 6; // 5 rounds + 1 final results
 
   function nextSlide() {
@@ -13,7 +13,7 @@
     currentSlide = currentSlide === 0 ? totalSlides - 1 : currentSlide - 1;
   }
 
-  function goToSlide(index) {
+  function goToSlide(index: number) {
     currentSlide = index;
   }
 </script>
@@ -209,7 +209,7 @@
     <div class="carousel-container">
       <!-- Carousel Navigation -->
       <div class="carousel-nav">
-        <button class="nav-btn prev" on:click={prevSlide} disabled={currentSlide === 0}>
+        <button class="nav-btn prev" onclick={prevSlide} disabled={currentSlide === 0}>
           ← Previous
         </button>
 
@@ -217,7 +217,7 @@
           {#each Array(totalSlides) as _, index}
             <button
               class="indicator {currentSlide === index ? 'active' : ''}"
-              on:click={() => goToSlide(index)}
+              onclick={() => goToSlide(index)}
             >
               {index + 1}
             </button>
@@ -226,7 +226,7 @@
 
         <button
           class="nav-btn next"
-          on:click={nextSlide}
+          onclick={nextSlide}
           disabled={currentSlide === totalSlides - 1}
         >
           Next →

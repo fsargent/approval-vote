@@ -53,9 +53,9 @@
     return `${months[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}`;
   }
 
-  const sumVotes = report.candidates.map((candidate) => candidate.votes).reduce((a, b) => a + b);
+  const sumVotes = $derived(report.candidates.map((candidate) => candidate.votes).reduce((a, b) => a + b));
 
-  const numCandidates = report.candidates.filter((candidate) => !candidate.writeIn).length;
+  const numCandidates = $derived(report.candidates.filter((candidate) => !candidate.writeIn).length);
 </script>
 
 <div class="row">

@@ -33,13 +33,13 @@
   const width = 600;
 
   // Sort candidates by votes in descending order
-  const candidates: ICandidate[] = [...report.candidates].sort((a, b) => b.votes - a.votes);
+  const candidates = $derived([...report.candidates].sort((a, b) => b.votes - a.votes));
 
-  const ballotsCast: number = report.ballotCount;
+  const ballotsCast = $derived(report.ballotCount);
   // Scale based on 100% of ballots cast (theoretical maximum in approval voting)
-  const scale = (width - labelSpace - 50) / ballotsCast;
+  const scale = $derived((width - labelSpace - 50) / ballotsCast);
 
-  const height = outerHeight * candidates.length;
+  const height = $derived(outerHeight * candidates.length);
 
   // Color scheme for different approval counts (lighter for more approvals, starting with theme base)
   const approvalColors = {

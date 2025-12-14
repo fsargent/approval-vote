@@ -47,6 +47,8 @@ The site is built with SvelteKit, uses Bun as the JavaScript runtime, and is hos
    bun run dev
    ```
 
+   Note: The dev server uses Node.js (via `node`) to avoid Bun compatibility issues with Svelte 5 hydration. Bun is still used for builds, tests, and other scripts.
+
 ### Code Quality
 
 We use trunk.io with Biome for consistent code quality:
