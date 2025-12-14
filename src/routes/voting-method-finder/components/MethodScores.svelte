@@ -7,13 +7,18 @@
     representation: number;
   };
 
-  export let scores: Scores;
-  export let activeTooltip: string | null = null;
-  export let onToggle: (id: string) => void;
+  interface Props {
+    scores: Scores;
+    activeTooltip: string | null;
+    onToggle: (id: string) => void;
+  }
+
+  let { scores, activeTooltip, onToggle }: Props = $props();
 </script>
 
 <div class="method-scores">
   <h3>System Analysis</h3>
+  <p style="font-size: 0.75rem; color: #666;">Debug: activeTooltip = "{activeTooltip}"</p>
   <div class="score-grid">
     <div class="score-item">
       <div class="score-bar-container">

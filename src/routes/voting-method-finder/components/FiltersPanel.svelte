@@ -1,20 +1,35 @@
 <script lang="ts">
   import { ballotTypes, limitedChoicesOptions } from '$lib/voting/finder-utils';
 
-  export let electionFacet: string[] = [];
-  export let ballotFacetSelections: string[] = [];
-  export let choiceFacetSelections: string[] = [];
-  export let partyFacetSelections: string[] = [];
-  export let inUseOnly: boolean = false;
+  interface Props {
+    electionFacet: string[];
+    ballotFacetSelections: string[];
+    choiceFacetSelections: string[];
+    partyFacetSelections: string[];
+    inUseOnly: boolean;
+    updateElectionFacet: (v: string[]) => void;
+    updateBallotFacetSelections: (v: string[]) => void;
+    updateChoiceFacetSelections: (v: string[]) => void;
+    updatePartyFacetSelections: (v: string[]) => void;
+    setInUseOnly: (v: boolean) => void;
+    activeTooltip: string | null;
+    toggleTooltip: (id: string) => void;
+  }
 
-  export let updateElectionFacet: (v: string[]) => void;
-  export let updateBallotFacetSelections: (v: string[]) => void;
-  export let updateChoiceFacetSelections: (v: string[]) => void;
-  export let updatePartyFacetSelections: (v: string[]) => void;
-  export let setInUseOnly: (v: boolean) => void;
-
-  export let activeTooltip: string | null = null;
-  export let toggleTooltip: (id: string) => void;
+  let {
+    electionFacet,
+    ballotFacetSelections,
+    choiceFacetSelections,
+    partyFacetSelections,
+    inUseOnly,
+    updateElectionFacet,
+    updateBallotFacetSelections,
+    updateChoiceFacetSelections,
+    updatePartyFacetSelections,
+    setInUseOnly,
+    activeTooltip,
+    toggleTooltip
+  }: Props = $props();
 
   function toggleSelection(list: string[], value: string): string[] {
     return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];

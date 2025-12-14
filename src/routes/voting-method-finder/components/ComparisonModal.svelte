@@ -1,12 +1,16 @@
 <script lang="ts">
   import type { VotingMethod } from '$lib/types/voting';
 
-  export let visible: boolean = false;
-  export let methods: string[] = [];
-  export let methodData: Record<string, VotingMethod> = {};
-  export let currentId: string | null = null;
-  export let onClose: () => void;
-  export let onSwitch: (id: string) => void;
+  interface Props {
+    visible: boolean;
+    methods: string[];
+    methodData: Record<string, VotingMethod>;
+    currentId: string | null;
+    onClose: () => void;
+    onSwitch: (id: string) => void;
+  }
+
+  let { visible, methods, methodData, currentId, onClose, onSwitch }: Props = $props();
 </script>
 
 {#if visible}

@@ -616,8 +616,8 @@
         {#if config.ballotType && config.tabulationMethod}
           <MethodScores
             scores={votingMethodScores}
-            {activeTooltip}
-            onToggle={(id) => toggleTooltip(id)}
+            activeTooltip={activeTooltip}
+            onToggle={toggleTooltip}
           />
         {/if}
 
