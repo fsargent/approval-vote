@@ -23,7 +23,7 @@
 		"puppeteer": "^24.33.0",
 		"qrcode": "^1.5.4",
 		"tippy.js": "^6.3.7",
-		"vite": "^7.2.7"
+		"vite": "^7.1.11"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "7.0.0",
