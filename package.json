@@ -23,7 +23,7 @@
 		"@sveltejs/adapter-static": "^3.0.10",
 		"better-sqlite3": "^12.5.0",
 		"mermaid": "^11.12.2",
-		"puppeteer": "^24.34.0",
+		"puppeteer": "^24.35.0",
 		"qrcode": "^1.5.4",
 		"tippy.js": "^6.3.7",
 		"vite": "^7.3.0"
